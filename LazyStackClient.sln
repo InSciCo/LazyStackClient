@@ -1,0 +1,111 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Annotations", "LazyStack.Annotations\LazyStack.Annotations.csproj", "{A2A5D963-AC9B-42DC-B28C-007ED6E421EF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Auth", "LazyStack.Auth\LazyStack.Auth.csproj", "{75A862C7-7D35-445C-A89E-F49000C039D7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.AwsSettings", "LazyStack.AwsSettings\LazyStack.AwsSettings.csproj", "{92854D63-BF9B-4D57-A1CC-26DF77B0E8EF}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LazyStack.AwsSettingsSharedCode", "LazyStack.AwsSettingsSharedCode\LazyStack.AwsSettingsSharedCode.shproj", "{36169D4F-FBD9-442A-97AD-6D763D8AA9D2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Base", "LazyStack.Base\LazyStack.Base.csproj", "{599D4DEF-A04D-4DD2-A3BC-BEA46E802147}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Blazor", "LazyStack.Blazor\LazyStack.Blazor.csproj", "{8D0527CB-7399-42D0-AF9B-9C3ED29323C5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.CognitoValidation", "LazyStack.CognitoValidation\LazyStack.CognitoValidation.csproj", "{F6030AAD-1BD6-4979-A18F-B46C25246DE9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.GetAwsSettings", "LazyStack.GetAwsSettings\LazyStack.GetAwsSettings.csproj", "{2CDCC465-CE33-4203-9F7F-7E6584DB4C86}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1B69CA48-CBB7-4EB7-B034-F3BE7D8220D2}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Packages.props = Directory.Packages.props
+		PackageVersions.props = PackageVersions.props
+	EndProjectSection
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LazyStack.Notifciations.SharedSDK", "LazyStack.NotifciationsSharedSDK\LazyStack.Notifciations.SharedSDK.shproj", "{764DFBAD-2799-4C2F-9061-6CA377816A5F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Notifications.ViewModels", "LazyStack.Notifications.ViewModels\LazyStack.Notifications.ViewModels.csproj", "{7EC50523-A053-40B5-8C6B-0656CD4327C9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Utils", "LazyStack.Utils\LazyStack.Utils.csproj", "{E74F641E-7B50-48BA-8B31-040483690B01}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.ViewModels", "LazyStack.ViewModels\LazyStack.ViewModels.csproj", "{12677965-F4C1-452A-A5A1-D635F11B9C98}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LazyStackShared", "LazyStackShared", "{D15965DC-8951-4663-BAE1-14EF3D6E3335}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Notifications.Schema", "..\LazyStackShared\LazyStack.Notifications.Schema\LazyStack.Notifications.Schema.csproj", "{6F921CF6-3E57-490F-93F1-DA270B8CB8AA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.BlazoriseComponents", "LazyStack.Blazorise\LazyStack.BlazoriseComponents.csproj", "{08E9655D-1121-4EB4-87CB-3CBEF8EBA65A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2A5D963-AC9B-42DC-B28C-007ED6E421EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2A5D963-AC9B-42DC-B28C-007ED6E421EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2A5D963-AC9B-42DC-B28C-007ED6E421EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2A5D963-AC9B-42DC-B28C-007ED6E421EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75A862C7-7D35-445C-A89E-F49000C039D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75A862C7-7D35-445C-A89E-F49000C039D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75A862C7-7D35-445C-A89E-F49000C039D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75A862C7-7D35-445C-A89E-F49000C039D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92854D63-BF9B-4D57-A1CC-26DF77B0E8EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92854D63-BF9B-4D57-A1CC-26DF77B0E8EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92854D63-BF9B-4D57-A1CC-26DF77B0E8EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92854D63-BF9B-4D57-A1CC-26DF77B0E8EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{599D4DEF-A04D-4DD2-A3BC-BEA46E802147}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{599D4DEF-A04D-4DD2-A3BC-BEA46E802147}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{599D4DEF-A04D-4DD2-A3BC-BEA46E802147}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{599D4DEF-A04D-4DD2-A3BC-BEA46E802147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D0527CB-7399-42D0-AF9B-9C3ED29323C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D0527CB-7399-42D0-AF9B-9C3ED29323C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D0527CB-7399-42D0-AF9B-9C3ED29323C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D0527CB-7399-42D0-AF9B-9C3ED29323C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6030AAD-1BD6-4979-A18F-B46C25246DE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6030AAD-1BD6-4979-A18F-B46C25246DE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6030AAD-1BD6-4979-A18F-B46C25246DE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6030AAD-1BD6-4979-A18F-B46C25246DE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CDCC465-CE33-4203-9F7F-7E6584DB4C86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CDCC465-CE33-4203-9F7F-7E6584DB4C86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CDCC465-CE33-4203-9F7F-7E6584DB4C86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CDCC465-CE33-4203-9F7F-7E6584DB4C86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EC50523-A053-40B5-8C6B-0656CD4327C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EC50523-A053-40B5-8C6B-0656CD4327C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EC50523-A053-40B5-8C6B-0656CD4327C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EC50523-A053-40B5-8C6B-0656CD4327C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E74F641E-7B50-48BA-8B31-040483690B01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E74F641E-7B50-48BA-8B31-040483690B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E74F641E-7B50-48BA-8B31-040483690B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E74F641E-7B50-48BA-8B31-040483690B01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12677965-F4C1-452A-A5A1-D635F11B9C98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12677965-F4C1-452A-A5A1-D635F11B9C98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12677965-F4C1-452A-A5A1-D635F11B9C98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12677965-F4C1-452A-A5A1-D635F11B9C98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F921CF6-3E57-490F-93F1-DA270B8CB8AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F921CF6-3E57-490F-93F1-DA270B8CB8AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F921CF6-3E57-490F-93F1-DA270B8CB8AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F921CF6-3E57-490F-93F1-DA270B8CB8AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08E9655D-1121-4EB4-87CB-3CBEF8EBA65A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08E9655D-1121-4EB4-87CB-3CBEF8EBA65A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08E9655D-1121-4EB4-87CB-3CBEF8EBA65A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08E9655D-1121-4EB4-87CB-3CBEF8EBA65A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6F921CF6-3E57-490F-93F1-DA270B8CB8AA} = {D15965DC-8951-4663-BAE1-14EF3D6E3335}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F515946-359D-4F5A-8F0C-AF7D8F422303}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		LazyStack.AwsSettingsSharedCode\LazyStack.AwsSettingsSharedCode.projitems*{36169d4f-fbd9-442a-97ad-6d763d8aa9d2}*SharedItemsImports = 13
+		LazyStack.NotifciationsSharedSDK\LazyStackNotifciationsSharedSDK.projitems*{764dfbad-2799-4c2f-9061-6ca377816a5f}*SharedItemsImports = 13
+		LazyStack.AwsSettingsSharedCode\LazyStack.AwsSettingsSharedCode.projitems*{92854d63-bf9b-4d57-a1cc-26df77b0e8ef}*SharedItemsImports = 5
+	EndGlobalSection
+EndGlobal

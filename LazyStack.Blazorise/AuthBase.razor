@@ -1,0 +1,230 @@
+﻿@namespace LazyStack.BlazoriseComponents
+@inherits CoreComponentBasePassViewModel<IAuthProcess>
+
+@if (ViewModel != null)
+{
+    <Div>
+        @if (ViewModel.CurrentChallengeIsLogin)
+        {
+            <Field>
+                <FieldLabel>@Msg("AuthComponent_LoginLabel")</FieldLabel>
+                <TextEdit @bind-Text="@ViewModel.Login"
+                  Class="@fieldClass"
+                  Style="@fieldStyle"
+                  Immediate="false"
+                  Autofocus="true"
+                  KeyUp="Verify" />
+                <FieldHelp>@Msg(@ViewModel.LoginFormatMessage)</FieldHelp>
+            </Field>
+        }
+
+        @if (ViewModel.CurrentChallengeIsNewLogin)
+        {
+            <Field>
+                <FieldLabel>@Msg("AuthComponent_NewLoginLabel")</FieldLabel>
+                <TextEdit @bind-Text="@ViewModel.NewLogin"
+                  Class="@fieldClass"
+                  Style="@fieldStyle"
+                  Immediate="false"
+                  Autofocus="true"
+                  KeyUp="Verify" />
+                <FieldHelp>@Msg(ViewModel.NewLoginFormatMessage)</FieldHelp>
+            </Field>
+        }
+
+        @if (ViewModel.CurrentChallengeIsPassword)
+        {
+            <Field>
+                <FieldLabel>@Msg("AuthComponent_PasswordLabel")</FieldLabel>
+                <TextEdit @bind-Text="@ViewModel.Password"
+                  Class="@fieldClass"
+                  Style="@fieldStyle"
+                  Immediate="false"
+                  Autofocus="true"
+                  Role="TextRole.Password"
+                  KeyUp="Verify" />
+                <FieldHelp>@Msg(ViewModel.PasswordFormatMessage)</FieldHelp>
+            </Field>
+        }
+
+        @if (ViewModel.CurrentChallengeIsNewPassword)
+        {
+            <Field>
+                <FieldLabel>@Msg("AuthComponent_NewPasswordLabel")</FieldLabel>
+                <TextEdit @bind-Text="@ViewModel.NewPassword"
+                  Class="@fieldClass"
+                  Style="@fieldStyle"
+                  Immediate="false"
+                  Autofocus="true"
+                  Role="TextRole.Password"
+                  KeyUp="Verify" />
+                <FieldHelp>@Msg(ViewModel.NewPasswordFormatMessage)</FieldHelp>
+            </Field>
+        }
+
+        @if (ViewModel.CurrentChallengeIsEmail)
+        {
+            <Field>
+                <FieldLabel>@Msg("AuthComponent_EmailLabel")</FieldLabel>
+                <TextEdit @bind-Text="@ViewModel.Email"
+                  Class="@fieldClass"
+                  Style="@fieldStyle"
+                  Immediate="false"
+                  Autofocus="true"
+                  Role="TextRole.Email"
+                  KeyUp="Verify" />
+                <FieldHelp>@Msg(ViewModel.EmailFormatMessage)</FieldHelp>
+            </Field>
+        }
+
+        @if (ViewModel.CurrentChallengeIsNewEmail)
+        {
+            <Field>
+                <FieldLabel>@Msg("AuthComponent_NewEmailLabel")</FieldLabel>
+                <TextEdit @bind-Text="@ViewModel.NewEmail"
+                  Class="@fieldClass"
+                  Style="@fieldStyle"
+                  Immediate="false"
+                  Autofocus="true"
+                  Role="TextRole.Email"
+                  KeyUp="Verify" />
+                <FieldHelp>@Msg(ViewModel.NewEmailFormatMessage)</FieldHelp>
+            </Field>
+        }
+
+        @if (ViewModel.CurrentChallengeIsPhone)
+        {
+            <Field>
+                <FieldLabel>@Msg("AuthComponent_PhoneLabel")</FieldLabel>
+                <TextEdit @bind-Text="@ViewModel.Phone"
+                  Class="@fieldClass"
+                  Style="@fieldStyle"
+                  Immediate="false"
+                  Autofocus="true"
+                  KeyUp="Verify" />
+                <FieldHelp>@ViewModel.PhoneFormatMessage</FieldHelp>
+            </Field>
+        }
+
+        @if (ViewModel.CurrentChallengeIsNewPhone)
+        {
+            <Field>
+                <FieldLabel>@Msg("AuthComponent_NewPhoneLabel")</FieldLabel>
+                <TextEdit @bind-Text="@ViewModel.NewPhone"
+                  Class="@fieldClass"
+                  Style="@fieldStyle"
+                  Immediate="false"
+                  Autofocus="true"
+                  KeyUp="Verify" />
+                <FieldHelp>@Msg(ViewModel.NewPhoneFormatMessage)</FieldHelp>
+            </Field>
+        }
+
+        @if (ViewModel.CurrentChallengeIsCode)
+        {
+            <Field>
+                <FieldLabel>@Msg("AuthComponent_CodeLabel")</FieldLabel>
+                <TextEdit @bind-Text="@ViewModel.Code"
+                  Class="@fieldClass"
+                  Style="@fieldStyle"
+                  Immediate="false"
+                  Autofocus="true"
+                  KeyUp="Verify" />
+                <FieldHelp>@Msg(ViewModel.CodeFormatMessage)</FieldHelp>
+            </Field>
+        }
+
+    </Div>
+    <Div Flex="Flex.Column">
+        @if (ViewModel.CanSignIn)
+        {
+            <Button Class="@btnClass" Color="@btnColor" Style="@btnStyle" Clicked="@(async() => await ViewModel.StartSignInAsync())">@Msg("AuthComponent_SignIn")</Button>
+        }
+        @if (ViewModel.CanSignUp)
+        {
+            <Button Class="@btnClass" Color="@btnColor" Style="@btnStyle" Clicked="@(async()=>await ViewModel.StartSignUpAsync())">@Msg("AuthComponent_SignUp")</Button>
+        }
+        @if (ViewModel.CanResetPassword)
+        {
+            <Button Class="@btnClass" Color="@btnColor" Style="@btnStyle" Clicked="@(async()=>await ViewModel.StartResetPasswordAsync())">@Msg("AuthComponent_ResetPassword")</Button>
+        }
+        @if (ViewModel.CanUpdateEmail)
+        {
+            <Button Class="@btnClass" Color="@btnColor" Style="@btnStyle" Clicked="@(async()=>await ViewModel.StartUpdateEmailAsync())">@Msg("AuthComponent_UpdateEmail")</Button>
+        }
+        @if (ViewModel.CanUpdatePassword)
+        {
+            <Button Class="@btnClass" Color="@btnColor" Style="@btnStyle" Clicked="@(async()=>await ViewModel.StartUpdatePasswordAsync())">@Msg("AuthComponent_UpdatePassword")</Button>
+        }
+        @if (ViewModel.CanUpdatePhone)
+        {
+            <Button Class="@btnClass" Color="@btnColor" Style="@btnStyle" Clicked="@(async()=>await ViewModel.StartUpdatePhoneAsync())">@Msg("AuthComponent_UpdatePhone")</Button>
+        }
+        @if (ViewModel.CanSignOut)
+        {
+            <Button Class="@btnClass" Color="@btnColor" Style="@btnStyle" Clicked="@(async() => await ViewModel.SignOutAsync())">@Msg("AuthComponent_SignOut")</Button>
+        }
+        @if (ViewModel.CanResendCode)
+        {
+            <Button Class="@btnClass" Color="@btnColor" Style="@btnStyle" Clicked="@(async()=>await ViewModel.ResendCodeAsync())">@Msg("AuthComponent_ResendCode")</Button>
+        }
+        @if (ViewModel.CanCancel)
+        {
+            <Button Class="@btnClass"
+            Color="@btnColor"
+            Style="@btnStyle"
+            Clicked="@(async()=> 
+                { 
+                    await ViewModel.CancelAsync();
+                })"
+            Disabled="@cancelButtonDisabled">
+                @Msg("AuthComponent_Cancel")
+            </Button>
+        }
+
+        @if (ViewModel.CanCancel)
+        {
+            <Button Class="@btnClass"
+            Color="@btnColor"
+            Style="@btnStyle"
+            Clicked="@VerifyNoArg">
+                @Msg("AuthComponent_Next")
+            </Button>
+
+        }
+    </Div>
+}
+
+@code {
+    private Color btnColor = Color.Secondary;
+    //private string btnClass = "m-2 col-6 col-sm-4 col-md-2 col-lg-2 col-xl-2 col-xxl-1";
+    //private string fieldClass = "m-2 col-10 col-sm-8 col-md-6 col-lg-4 col-xl-3 col-xxl-2";
+    private string btnClass = "m-1"; 
+    private string fieldClass = "";
+    private string btnStyle = "width:10rem";
+    private string fieldStyle = "";
+    private int renderCount = 0;
+    private bool cancelButtonDisabled = false;
+    const KeyboardEventArgs emptyKeyboardEventArgs = null;
+
+    protected override async Task OnInitializedAsync() 
+    {
+        //ViewModel.AssignFieldOnCheck = true;
+        ViewModel!.IsChatty = true;
+        await base.OnInitializedAsync();
+    }
+
+    protected async Task VerifyNoArg()
+    {
+        await ViewModel!.Verify();
+    }
+
+    protected async Task Verify(KeyboardEventArgs e)
+    {
+        if (e == null || e.Key == "Enter")
+        {
+            await ViewModel!.Verify();
+        }
+    }
+    
+}

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\PackageVersions.props"/>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Copyright>Copyright (c) 2021,2022 Insight Sciences Corporation. All rights reserved.</Copyright>
+		<Description>Utility library - used by LazyStackAuth and LazyStack.GetAwsSettings projects</Description>
+		<Authors>Tim May, Thomas May</Authors>
+		<Company>Insight Sciences Corporation</Company>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageProjectUrl>https://lazystack.io</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/InSciCo/LazyStack</RepositoryUrl>
+		<RepositoryType>GitHub</RepositoryType>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AWSSDK.CloudFormation"/>
+		<PackageReference Include="AWSSDK.SecurityToken"/>
+		<PackageReference Include="Newtonsoft.Json"/>
+		<PackageReference Include="YamlDotNet"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LazyStack.Base\LazyStack.Base.csproj" />
+	</ItemGroup>
+
+	<Import Project="..\LazyStack.AwsSettingsSharedCode\LazyStack.AwsSettingsSharedCode.projitems" Label="Shared" />
+
+</Project>
