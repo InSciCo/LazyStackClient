@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Configuration;
-using System.Net.Mail;
-
-namespace LazyStack.Auth;
+﻿namespace LazyStack.Auth;
 
 public class EmailFormat : IEmailFormat
 {

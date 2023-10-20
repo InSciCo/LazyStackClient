@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using Microsoft.Extensions.Configuration;
-
-using MailKit;
-using MailKit.Net.Imap;
-using MailKit.Search;
-
-namespace LazyStack.Auth;
+﻿namespace LazyStack.Auth;
 
 /// <summary>
 /// Opens your email account and retrieves authorization codes sent to that 

@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-using Amazon.Auth.AccessControlPolicy;
-using Amazon.Runtime;
-using LazyStack.AwsSettings;
-using LazyStack.Base;
-using Newtonsoft.Json.Linq;
-
-namespace LazyStack.Auth;
+﻿namespace LazyStack.Auth;
 
 /// <summary>
 /// This ILzHttpClient supports calling Local, CloudFront or ApiGateway endpoints.

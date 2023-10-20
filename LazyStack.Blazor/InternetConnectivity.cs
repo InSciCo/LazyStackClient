@@ -17,7 +17,7 @@ public class InternetConnectivity : NotifyBase, IInternetConnectivitySvc, IDispo
             "import", "./_content/LazyStack.Blazor/internetConnectivity.js").AsTask());
     }
     private readonly Lazy<Task<IJSObjectReference>> moduleTask;
-    private bool isOnline; 
+    private bool isOnline;  
     public bool IsOnline { 
         get => isOnline;  
         private set => SetProperty(ref isOnline, value);

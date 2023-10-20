@@ -1,22 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Threading.Tasks;
 
-using Microsoft.Extensions.Configuration;
- 
-using Amazon;
-using Amazon.CognitoIdentity;
-using Amazon.CognitoIdentityProvider;
-using Amazon.CognitoIdentityProvider.Model;
-using Amazon.Extensions.CognitoAuthentication;
-using Amazon.Runtime;
-using Newtonsoft.Json.Linq;
-using System.Collections;
-using LazyStack.Base;
-using LazyStack.Auth;
 
 /// <summary> 
 /// AWS Authentication and Authorization Strategy

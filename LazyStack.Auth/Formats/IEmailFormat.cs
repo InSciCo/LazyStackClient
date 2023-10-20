@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace LazyStack.Auth;
+﻿namespace LazyStack.Auth;
 
 public interface IEmailFormat
 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LazyStack.Auth;
+﻿namespace LazyStack.Auth;
 
 public class Creds
 {

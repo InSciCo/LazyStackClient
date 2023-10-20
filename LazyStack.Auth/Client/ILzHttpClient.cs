@@ -1,9 +1,3 @@
-using System;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
-
 namespace LazyStack.Auth;
 
 // This interface surfaces only those HttpClient members actually

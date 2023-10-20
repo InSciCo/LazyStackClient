@@ -1,12 +1,4 @@
-﻿using System.IO;
-using System.Reflection;
-
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-
-using LazyStack.Utils;
-
-namespace LazyStack.Auth
+﻿namespace LazyStack.Auth
 {
     public static class ConfigureLazyStackAuth
     {
@@ -19,15 +11,15 @@ namespace LazyStack.Auth
             // base url can be captured. MAUI programs are not loaded from a URL so they 
             // read their API params from a configuration file specific to the client build,
             // see the RunConfig class.
-            services.TryAddSingleton<ILzHttpClient, LzHttpClient>();
-            services.TryAddSingleton<IAuthProcess, AuthProcess>();
-            services.TryAddSingleton<IAuthProviderCognito, AuthProviderCognito>();
-            services.TryAddSingleton<ILoginFormat, LoginFormat>();
-            services.TryAddSingleton<IEmailFormat, EmailFormat>();
-            services.TryAddSingleton<IPhoneFormat, PhoneFormat>();
-            services.TryAddSingleton<ICodeFormat, CodeFormat>();
-            services.TryAddSingleton<IAuthProcess, AuthProcess>();
-            services.TryAddSingleton<IPasswordFormat, PasswordFormat>();
+            services.TryAddTransient<ILzHttpClient, LzHttpClient>();
+            services.TryAddTransient<IAuthProcess, AuthProcess>();
+            services.TryAddTransient<IAuthProviderCognito, AuthProviderCognito>();
+            services.TryAddTransient<ILoginFormat, LoginFormat>();
+            services.TryAddTransient<IEmailFormat, EmailFormat>();
+            services.TryAddTransient<IPhoneFormat, PhoneFormat>();
+            services.TryAddTransient<ICodeFormat, CodeFormat>();
+            services.TryAddTransient<IAuthProcess, AuthProcess>();
+            services.TryAddTransient<IPasswordFormat, PasswordFormat>();
             services.TryAddSingleton<ILzHost, LzHost>();
             return services;
         }

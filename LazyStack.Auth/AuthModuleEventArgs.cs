@@ -1,5 +1,3 @@
-using System;
-
 namespace LazyStack.Auth;
 
 // SeeAuthMessages.json for language specific messages

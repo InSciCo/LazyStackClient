@@ -1,6 +1,4 @@
-﻿using LazyStack.Base;
-
-namespace LazyStack.Auth;
+﻿namespace LazyStack.Auth;
 
 public interface IAuthProviderCognito : IAuthProvider
 {

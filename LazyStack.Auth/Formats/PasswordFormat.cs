@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-using Microsoft.Extensions.Configuration;
-
-
-namespace LazyStack.Auth;
+﻿namespace LazyStack.Auth;
 
 public class PasswordFormat : IPasswordFormat
 {
