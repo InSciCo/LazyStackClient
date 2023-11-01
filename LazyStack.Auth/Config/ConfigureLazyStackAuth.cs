@@ -13,12 +13,11 @@
             // see the RunConfig class.
             services.TryAddTransient<ILzHttpClient, LzHttpClient>();
             services.TryAddTransient<IAuthProcess, AuthProcess>();
-            services.TryAddTransient<IAuthProviderCognito, AuthProviderCognito>();
+            services.TryAddTransient<IAuthProvider, AuthProviderCognito>();
             services.TryAddTransient<ILoginFormat, LoginFormat>();
             services.TryAddTransient<IEmailFormat, EmailFormat>();
             services.TryAddTransient<IPhoneFormat, PhoneFormat>();
             services.TryAddTransient<ICodeFormat, CodeFormat>();
-            services.TryAddTransient<IAuthProcess, AuthProcess>();
             services.TryAddTransient<IPasswordFormat, PasswordFormat>();
             services.TryAddSingleton<ILzHost, LzHost>();
             return services;

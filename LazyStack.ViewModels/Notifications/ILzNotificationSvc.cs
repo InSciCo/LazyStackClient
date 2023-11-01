@@ -1,5 +1,5 @@
 ﻿
-namespace LazyStack.Notifications.ViewModels;
+namespace LazyStack.ViewModels;
 
 public interface ILzNotificationSvc
 {

@@ -20,6 +20,10 @@
         <MailKit>4.2.0</MailKit>
         <Microsoft_AspNetCore_Components_Forms>7.0.5</Microsoft_AspNetCore_Components_Forms>
         <Microsoft_AspNetCore_Components_Web>7.0.5</Microsoft_AspNetCore_Components_Web>
+		<Microsoft_CodeAnalysis>4.6.0</Microsoft_CodeAnalysis>
+		<Microsoft_CodeAnalysis_Common>4.6.0</Microsoft_CodeAnalysis_Common>
+		<Microsoft_CodeAnalysis_CSharp>4.6.0</Microsoft_CodeAnalysis_CSharp>
+		<Microsoft_CodeAnalysis_Workspaces_Common>4.6.0</Microsoft_CodeAnalysis_Workspaces_Common>
 		<Microsoft_Extensions_Configuration>7.0.0</Microsoft_Extensions_Configuration>
 		<Microsoft_Extensions_Configuration_Binder>7.0.4</Microsoft_Extensions_Configuration_Binder>
         <Microsoft_Extensions_DependencyInjection>7.0.0</Microsoft_Extensions_DependencyInjection>

@@ -15,12 +15,13 @@ public class LzItemsViewModelBase<TVM, TDTO, TModel> : LzViewModelBase, INotifyC
     where TModel : class, TDTO, IRegisterObservables, new()
     where TVM : class,  ILzItemViewModelBase<TModel>
 {
-    public LzItemsViewModelBase()
+    public LzItemsViewModelBase(ILzBaseSessionViewModel sessionViewModel)
     {
+        LzBaseSessionViewModel = sessionViewModel;    
         CanList = true;
         CanAdd = true;
     }
-    protected IAuthProcess? authProcess;
+    protected ILzBaseSessionViewModel LzBaseSessionViewModel { get; init; }
     public string? Id { get; set; }
     public Dictionary<string, TVM> ViewModels { get; set; } = new();
     private TVM? currentViewModel;
@@ -150,10 +151,7 @@ public class LzItemsViewModelBase<TVM, TDTO, TModel> : LzViewModelBase, INotifyC
         {
             case StorageAPI.Rest:
             case StorageAPI.S3:
-                if (authProcess == null)
-                    throw new Exception("AuthProcess not assigned");
-
-                if (authProcess.IsNotSignedIn)
+                if (!LzBaseSessionViewModel.IsSignedIn)
                     throw new Exception("Not signed in.");
                 break;
             default:

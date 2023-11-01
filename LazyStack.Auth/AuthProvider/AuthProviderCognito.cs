@@ -404,6 +404,9 @@ public class AuthProviderCognito : IAuthProviderCognito
                 case AuthProcessEnum.SigningIn:
                     if (IsSignedIn)
                         return AuthEventEnum.Alert_AlreadySignedIn;
+                    if(string.IsNullOrEmpty(clientId)) throw new Exception("Config.UserPoolClientId is empty"); 
+                    if(userPool is null) throw new Exception("Config.UserPoolId is null");
+                    if(providerClient is null) throw new Exception("ProviderClient is null");
                     // We don't expect this to ever throw an exception as the AWS operation is local
                     CognitoUser = new CognitoUser(login, clientId, userPool, providerClient);
                     this.login = login;
@@ -423,6 +426,9 @@ public class AuthProviderCognito : IAuthProviderCognito
                 case AuthProcessEnum.ResettingPassword:
                     if (IsSignedIn)
                         return AuthEventEnum.Alert_InvalidOperationWhenSignedIn;
+                    if (string.IsNullOrEmpty(clientId)) throw new Exception("Config.UserPoolClientId is empty");
+                    if (userPool is null) throw new Exception("Config.UserPoolId is null");
+                    if (providerClient is null) throw new Exception("ProviderClient is null");
                     // This step may throw an exception if the call to ForgotPasswordAsync fails.
                     CognitoUser = new CognitoUser(login, clientId, userPool, providerClient);
                     this.login = login;

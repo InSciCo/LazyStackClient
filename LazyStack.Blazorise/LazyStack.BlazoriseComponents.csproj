@@ -15,7 +15,6 @@
 		<PackageReference Include="Blazorise.Bootstrap5" />
 		<PackageReference Include="Blazorise.Components" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web"/>
-		<!--<PackageReference Include="Blazorise" />-->
 	</ItemGroup>
 
 	<ItemGroup>

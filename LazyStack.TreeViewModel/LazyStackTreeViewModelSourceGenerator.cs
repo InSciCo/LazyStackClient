@@ -1,7 +1,7 @@
-﻿namespace LazyStack.Annotations;
+﻿namespace LazyStack.TreeViewModel;
 
 [Generator]
-public class LazyStackAnnotationsSourceGenerator : ISourceGenerator
+public class LazyStackTreeViewModelSourceGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context) { }
 
@@ -26,7 +26,7 @@ public class LazyStackAnnotationsSourceGenerator : ISourceGenerator
                 var treeNodeNamePropertyName = classNode.DescendantNodes()
                     .OfType<PropertyDeclarationSyntax>()
                     .Where(x => model.GetDeclaredSymbol(x)!.GetAttributes().Any(a => a.AttributeClass!.Name == nameof(TreeNodeNameAttribute)))
-                    .FirstOrDefault()?.Identifier.Text; ;
+                    .FirstOrDefault()?.Identifier.Text; 
 
                 var treeNodeParallellMaxAttribute = classNode.DescendantNodes()
                     .OfType<PropertyDeclarationSyntax>()
@@ -45,18 +45,18 @@ public class LazyStackAnnotationsSourceGenerator : ISourceGenerator
 
 				sourceBuilder.Append(@$"
 using System.Linq;
-using TreeItemViewModels;
+using LazyStack.TreeViewModel;
 namespace {namespaceName}
 {{
-    public partial class {className} : ITreeItemNode
+    public partial class {className} : ILzTreeNode
     {{
-        public async Task<TreeItemViewModel> GetTreeNodeAsync()
+        public async Task<ILzTreeNodeViewModel> GetTreeNodeAsync()
         {{
-            var nodeList = new List<ITreeItemNode>();
+            var nodeList = new List<ILzTreeNode>();
 ");
                 if (ViewModelsPropetyExists)
                     sourceBuilder.Append(@$"
-            nodeList.AddRange(ViewModels.Values.Cast<ITreeItemNode>());");
+            nodeList.AddRange(ViewModels.Values.Cast<ILzTreeNode>());");
 
                 var propertiesWithTreeNodeChildAttribute = classNode.DescendantNodes()
                     .OfType<PropertyDeclarationSyntax>()
@@ -66,7 +66,7 @@ namespace {namespaceName}
                 {
                     var propName = propNode.Identifier.Text;
                     sourceBuilder.Append(@$"
-            nodeList.Add({propName}! as ITreeItemNode);");
+            nodeList.Add({propName}! as ILzTreeNode);");
                 }
                 var hasChildren = propertiesWithTreeNodeChildAttribute.Count() > 0 || ViewModelsPropetyExists;
                 if (hasChildren)
@@ -100,7 +100,7 @@ namespace {namespaceName}
             await Task.Delay(0);
 ");
                 sourceBuilder.Append(@"
-            var node = new TreeItemViewModel(
+            var node = new LzTreeNodeViewModel(
                 viewModel: this,
                 viewModelType: this.GetType(),");
                 if (treeNodeNamePropertyName is not null)
@@ -134,24 +134,30 @@ namespace {namespaceName}
             }
         }
     }
-
     private bool PropertyExists(ClassDeclarationSyntax classNode, SemanticModel model, string propertyName)
     {
         var classSymbol = model.GetDeclaredSymbol(classNode) as INamedTypeSymbol;
         if (classSymbol == null) return false;
 
-        if (classSymbol.GetMembers(propertyName).Any(m => m.Kind == SymbolKind.Property))
-            return true;  // The property exists directly on the derived class.
+        if (HasProperty(classSymbol, propertyName))
+            return true;
 
         var baseType = classSymbol.BaseType;
-        if (baseType != null)
+        while (baseType != null)
         {
-            return baseType.GetMembers(propertyName).Any(m => m.Kind == SymbolKind.Property);
+            if (HasProperty(baseType, propertyName))
+                return true;
+
+            baseType = baseType.BaseType;
         }
 
-        return false;  // The property was not found on the derived class or its base class.
+        return false;  // The property was not found on the derived class or any of its base classes.
     }
 
+    private bool HasProperty(INamedTypeSymbol typeSymbol, string propertyName)
+    {
+        return typeSymbol.GetMembers(propertyName).Any(m => m.Kind == SymbolKind.Property);
+    }
 
 
     private string GetNamespace(GeneratorExecutionContext context, SemanticModel model, ClassDeclarationSyntax classNode)
@@ -173,7 +179,7 @@ namespace {namespaceName}
 
     private static readonly DiagnosticDescriptor _messageRule = new DiagnosticDescriptor(
         id: "LZSG0001",
-        title: "LazyStack.Annotations Source Generator Message",
+        title: "LazyStack.TreeViewModel Source Generator Message",
         messageFormat: "{0}",
         category: "SourceGenerator",
         defaultSeverity: DiagnosticSeverity.Warning,

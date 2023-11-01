@@ -1,4 +1,4 @@
-﻿namespace LazyStack.Auth;
+﻿namespace LazyStack.Utils;
 
 public interface ILzHost
 {

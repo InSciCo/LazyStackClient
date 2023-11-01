@@ -1,4 +1,4 @@
-﻿namespace LazyStack.Annotations;
+﻿namespace LazyStack.TreeViewModel;
 
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public sealed class TreeNodeAttribute : Attribute { }

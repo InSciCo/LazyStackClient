@@ -4,6 +4,8 @@ global using FluentValidation.Internal;
 global using LazyStack.Utils;
 global using LazyStack.Base;
 global using LazyStack.Auth;
+global using LazyStack.Notifications.Schema;
+global using LazyStack.Notifications.Schema.Models;
 global using Microsoft.AspNetCore.Components.Forms;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.DependencyInjection.Extensions;

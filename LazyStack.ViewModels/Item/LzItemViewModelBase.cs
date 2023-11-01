@@ -9,8 +9,9 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
     where TDTO : class, new()
     where TModel : class, TDTO, IRegisterObservables, new()
 {
-    public LzItemViewModelBase(TDTO item, bool? isLoaded = null)
+    public LzItemViewModelBase(ILzBaseSessionViewModel sessionViewModel, TDTO item, bool? isLoaded = null)
     {
+        LzBaseSessionViewModel = sessionViewModel;    
         CanCreate = true;
         CanRead = true;
         CanUpdate = true;
@@ -39,8 +40,8 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
         Data.RegisterObservables();
 
     }
-    protected string entityName = string.Empty; 
-    public IAuthProcess? AuthProcess { get; set; }
+    protected ILzBaseSessionViewModel LzBaseSessionViewModel { get; init; }
+    protected string entityName = string.Empty;
     //public string UpdateTickField { get; set; } = "UpdatedAt";
     public bool AutoLoadChildren { get; set; } = true;
     public abstract string? Id { get; }
@@ -101,10 +102,7 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
         {
             case StorageAPI.Rest:
             case StorageAPI.S3:
-                if (AuthProcess == null)
-                    throw new Exception("AuthProcess not assigned");
-
-                if (AuthProcess.IsNotSignedIn)
+                if (!LzBaseSessionViewModel.IsSignedIn)
                     throw new Exception("Not signed in.");
                 break;
             default:

@@ -5,6 +5,7 @@ global using Microsoft.AspNetCore.Components;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.JSInterop;
 global using ReactiveUI;
+global using ReactiveUI.Blazor;
 global using System.Reflection;
 global using System.ComponentModel;
 global using System.Reactive.Disposables;
