@@ -7,7 +7,7 @@ public abstract class LzItemsViewModelNotificationsBase<TVM, TDTO, TModel> :
     where TModel : class, TDTO, IRegisterObservables, new()
     where TVM : class, ILzItemViewModelBase<TModel>
 {
-    public LzItemsViewModelNotificationsBase() 
+    public LzItemsViewModelNotificationsBase(ILzBaseSessionViewModel sessionViewModel) : base(sessionViewModel)
     {
         this.WhenAnyValue(x => x.NotificationsSvc!.Notification!)
             .WhereNotNull()
