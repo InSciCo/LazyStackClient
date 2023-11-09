@@ -1,5 +1,6 @@
-﻿namespace LazyStack.ViewModels;
+﻿using AwsSignatureVersion4.Private;
 
+namespace LazyStack.ViewModels;
 /// <summary>
 /// This class manages a list of ViewModels
 /// TVM is the ViewModel Class in the list
@@ -17,13 +18,20 @@ public class LzItemsViewModelBase<TVM, TDTO, TModel> : LzViewModelBase, INotifyC
 {
     public LzItemsViewModelBase(ILzBaseSessionViewModel sessionViewModel)
     {
-        LzBaseSessionViewModel = sessionViewModel;    
+        LzBaseSessionViewModel = sessionViewModel;
+
+        // Assign default storage API handlers
+        _ContentSvcReadIdAsync = sessionViewModel.OSAccess.ContentReadAsync;
+        _S3SvcReadIdAsync = sessionViewModel.OSAccess.S3ReadAsync;
+        _LocalSvcReadIdAsync = sessionViewModel.OSAccess.LocalReadAsync;
+        _HttpSvcReadIdAsync = sessionViewModel.OSAccess.HttpReadAsync;
         CanList = true;
         CanAdd = true;
     }
     protected ILzBaseSessionViewModel LzBaseSessionViewModel { get; init; }
     public string? Id { get; set; }
     public Dictionary<string, TVM> ViewModels { get; set; } = new();
+    public bool SourceIsList { get; set; }  
     private TVM? currentViewModel;
     public TVM? CurrentViewModel
     {
@@ -49,62 +57,110 @@ public class LzItemsViewModelBase<TVM, TDTO, TModel> : LzViewModelBase, INotifyC
     [Reactive] public long LastLoadTick { get; set; }
     [Reactive] public bool CanList { get; set; }
     [Reactive] public bool CanAdd { get; set; }
-    
     [Reactive] public virtual long UpdateCount { get; set; }
-    public Func<string, Task<ICollection<TDTO>>>? SvcReadListId { get; init; }
-    public Func<Task<ICollection<TDTO>>>? SvcReadList { get; init; }
+    protected StorageAPI _storageAPI { get; set; }
+
+    // API Access
+    protected Func<string, Task<ICollection<TDTO>>>? _SvcReadListId { get; init; }
+    protected Func<Task<ICollection<TDTO>>>? _SvcReadList { get; init; }
+    protected Func<string, Task<string>>? _S3SvcReadIdAsync { get; init; }
+    protected Func<string, Task<string>>? _LocalSvcReadIdAsync { get; init; }
+    protected Func<string, Task<string>>? _ContentSvcReadIdAsync { get; init; }
+    protected Func<string, Task<string>>? _HttpSvcReadIdAsync { get; init; }
+
     protected string entityName { get; set; } = string.Empty;
     protected virtual (TVM viewmodel, string id) NewViewModel(TDTO dto)
         => throw new NotImplementedException();
     public virtual async Task<(bool, string)> ReadAsync(bool forceload = false, StorageAPI storageAPI = StorageAPI.Rest)
         => await ReadAsync(string.Empty, forceload, storageAPI);
-    public virtual async Task<(bool, string)> ReadAsync(string parentId, bool forceload = false, StorageAPI storageAPI = StorageAPI.Rest)
+    public virtual async Task<(bool, string)> ReadAsync(string id, bool forceload = false, StorageAPI storageAPI = StorageAPI.Rest)
     {
         if (storageAPI == StorageAPI.Default)
             storageAPI = (storageAPI == StorageAPI.Default)
                 ? StorageAPI.Rest
                 : storageAPI;
 
-        var userMsg = "Can't read " + entityName + " id:" + parentId;
-        (bool success, string msg) result;
+        var userMsg = "Can't read " + entityName + " id:" + id;
         try
         {
-            if (storageAPI != StorageAPI.Rest)
-                throw new Exception("Unsupported StorageAPI:" + storageAPI);
-
             CheckAuth(storageAPI);  
-
-            if (SvcReadList == null && SvcReadListId == null)
-                throw new Exception("SvcReadList function not assigned");
-            IsLoading = true;
-            var items = (SvcReadListId != null)
-                ? await SvcReadListId(parentId)
-                : await SvcReadList!();
-            var tasks = new List<Task<(bool success, string msg)>>();
-            foreach (var item in items)
+            switch(storageAPI)
             {
-                var (vm, itemMsg) = NewViewModel(item);
-                var id = vm.Id;
-                if (id is null)
-                    throw new Exception("NewViewModel return null id");
-                if (!ViewModels!.ContainsKey(id))
-                    ViewModels!.Add(id, vm);
-                else
-                    ViewModels![id] = vm;
-                vm.State = LzItemViewModelBaseState.Current;
-                if (AutoReadChildren)
-                    tasks.Add(ViewModels![id].ReadChildrenAsync(forceload, storageAPI));
+                case StorageAPI.Rest:
+                    if(string.IsNullOrEmpty(id) && _SvcReadList == null)
+                        throw new Exception("SvcReadList function not assigned");   
+                    if(!string.IsNullOrEmpty(id) && _SvcReadListId == null)
+                        throw new Exception("SvcReadListId function not assigned");
+                    IsLoading = true;
+                    var items = (!string.IsNullOrEmpty(id))
+                        ? await _SvcReadListId!(id)
+                        : await _SvcReadList!(); 
+                    return await UpdateDataAsync(items, forceload, storageAPI);
+                case StorageAPI.S3:
+                    if (string.IsNullOrEmpty(id)) throw new Exception("ParentId required for S3SvcReadId");
+                    if (_S3SvcReadIdAsync == null) throw new Exception("S3SvcReadIdAsync not assigned.");
+                    IsLoading = true;
+                    var s3Text = await _S3SvcReadIdAsync(id);
+                    return await UpdateDataFromTextAsync(s3Text, forceload, storageAPI);
+                case StorageAPI.Local:
+                    if(string.IsNullOrEmpty(id)) throw new Exception("ParentId required for LocalSvcReadId");   
+                    if(_LocalSvcReadIdAsync == null) throw new Exception("LocalSvcReadIdAsync not assigned.");
+                    IsLoading = true;
+                    var localText = await _LocalSvcReadIdAsync(id);
+                    return await UpdateDataFromTextAsync(localText, forceload, storageAPI);    
+                case StorageAPI.Content:
+                    if(string.IsNullOrEmpty(id)) throw new Exception("ParentId required for ContentSvcReadId");
+                    if(_ContentSvcReadIdAsync == null) throw new Exception("ContentSvcReadIdAsync not assigned.");
+                    IsLoading = true;
+                    var contentText = await _ContentSvcReadIdAsync(id);
+                    return await UpdateDataFromTextAsync(contentText, forceload, storageAPI);
+                case StorageAPI.Http:
+                    if(string.IsNullOrEmpty(id)) throw new Exception("ParentId required for HttpSvcReadId");
+                    if(_HttpSvcReadIdAsync == null) throw new Exception("HttpSvcReadIdAsync not assigned.");
+                    IsLoading = true;
+                    var httpText = await _HttpSvcReadIdAsync(id);
+                    return await UpdateDataFromTextAsync(httpText, forceload, storageAPI);
+                case StorageAPI.Internal:
+                    return (true, string.Empty);
+                default:
+                    return (false, Log(userMsg, "StorageAPI not implemented")); 
             }
-            await Task.WhenAll(tasks);
-            result = tasks.Where(x => x.Result.success == false).Select(x => x.Result).FirstOrDefault((true, string.Empty));
-            IsLoaded = result.success;
-            return result;
         }
         catch (Exception ex)
         {
             return (false, Log(userMsg, ex.Message));
         }
         finally { IsLoading = false; }
+    }
+    public virtual string GetId(TDTO dto)
+        => throw new NotImplementedException();
+    protected virtual async Task<(bool, string)> UpdateDataFromTextAsync(string jsonContent, bool forceload, StorageAPI storageAPI)
+    {
+        var items = JsonConvert.DeserializeObject<ICollection<TDTO>>(jsonContent);
+        if (items == null) throw new Exception("UpdateDataFromJsonAsync returned null");
+        return await UpdateDataAsync(items, forceload, storageAPI);
+    }
+    protected virtual async Task<(bool, string)> UpdateDataAsync(ICollection<TDTO> list, bool forceload, StorageAPI storageAPI)
+    {
+        var tasks = new List<Task<(bool success, string msg)>>();
+        foreach (var item in list)
+        {
+            var (vm, itemMsg) = NewViewModel(item);
+            var id = vm.Id;
+            if (id is null)
+                throw new Exception("NewViewModel return null id");
+            if (!ViewModels!.ContainsKey(id))
+                ViewModels!.Add(id, vm);
+            else
+                ViewModels![id] = vm;
+            vm.State = LzItemViewModelBaseState.Current;
+            if (AutoReadChildren)
+                tasks.Add(ViewModels![id].ReadChildrenAsync(forceload, storageAPI));
+        }
+        await Task.WhenAll(tasks);
+        var result = tasks.Where(x => x.Result.success == false).Select(x => x.Result).FirstOrDefault((success: true, msg: string.Empty));
+        IsLoaded = result.success;
+        return result;
     }
     public virtual async Task<(bool, string)> CancelCurrentViewModelEditAsync()
     {

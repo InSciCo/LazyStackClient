@@ -7,12 +7,13 @@
 public class LzBaseSessionViewModel : LzViewModelBase, ILzBaseSessionViewModel
 {
     public LzBaseSessionViewModel(
+        IOSAccess osAccess,   
         ILzClientConfig clientConfig, 
         IInternetConnectivitySvc internetConnectivity
         )
     {
+        OSAccess = osAccess ?? throw new ArgumentNullException(nameof(osAccess));    
         ClientConfig = clientConfig ?? throw new ArgumentNullException(nameof(clientConfig));
-        
         InternetConnectivity = internetConnectivity ?? throw new ArgumentNullException(nameof(internetConnectivity));
 
         this.WhenAnyValue(x => x.InternetConnectivity.IsOnline)
@@ -33,6 +34,7 @@ public class LzBaseSessionViewModel : LzViewModelBase, ILzBaseSessionViewModel
     public string SessionId { get; set; } = Guid.NewGuid().ToString();
     public ILzNotificationSvc? NotificationsSvc { get; set; } 
     public ILzClientConfig ClientConfig { get; set; }
+    public IOSAccess OSAccess { get; set; }
 
     // The ObservableAsProperty annotation is defined in ReactiveUI.Fody
     [ObservableAsProperty] public bool IsSignedIn { get; }

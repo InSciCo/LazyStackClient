@@ -7,10 +7,11 @@
 public class LzAuthSessionViewModel : LzBaseSessionViewModel, ILzAuthSessionViewModel
 {
     public LzAuthSessionViewModel(
+        IOSAccess osAccess,
         IAuthProcess authProcess, 
         ILzClientConfig clientConfig, 
         IInternetConnectivitySvc internetConnectivity
-        ) : base(clientConfig, internetConnectivity)    
+        ) : base(osAccess, clientConfig, internetConnectivity)    
     {
         AuthProcess = authProcess ?? throw new ArgumentNullException(nameof(authProcess));    
 

@@ -16,14 +16,9 @@
         bool IsLoading { get; set; }
         long LastLoadTick { get; set; }
         TVM? LastViewModel { get; set; }
-
-        Func<Task<ICollection<TDTO>>>? SvcReadList { get; init; }
-        Func<string, Task<ICollection<TDTO>>>? SvcReadListId { get; init; }
         long UpdateCount { get; set; }
         Dictionary<string, TVM> ViewModels { get; set; }
-
         event NotifyCollectionChangedEventHandler? CollectionChanged;
-
         Task<(bool, string)> CancelCurrentViewModelEditAsync();
         Task<(bool, string)> ReadAsync(bool forceload = false, StorageAPI storageAPI = StorageAPI.Rest);
         Task<(bool, string)> ReadAsync(string parentId, bool forceload = false, StorageAPI storageAPI = StorageAPI.Rest);

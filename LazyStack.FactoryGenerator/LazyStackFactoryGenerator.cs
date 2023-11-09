@@ -316,7 +316,7 @@ namespace {namespaceName}
 
     private static readonly DiagnosticDescriptor _messageRule = new DiagnosticDescriptor(
         id: "LZSG0002",
-        title: "LazyStack.TreeViewModel Source Generator Message",
+        title: "LazyStack.FactoryGenerator Source Generator Message",
         messageFormat: "{0}",
         category: "SourceGenerator",
         defaultSeverity: DiagnosticSeverity.Warning,

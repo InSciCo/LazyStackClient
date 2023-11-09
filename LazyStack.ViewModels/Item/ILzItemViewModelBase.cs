@@ -19,9 +19,7 @@ public interface ILzItemViewModelBase<TModel>
     public bool IsCurrent { get; }
     public bool IsDeleted { get; }
     public bool IsDirty { get; set; }
-
     public ILzParentViewModel? ParentViewModel { get; set; }
-
     public Task<(bool, string)> CreateAsync(string? id,StorageAPI storageAPI = StorageAPI.Default);
     public Task<(bool, string)> ReadAsync(string id, StorageAPI storageAPI = StorageAPI.Default);
     public Task<(bool, string)> ReadAsync(StorageAPI storageAPI = StorageAPI.Default);

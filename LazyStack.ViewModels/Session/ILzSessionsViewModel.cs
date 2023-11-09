@@ -2,7 +2,7 @@
 public interface ILzSessionsViewModel
 {
     IDictionary<string, string> SessionLogins { get; }
-    Task CreateAsync();
+    Task CreateSessionAsync();
     Task DeleteAsync(string sessionId);
     Task SetAsync(string sessionId);
 }

@@ -5,6 +5,7 @@ public interface ILzBaseSessionViewModel
     bool IsSignedIn { get; }
     IInternetConnectivitySvc InternetConnectivity { get; set; }
     ILzClientConfig ClientConfig { get; set; }
+    IOSAccess OSAccess { get; set; }  
     string SessionId { get; set; }
     bool HasChallenge { get; }
     bool IsAdmin { get; }

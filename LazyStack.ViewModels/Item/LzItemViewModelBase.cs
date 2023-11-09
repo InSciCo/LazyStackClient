@@ -9,7 +9,7 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
     where TDTO : class, new()
     where TModel : class, TDTO, IRegisterObservables, new()
 {
-    public LzItemViewModelBase(ILzBaseSessionViewModel sessionViewModel, TDTO item, bool? isLoaded = null)
+    public LzItemViewModelBase(ILzBaseSessionViewModel sessionViewModel, TDTO? item = null, bool? isLoaded = null)
     {
         LzBaseSessionViewModel = sessionViewModel;    
         CanCreate = true;
@@ -18,6 +18,18 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
         CanDelete = true;
         IsLoaded = false;
         IsDirty = false;
+
+        // Assign default storage API handlers
+        _ContentSvcReadIdAsync = sessionViewModel.OSAccess.ContentReadAsync;
+        _S3SvcCreateIdAsync = sessionViewModel.OSAccess.S3CreateAsync;
+        _S3SvcReadIdAsync = sessionViewModel.OSAccess.S3ReadAsync;
+        _S3SvcUpdateIdAsync = sessionViewModel.OSAccess.S3UpdateAsync;
+        _S3SvcDeleteIdAsync = sessionViewModel.OSAccess.S3DeleteAsync;
+        _LocalSvcCreateIdAsync = sessionViewModel.OSAccess.LocalCreateAsync;
+        _LocalSvcReadIdAsync = sessionViewModel.OSAccess.LocalReadAsync;
+        _LocalSvcUpdateIdAsync = sessionViewModel.OSAccess.LocalUpdateAsync;
+        _LocalSvcDeleteIdAsync = sessionViewModel.OSAccess.LocalDeleteAsync;
+        _HttpSvcReadIdAsync = sessionViewModel.OSAccess.HttpReadAsync;
 
         this.WhenAnyValue(x => x.State, (x) => x == LzItemViewModelBaseState.New)
             .ToPropertyEx(this, x => x.IsNew);
@@ -63,39 +75,38 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
     [ObservableAsProperty] public bool IsCurrent { get; }
     [ObservableAsProperty] public bool IsDeleted { get; }
     [Reactive] public bool IsDirty { get; set; }
-    [Reactive] public StorageAPI StorageAPI { get; set; }
-
     public ILzParentViewModel? ParentViewModel { get; set; }
-
+    protected StorageAPI _storageAPI { get; set; }
     // API access - requires authentication
-    public Func<TDTO, Task<TDTO>>? SvcCreateAsync { get; init; } // Assumes storage Id is in TDTO
-    public Func<string, TDTO, Task<TDTO>>? SvcCreateIdAsync { get; init; } // Assumes storage Id is passed separate from TDTO
-    public Func<string, Task<TDTO>>? SvcReadIdAsync { get; init; }
-    public Func<Task<TDTO>>? SvcReadAsync { get; init; } // Read using this.Id
-    public Func<TDTO, Task<TDTO>>? SvcUpdateAsync { get; init; } // Assumes storage Id is in TDTO
-    public Func<string, TDTO, Task<TDTO>>? SvcUpdateIdAsync { get; init; } // Assumes storage Id is passed separate from TDTO
-    public Func<string, Task>? SvcDeleteIdAsync { get; init; }
+    protected Func<TDTO, Task<TDTO>>? _SvcCreateAsync { get; init; } // Assumes storage Id is in TDTO
+    protected Func<string, TDTO, Task<TDTO>>? _SvcCreateIdAsync { get; init; } // Assumes storage Id is passed separate from TDTO
+    protected Func<string, Task<TDTO>>? _SvcReadIdAsync { get; init; }
+    protected Func<Task<TDTO>>? _SvcReadAsync { get; init; } // Read using this.Id
+    protected Func<TDTO, Task<TDTO>>? _SvcUpdateAsync { get; init; } // Assumes storage Id is in TDTO
+    protected Func<string, TDTO, Task<TDTO>>? _SvcUpdateIdAsync { get; init; } // Assumes storage Id is passed separate from TDTO
+    protected Func<string, Task>? _SvcDeleteIdAsync { get; init; }
     // S3 access - requires authentication
     // Id is S3 bucket reference
-    public Func<string, string, Task>? S3SvcCreateIdAsync { get; init; }
-    public Func<string, Task<string>>? S3SvcReadIdAsync { get; init; }
-    public Func<string, string, Task>? S3SvcUpdateIdAsync { get; init; }
-    public Func<string, Task>? S3SvcDeleteIdAsync { get; init; }
+    protected Func<string, string, Task>? _S3SvcCreateIdAsync { get; init; }
+    protected Func<string, Task<string>>? _S3SvcReadIdAsync { get; init; }
+    protected Func<string, string, Task>? _S3SvcUpdateIdAsync { get; init; }
+    protected Func<string, Task>? _S3SvcDeleteIdAsync { get; init; }
     // Local storage access
     // Id is full path reference
-    public Func<string, string, Task>? LocalSvcCreateIdAsync { get; init; }
-    public Func<string, Task<string>>? LocalSvcReadIdAsync { get; init; }
-    public Func<string, string, Task>? LocalSvcUpdateIdAsync { get; init; }
-    public Func<string, Task>? LocalSvcDeleteIdAsync { get; init; }
+    protected Func<string, string, Task>? _LocalSvcCreateIdAsync { get; init; }
+    protected Func<string, Task<string>>? _LocalSvcReadIdAsync { get; init; }
+    protected Func<string, string, Task>? _LocalSvcUpdateIdAsync { get; init; }
+    protected Func<string, Task>? _LocalSvcDeleteIdAsync { get; init; }
     // _content access 
     // Id is something like "_content/library/somefile"
     // WASM implements this using HttpClient - assumes resource is under wwwroot
     // MAUI implements this using FileSystem.OpenAppPackageFileAsync(id)
-    public Func<string, Task<string>>? ContentSvcReadIdAsync { get; init; }    // Http access - general http calls
+    protected Func<string, Task<string>>? _ContentSvcReadIdAsync { get; init; }
+    // Http access - general http calls
     // Id is URL
-    public Func<string, Task<string>>? HttpSvcReadIdAsync { get; init; }
+    protected Func<string, Task<string>>? _HttpSvcReadIdAsync { get; init; }
 
-    private void CheckAuth(StorageAPI storageAPI)
+    protected void CheckAuth(StorageAPI storageAPI)
     {
         // Check for Auth
         switch (storageAPI)
@@ -109,7 +120,7 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
                 break;
         }
     }
-    private void CheckId(string? id)
+    protected void CheckId(string? id)
     {
         if (id is null)
             throw new Exception("Id is null");
@@ -117,9 +128,9 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
     public virtual async Task<(bool, string)> CreateAsync(string? id, StorageAPI storageAPI = StorageAPI.Default)
     {
         if (storageAPI == StorageAPI.Default)
-            storageAPI = (StorageAPI == StorageAPI.Default) 
+            storageAPI = (_storageAPI == StorageAPI.Default) 
                 ? StorageAPI.Rest
-                : StorageAPI;
+                : _storageAPI;
 
         try
         {
@@ -145,35 +156,35 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
                 case StorageAPI.Rest:
                     if (id is null)
                     {
-                        if (SvcCreateAsync == null)
+                        if (_SvcCreateAsync == null)
                             throw new Exception("SvcCreateAsync not assigned.");
-                        item = await SvcCreateAsync(item!);
+                        item = await _SvcCreateAsync(item!);
                     }
                     else
                     {
-                        if (SvcCreateIdAsync == null)
+                        if (_SvcCreateIdAsync == null)
                             throw new Exception("SvcCreateIdAsync not assigned.");
                         CheckId(id);
-                        item = await SvcCreateIdAsync(id!, item!);
+                        item = await _SvcCreateIdAsync(id!, item!);
                     }
                     break;
                 case StorageAPI.S3:
-                    if (S3SvcCreateIdAsync == null)
+                    if (_S3SvcCreateIdAsync == null)
                         throw new Exception("S3SvcCreateIdAsync not assigned.");
                     CheckId(id);
                     var s3Text = JsonConvert.SerializeObject(item);
-                    await S3SvcCreateIdAsync(id!, s3Text!);
+                    await _S3SvcCreateIdAsync(id!, s3Text!);
                     break;
                 case StorageAPI.Http:
                     throw new Exception("HttpSvcCreateIdAsync is not supported.");
                 case StorageAPI.Content:
                     throw new Exception("ContentSvcCreateIdAsync is not supported.");
                 case StorageAPI.Local:
-                    if (LocalSvcCreateIdAsync == null)
+                    if (_LocalSvcCreateIdAsync == null)
                         throw new Exception("LocalSvcCreateIdAsync not assigned.");
                     CheckId(id);
                     var localText = JsonConvert.SerializeObject(item);
-                    await LocalSvcCreateIdAsync(id!,localText!);
+                    await _LocalSvcCreateIdAsync(id!,localText!);
                     break;
                 case StorageAPI.Internal:
                     break;
@@ -191,9 +202,9 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
     public virtual async Task<(bool, string)> ReadAsync(string id, StorageAPI storageAPI = StorageAPI.Default)
     {
         if (storageAPI == StorageAPI.Default)
-            storageAPI = (StorageAPI == StorageAPI.Default)
+            storageAPI = (_storageAPI == StorageAPI.Default)
                 ? StorageAPI.Rest
-                : StorageAPI;
+                : _storageAPI;
         var userMsg = "Can't load " + entityName;
         try
         {
@@ -207,35 +218,35 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
             switch (storageAPI)
             {
                 case StorageAPI.Rest:
-                    if (SvcReadIdAsync == null)
+                    if (_SvcReadIdAsync == null)
                         throw new Exception("SvcReadIdAsync not assigned.");
-                    UpdateData(await SvcReadIdAsync(id));
+                    UpdateData(await _SvcReadIdAsync(id));
                     break;
                 case StorageAPI.S3:
-                    if (S3SvcReadIdAsync == null)
+                    if (_S3SvcReadIdAsync == null)
                         throw new Exception("S3SvcReadIdAsync not assigned.");
-                    var s3Text = await S3SvcReadIdAsync(id);
+                    var s3Text = await _S3SvcReadIdAsync(id);
                     var s3Item = JsonConvert.DeserializeObject<TDTO>(s3Text);
                     UpdateData(s3Item!);
                     break;
                 case StorageAPI.Http:
-                    if (HttpSvcReadIdAsync == null)
+                    if (_HttpSvcReadIdAsync == null)
                         throw new Exception("HttpSvcReadIdAsync not assigned.");
-                    var httpText = await HttpSvcReadIdAsync(id);
+                    var httpText = await _HttpSvcReadIdAsync(id);
                     var httpItem = JsonConvert.DeserializeObject<TDTO>(httpText);
                     UpdateData(httpItem!);
                     break;
                 case StorageAPI.Content:
-                    if (ContentSvcReadIdAsync == null)
+                    if (_ContentSvcReadIdAsync == null)
                         throw new Exception("ContentSvcReadIdAsync not assigned.");
-                    var contentText = await ContentSvcReadIdAsync(id);
+                    var contentText = await _ContentSvcReadIdAsync(id);
                     var contextItem = JsonConvert.DeserializeObject<TDTO>(contentText);
                     UpdateData(contextItem!);
                     break;
                 case StorageAPI.Local:
-                    if (LocalSvcReadIdAsync == null)
+                    if (_LocalSvcReadIdAsync == null)
                         throw new Exception("LocalSvcReadIdAsync not assigned.");
-                    var localText = await LocalSvcReadIdAsync(id);
+                    var localText = await _LocalSvcReadIdAsync(id);
                     var localItem = JsonConvert.DeserializeObject<TDTO>(localText);
                     UpdateData(localItem!);
                     break;
@@ -265,9 +276,9 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
     public virtual async Task<(bool, string)> ReadAsync(StorageAPI storageAPI = StorageAPI.Default)
     {
         if (storageAPI == StorageAPI.Default)
-            storageAPI = (StorageAPI == StorageAPI.Default)
+            storageAPI = (_storageAPI == StorageAPI.Default)
                 ? StorageAPI.Rest
-                : StorageAPI;
+                : _storageAPI;
         try
         {
             if (!CanRead)
@@ -279,9 +290,9 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
             switch (storageAPI)
             {
                 case StorageAPI.Rest:
-                    if (SvcReadAsync == null)
+                    if (_SvcReadAsync == null)
                         throw new Exception("SvcReadAsync not assigned.");
-                    UpdateData(await SvcReadAsync());
+                    UpdateData(await _SvcReadAsync());
                     break;
                 case StorageAPI.S3:
                     throw new Exception("S3SvcReadAsync not supported. Use S3SvcReadIdAsync instead.");
@@ -308,9 +319,9 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
     public virtual async Task<(bool, string)> UpdateAsync(string? id, StorageAPI storageAPI = StorageAPI.Default)
     {
         if (storageAPI == StorageAPI.Default)
-            storageAPI = (StorageAPI == StorageAPI.Default)
+            storageAPI = (_storageAPI == StorageAPI.Default)
                 ? StorageAPI.Rest
-                : StorageAPI;
+                : _storageAPI;
 
         try
         {
@@ -333,35 +344,35 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
                 case StorageAPI.Rest:
                     if(id is null)
                     {
-                        if (SvcUpdateAsync == null)
+                        if (_SvcUpdateAsync == null)
                             throw new Exception("SvcUpdateAsync is not assigned.");
-                        UpdateData(await SvcUpdateAsync((TDTO)Data!));
+                        UpdateData(await _SvcUpdateAsync((TDTO)Data!));
                     }
                     else
                     {
-                        if (SvcUpdateIdAsync == null)
+                        if (_SvcUpdateIdAsync == null)
                             throw new Exception("SvcUpdateIdAsync is not assigned.");
                         CheckId(id);
-                        UpdateData(await SvcUpdateIdAsync(id,(TDTO)Data!));
+                        UpdateData(await _SvcUpdateIdAsync(id,(TDTO)Data!));
                     }
                     break;
                 case StorageAPI.S3:
-                    if (S3SvcUpdateIdAsync == null)
+                    if (_S3SvcUpdateIdAsync == null)
                         throw new Exception("S3SvcUpdateIdAsync is not assigned.");
                     CheckId(id);
                     var s3Text = JsonConvert.SerializeObject(Data);
-                    await S3SvcUpdateIdAsync(id!, s3Text);
+                    await _S3SvcUpdateIdAsync(id!, s3Text);
                     break;
                 case StorageAPI.Http:
                     throw new Exception("HttpSvcUpdateIdAsync is not supported.");
                 case StorageAPI.Content:
                     throw new Exception("ContentSvcUpdateIdAsync is not supported.");
                 case StorageAPI.Local:
-                    if (LocalSvcUpdateIdAsync == null)
+                    if (_LocalSvcUpdateIdAsync == null)
                         throw new Exception("LocalSvcUpdateIdAsync is not assigned.");
                     CheckId(id);
                     var localText = JsonConvert.SerializeObject(Data);
-                    await LocalSvcUpdateIdAsync(id!,localText);
+                    await _LocalSvcUpdateIdAsync(id!,localText);
                     break;
                 case StorageAPI.Internal:
                     break;
@@ -377,9 +388,9 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
     public virtual async Task<(bool,string)> DeleteAsync(string id, StorageAPI storageAPI = StorageAPI.Default)
     {
         if (storageAPI == StorageAPI.Default)
-            storageAPI = (StorageAPI == StorageAPI.Default)
+            storageAPI = (_storageAPI == StorageAPI.Default)
                 ? StorageAPI.Rest
-                : StorageAPI;
+                : _storageAPI;
 
         try
         {
@@ -394,23 +405,23 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
             switch(storageAPI)
             {
                 case StorageAPI.Rest:
-                    if (SvcDeleteIdAsync == null)
+                    if (_SvcDeleteIdAsync == null)
                         throw new Exception("SvcDelete(id) is not assigned.");
-                    await SvcDeleteIdAsync(Id!);
+                    await _SvcDeleteIdAsync(Id!);
                     break;
                 case StorageAPI.S3:
-                    if (S3SvcDeleteIdAsync == null)
+                    if (_S3SvcDeleteIdAsync == null)
                         throw new Exception("S3SvcDelete(id) is not assigned.");
-                    await S3SvcDeleteIdAsync(Id!);
+                    await _S3SvcDeleteIdAsync(Id!);
                     break;
                 case StorageAPI.Http:
                     throw new Exception("HttpSvcDelete(id) is not supported.");
                 case StorageAPI.Content:
                     throw new Exception("ContentSvcDelete(id) is not supported.");
                 case StorageAPI.Local:
-                    if (LocalSvcDeleteIdAsync == null)
+                    if (_LocalSvcDeleteIdAsync == null)
                         throw new Exception("LocalSvcDelete(id) is not assigned.");
-                    await LocalSvcDeleteIdAsync(Id!);
+                    await _LocalSvcDeleteIdAsync(Id!);
                     break;
                 case StorageAPI.Internal:
                     break;
@@ -483,25 +494,51 @@ public abstract class LzItemViewModelBase<TDTO, TModel> : LzViewModelBase, ILzIt
     {
         return true;
     }
+    /// <summary>
+    /// This method uses a json copy of the data.
+    /// Updating data from JSON is not fast. Using 
+    /// Force.DeepCloner DeepCloneTo(Data) is not possible 
+    /// because it overwrites any event subscriptions.
+    /// If your usecase requires optimization, override 
+    /// this method and use individual property assignments.
+    /// Using individual property assignments is a maintenance 
+    /// load but nothing is faster.    
+    /// </summary>
+    /// <param name="item"></param>
     protected virtual void UpdateData(TDTO item)
     {
-        // Updating data from JSON is not fast. Using 
-        // Force.DeepCloner DeepCloneTo(Data) is not possible 
-        // because it overwrites any event subscriptions.
+
         Data ??= new();
         var json = JsonConvert.SerializeObject(item);
         JsonConvert.PopulateObject(json, Data);
         IsDirty = false;
         this.RaisePropertyChanged(nameof(Data));
     }
+    /// <summary>
+    /// This method uses a json copy of the data. 
+    /// Saving data using JSON is not fast. Using Force.DeepCloner
+    /// for DataCopy is not possible because the clone process 
+    /// fails if the source data has event subscriptions.
+    /// It is unlikely that MakeDataCopy is ever used in a usecase 
+    /// where performance is critical. If your usecase requires 
+    /// opmization, override this method (and the RestoreFromDataCopy method)
+    /// and use individual property assignments. 
+    /// </summary>
     protected virtual void MakeDataCopy()
     {
-        // Saving data using JSON is not fast. Using Force.DeepCloner
-        // for DataCopy is not possible because the clone process 
-        // fails if the source data has event subscriptions.
         Data ??= new();
         dataCopyJson = JsonConvert.SerializeObject(Data);
     }
+    /// <summary>
+    /// This method uses a json copy of the data. 
+    /// Saving data using JSON is not fast. Using Force.DeepCloner
+    /// for DataCopy is not possible because the clone process 
+    /// fails if the source data has event subscriptions.
+    /// It is unlikely that RestoreFromDataCopy is ever used in a usecase 
+    /// where performance is critical. If your usecase requires 
+    /// opmization, override this method (and the MakeDataCopy method)
+    /// and use individual property assignments. 
+    /// </summary>
     protected virtual void RestoreFromDataCopy()
     {
         // Restoring data from JSON is not fast. Using Force.DeepCloner 

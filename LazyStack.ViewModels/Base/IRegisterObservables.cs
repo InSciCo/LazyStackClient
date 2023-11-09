@@ -1,5 +1,5 @@
 ﻿namespace LazyStack.ViewModels;
 public interface IRegisterObservables
 {
-    public void RegisterObservables();
+    public void RegisterObservables() { } // default implementation 
 }
