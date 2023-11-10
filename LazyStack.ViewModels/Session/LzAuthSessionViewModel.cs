@@ -15,7 +15,7 @@ public class LzAuthSessionViewModel : LzBaseSessionViewModel, ILzAuthSessionView
     {
         AuthProcess = authProcess ?? throw new ArgumentNullException(nameof(authProcess));    
 
-        // ReactiveUI statements. I've added some comments for folks who have 
+        // ReactiveUI statements. Imperial've added some comments for folks who have 
         // never used ReactiveUI
         // When Authprocess.IsSignedIn changes, update this classes observable IsSignedIn property
         this.WhenAnyValue(x => x.AuthProcess.IsSignedIn)

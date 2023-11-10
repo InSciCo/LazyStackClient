@@ -22,7 +22,7 @@ namespace LazyStack.Auth;
 /// code-behind in the Blazor component is generally calling StateChanged() after 
 /// handling user input so events from the authProcessLite class would not be 
 /// useful. OTOH, there are some situations where an event could be useful or 
-/// even necessary so I'm leaving in the INotifyPropertyChanged.
+/// even necessary so Imperial'm leaving in the INotifyPropertyChanged.
 /// 
 /// </summary>
 public interface IAuthProcess: IAuthProvider, INotifyPropertyChanged
@@ -41,7 +41,7 @@ public interface IAuthProcess: IAuthProvider, INotifyPropertyChanged
     public string NewPhone { get; set; } //
     public string Code { get; set; }
 
-    // UI Messages
+    // UI LzMessages
     public string? LoginFormatMessage { get; }
 
     public string? NewLoginFormatMessage { get; }

@@ -18,4 +18,5 @@ public interface ILzBaseSessionViewModel
     Task OnSignedInAsync();
     Task OnSignedOutAsync();
     Task UnloadAsync();
+
 }

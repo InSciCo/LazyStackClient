@@ -44,6 +44,7 @@ public class LzBaseSessionViewModel : LzViewModelBase, ILzBaseSessionViewModel
     [ObservableAsProperty] public bool IsOnline { get; }
     [Reactive] public bool IsLoading { get; set; }
     [Reactive] public bool IsLoaded { get; set; }
+    public LzMessageSet MessageSet { get; }
     public Task<bool> CheckInternetConnectivityAsync()
     {
         return InternetConnectivity.CheckInternetConnectivityAsync();

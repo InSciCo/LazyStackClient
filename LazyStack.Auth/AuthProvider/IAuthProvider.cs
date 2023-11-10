@@ -31,7 +31,7 @@ public interface IAuthProvider
     public bool IsSignedIn { get; }
     // Challenge states
     public bool HasChallenge { get; }
-    // Format Messages
+    // Format LzMessages
     public string[]? FormatMessages { get; }
     public string? FormatMessage { get; }
 

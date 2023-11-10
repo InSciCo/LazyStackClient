@@ -9,10 +9,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="Config\Messages.json" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<EmbeddedResource Include="Config\Messages.json">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>

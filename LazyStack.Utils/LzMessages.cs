@@ -1,71 +1,113 @@
 ﻿namespace LazyStack.Utils;
 using LazyStack.Base;
+using System.Text.RegularExpressions;
 
-public enum MessageUnits { I, M }   
+public enum LzMessageUnits { Imperial, Metric }   
 
-public interface IMessages
+public interface ILzMessages
 {
     public void ReplaceVars();
     public void SetOSAccess(IOSAccess oSAccess);
-    public Task SetLanguageAsync(string language, MessageUnits units);  
+    public Task SetMessageSetAsync(LzMessageSet messageSet);  
     public void AddInternalMsg(string key, string msg);
     public List<string> MessageFiles { get; set; }
     public string Msg(string key);
     public bool TryGetMsg(string key, out string msg);
     public void MergeJson(string messageJson);
-    public string CurrentLanguage { get; } 
+    public string Culture => MessageSet.Culture;
+    public LzMessageUnits Units => MessageSet.Units;
+    public List<LzMessageSet> MessageSets { get; }   
+    public LzMessageSet MessageSet { get; }
+
 }
 /// <summary>
-/// Messages provide a way to localize text in a Blazor app.
+/// LzMessages provide a way to localize text in a Blazor app.
 /// In addition to localization, messages can be tailored to a tenancy. 
-/// Messages are stored in JSON object format. { key: value}.
+/// LzMessages are stored in JSON object format. { key: value}.
 /// 
-/// Messages can be loaded from embedded assembly resources or from external files.
+/// LzMessages can be loaded from embedded assembly resources or from external files.
 /// Internal resources are loaded in each assembly. By convention, LazyStack has a 
 /// Config folder in projects that register messages. Internal message files are 
-/// mono-language. An example: "Config/Messages.json".
+/// mono-culture. An example: "Config/LzMessages.json".
 /// 
-/// External message resources are language specific with a sufix determining the 
-/// language of the messages. ex: "_content/{assembly}/Messages.en-US.json".
+/// External message resources are culture specific with a sufix determining the 
+/// culture of the messages. ex: "_content/{assembly}/LzMessages.en-US.json".
 /// External message resources are loaded using IOSAccess.ContentReadAsync. 
 /// 
 /// To load external message resources:
 /// 1. Set the MessageFiles property to the list of message files. ex:
-///     Messages.MessageFiles = new List<string> { "_content/MyApp/messages.en-US.json", "_content/MyApp/inventory.en-US.json };
+///     LzMessages.MessageFiles = new List<string> { "_content/MyApp/messages.en-US.json", "_content/MyApp/inventory.en-US.json };
 /// 2. Call SetOSAccess() with an IOSAccess object. 
-/// 3. Call SetLanguageAsync("en-US") with the language to load and make current.
+/// 3. Call SetMessageSetAsync("en-US") with the culture to load and make current.
 /// 
 /// To retrieve messages call Msg(key).
-/// If a key is not found in the current language, the key is searched for in the
+/// If a key is not found in the current culture, the key is searched for in the
 /// internal messages. If the key is not found in the internal messages, the key
 /// is returned.
 /// 
 /// Overrides/Tenancy:
-/// When multiple message files are loaded for a language, the keys in the last 
+/// When multiple message files are loaded for a culture, the keys in the last 
 /// loaded file override keys in previously loaded files. This allows for 
 /// customization by tenancy.
 /// 
 /// </summary>
-public class Messages : IMessages
+public class LzMessages : ILzMessages
 {
     const string keyPattern = "__.*__";
-    public Messages()
+    public LzMessages()
     {
+        // Add the internal message set so config methods can 
+        // add messages to it from embedded assembly resources. 
+        MessageSet = new LzMessageSet("internal", LzMessageUnits.Imperial);
+        _internalMsgs = _msgs = new Dictionary<string, string>();
         // Internal messages are those loaded from embedded resources
-        Languages.Add("internal", new Dictionary<string, string>());   
+        _messageSetData.Add(MessageSet, _internalMsgs);
+    }
+
+    protected Dictionary<string, string> _msgs;
+    protected Dictionary<string, string> _internalMsgs;
+    protected Dictionary<LzMessageSet, Dictionary<string, string>> _messageSetData = new();
+    public LzMessageSet MessageSet { get; set; }
+    public List<LzMessageSet> MessageSets { get; } = new List<LzMessageSet>();
+    public List<string> MessageFiles { get; set; } = new();
+    protected IOSAccess? _oSAccess;
+    public LzMessageSet GetMessageSet(string culture, LzMessageUnits units)
+    {
+        var messageSet = MessageSets.FirstOrDefault(ms => ms.Culture == culture && ms.Units == units)
+            ?? throw new Exception($"MessageSet not found for culture: {culture} and units: {units}");
+        return messageSet;
     }
     public void AddInternalMsg(string key, string msg)
     {
-        Languages["internal"][key] = msg;
+        _internalMsgs[key] = ReplaceUnits(msg);
+    }
+
+    public string ReplaceUnits(string msg)
+    {
+        if (!msg.Contains("@Unit")) // typically, most messages don't have units, this is a quick check to see if we need to do anything
+            return msg;
+        MatchCollection matches;
+        // Process @Unit() functions 
+        while ((matches = Regex.Matches(msg, "@Unit\\((.*?)\\)")).Count > 0)
+            foreach (Match match in matches)
+            {
+                var val = match.Value[6..^1];
+                msg = msg.Replace(match.Value, ProcessUnitConversion(match.Value[6..^1]));
+            }
+        // Process @UnitS() functions 
+        while ((matches = Regex.Matches(msg, "@UnitS\\((.*?)\\)")).Count > 0)
+            foreach (Match match in matches)
+                msg = msg.Replace(match.Value, ProcessUnitS(match.Value[7..^1]));
+        return msg;
     }
     public void ReplaceVars()
     {
-        for (var i = 0; i < Msgs.Count; i++)
+        for (var i = 0; i < _msgs.Count; i++)
         {
             // TODO: optimize
             // replace variables in the form __.*__ with the value of the key
-            var msg = Msgs.ElementAt(i).Value;
-            var key = Msgs.ElementAt(i).Key;
+            var msg = _msgs.ElementAt(i).Value;
+            var key = _msgs.ElementAt(i).Key;
             MatchCollection matches;
             while ((matches = Regex.Matches(msg, keyPattern)).Count > 0)
                 foreach (Match match in matches)
@@ -73,41 +115,29 @@ public class Messages : IMessages
                         msg = msg.Replace(match.Value, replacement);
                     else
                         throw new Exception($"Msgs[{match.Value[2..^2]}] not found.");
-            Msgs[key] = msg;
-            // Process @Unit() functions 
-            while ((matches = Regex.Matches(msg, "@Unit\\((.*?)\\)")).Count > 0)
-                foreach (Match match in matches)
-                    msg = msg.Replace(match.Value, ProcessUnitConversion(match.Value[6..^2]));
-            // Process @UnitS() functions 
-            while ((matches = Regex.Matches(msg, "@UnitS\\((.*?)\\)")).Count > 0)
-                foreach (Match match in matches)
-                    msg = msg.Replace(match.Value, ProcessUnitS(match.Value[7..^2]));
-
+            _msgs[key] = ReplaceUnits(msg);
         }
     }
-    public string CurrentLanguage { get; private set; } = "internal";  
-    protected Dictionary<string, string> Msgs => Languages[CurrentLanguage];
-    public Dictionary<string, Dictionary<string,string>> Languages { get; set; } = new();
-    public List<string> MessageFiles { get; set; } = new();
-    protected IOSAccess? _oSAccess;
-    public void SetOSAccess (IOSAccess oSAccess)
+    public void SetOSAccess(IOSAccess oSAccess)
     {
         _oSAccess = oSAccess;
     }
-    public async Task SetLanguageAsync(string language, MessageUnits units)
+    public async Task SetMessageSetAsync(LzMessageSet messageSet)
     {
         if (_oSAccess == null)
             throw new Exception("SetOSAccess must be called before SetLanguageAsync.");
-        var languageAndUnits = language + "-" + units;
-        CurrentLanguage = languageAndUnits;
-        if (Languages.ContainsKey(languageAndUnits))
+        MessageSet = messageSet;
+        if (_messageSetData.ContainsKey(messageSet))
+        {
+            _msgs = _messageSetData[messageSet];
             return;
-        var languageMessages = new Dictionary<string, string>();
-        Languages.Add(languageAndUnits, languageMessages);
+        }
+        _msgs = new Dictionary<string, string>();
+        _messageSetData.Add(messageSet, _msgs);
         foreach (var msgFile in MessageFiles)
         {
             // msgFile example: "messages.en-US.json"
-            var filePath = msgFile.Replace(".json", $".{language}.json");    
+            var filePath = msgFile.Replace(".json", $".{messageSet.Culture}.json");
             var json = await _oSAccess.ContentReadAsync(filePath);
             MergeJson(json);
         }
@@ -116,48 +146,31 @@ public class Messages : IMessages
     }
     public bool TryGetMsg(string key, out string msg)
     {
-        msg = key;   
+        msg = key;
         if (key == null)
             return false;
 
         if (key == "Nothing")
             return false;
 
-        // Try and get the message from the current language messages
-        if (Msgs.TryGetValue(key, out string? value))
+        // Try and get the message from the current culture messages
+        if (_msgs.TryGetValue(key, out string? value))
             msg = string.IsNullOrEmpty(value) ? key : value;
-
+        else
         // Try and get the message from the internal messages
-        if (Languages["internal"].TryGetValue(key, out string? internalValue))
+        if (_internalMsgs.TryGetValue(key, out string? internalValue))
             msg = string.IsNullOrEmpty(value) ? key : internalValue;
-
-        return key.Equals(msg);
+        Console.WriteLine($"{key}:{msg}");
+        return !key.Equals(msg);
     }
     public string Msg(string key)
-    {
-        if (key == null)
-            return "";
+        {
+        if(TryGetMsg(key, out string msg))
+            return msg;
+        else
+            return key; 
+        }
 
-        if (key == "Nothing")
-            return "";
-
-        var msg = "";
-        // Try and get the message from the current language    
-        if (Msgs.TryGetValue(key, out string? value))
-            msg = string.IsNullOrEmpty(value) ? key : value;
-
-        // Try and get the message from the internal messages
-        if (msg == "" && Languages["internal"].TryGetValue(key, out string? internalValue))
-            msg = string.IsNullOrEmpty(value) ? key : internalValue;
-        
-        // Perform valueUnit conversion and replacement for each @Unit() in the msg 
-        MatchCollection matches;
-        while ((matches = Regex.Matches(msg, "@Unit\\((.*?)\\)")).Count > 0)
-            foreach (Match match in matches)
-                msg = msg.Replace(match.Value, UnitConversion(match.Value[6..^2], match.Value[6..^2]));
-
-        return msg == "" ? key : msg;
-    }
     public void MergeJson(string messagesJson)
     {
         if (string.IsNullOrEmpty(messagesJson))
@@ -165,25 +178,27 @@ public class Messages : IMessages
         var newMsgs = JsonConvert.DeserializeObject<Dictionary<string,string>>(messagesJson);
         if(newMsgs != null) 
             foreach (var msg in newMsgs)
-                Msgs[msg.Key] = msg.Value;
+                _msgs[msg.Key] = msg.Value;
     }
-    public MessageUnits CurrentUnits { get; set; } = MessageUnits.I;  
+    public LzMessageUnits Units { get; set; } = LzMessageUnits.Imperial;  
 
-    static string[] imperialUnits = { "in", "ft", "yd", "mi", "oz", "lb", "sq in", "sq ft" };
+    static string[] imperialUnits = { "in", "\"", "ft", "'", "yd", "mi", "oz", "lb", "sq in", "sq ft" };
     static string[] metricUnits = { "mm", "cm", "m", "km", "g", "kg", "sq mm", "sq cm", "sq m" };
     static Dictionary<string, string> defaultConversions() => new()
     {
         { "in", "mm" },
+        { "\"", "mm" },
         { "ft", "m" },
+        { "'", "m" },
         { "yd", "m" },
         { "mi", "km" },
         { "oz", "g" },
         { "lb", "kg" },
         { "sq in", "sq cm" },
         { "sq ft", "sq m"},
-        { "mm", "in" },
-        { "cm", "in" },
-        { "m", "ft" },
+        { "mm", "\"" },
+        { "cm", "\"" },
+        { "m", "'" },
         { "km", "mi" },
         { "g", "oz" },
         { "kg", "lb" },
@@ -194,7 +209,9 @@ public class Messages : IMessages
     static Dictionary<string, (double factor, int precision)> conversionFactors = new()
     {
         { "in,mm", (25.4, 2)},
+        { "\",mm", (25.4, 2)},
         { "ft,m",  (0.3048, 1)},
+        { "',m",  (0.3048, 1)},
         { "yd,m", (0.9144,1) },
         { "mi,km", (1.609344, 2) },
         { "oz,g", (28.349523125,0) },
@@ -202,8 +219,11 @@ public class Messages : IMessages
         { "sq in,sq cm", (6.4516, 0) },
         { "sq ft,sq m", (0.09290304, 1)},
         { "mm,in", (0.0393700787, 2) },
+        { "mm,\"", (0.0393700787, 2) },
         { "cm,in", (0.393700787, 2) },
+        { "cm,\"", (0.393700787, 2) },
         { "m,ft", (3.2808399, 1) },
+        { "m,'", (3.2808399, 1) },
         { "km,mi", (0.621371192, 2) },
         { "g,oz", (0.0352739619, 2) },
         { "kg,lb", (2.20462262, 1) },
@@ -227,15 +247,15 @@ public class Messages : IMessages
     }
     protected string UnitConversion(string value, string valueUnit, int? precision = null, string? toUnit = null )
     {
-        MessageUnits valueUnits = MessageUnits.I; 
+        LzMessageUnits valueUnits = LzMessageUnits.Imperial; 
         if(imperialUnits.Contains(valueUnit))
-            valueUnits = MessageUnits.I;
+            valueUnits = LzMessageUnits.Imperial;
         else if(metricUnits.Contains(valueUnit))
-            valueUnits = MessageUnits.M;
+            valueUnits = LzMessageUnits.Metric;
         else
             throw new Exception($"UnitConversion: {valueUnit} is not a recognized unit.");
 
-        if(valueUnits == CurrentUnits)
+        if(valueUnits == Units)
             return $"{value}{valueUnit}";
         try
         {
@@ -254,28 +274,13 @@ public class Messages : IMessages
             return $"{value} {valueUnit} can't be converted.";
         }
     }
-
-    public static int CountDigitsAfterDecimal(string number)
-    {
-        // Check if the number contains a decimal point.
-        int decimalIndex = number.IndexOf('.');
-        if (decimalIndex == -1)
-        {
-            // No decimal point found, so return 0.
-            return 0;
-        }
-
-        // Count the number of digits after the decimal point.
-        // We subtract 1 to account for the decimal point itself.
-        return number.Length - decimalIndex - 1;
-    }
     protected string ProcessUnitS(string arguments)
     {
         var args = arguments.Split(',');
         if (args.Length != 2)
             return $"UnitS requires two arguments. ";
 
-        if(CurrentUnits == MessageUnits.I)
+        if(Units == LzMessageUnits.Imperial)
             return args[0];
         else
             return args[1];

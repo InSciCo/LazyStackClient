@@ -47,7 +47,7 @@ public class LzReactiveComponentBase<T> : ComponentBase, IViewFor<T>, INotifyPro
     public T _myViewModel { set => ViewModel = value; }
 
     [Inject]
-    public IMessages? Messages { get; set; }
+    public ILzMessages? Messages { get; set; }
     protected MarkupString Msg(string key) => (MarkupString)Messages!.Msg(key);
 
     /// <inheritdoc />

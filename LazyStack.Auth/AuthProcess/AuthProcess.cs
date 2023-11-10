@@ -143,7 +143,7 @@ public class AuthProcess : NotifyBase, IAuthProcess
         }
     }
 
-    // UI Messages
+    // UI LzMessages
     private string? _loginFormatMessage;
     public string? LoginFormatMessage => _loginFormatMessage;
 
@@ -215,7 +215,7 @@ public class AuthProcess : NotifyBase, IAuthProcess
     public bool IsSignedIn => _authProvider.IsSignedIn;
     public bool IsNotSignedIn => !_authProvider.IsSignedIn;
 
-    // Format Messages
+    // Format LzMessages
     public string[]? FormatMessages { get { return _authProvider.FormatMessages; } }
     public string? FormatMessage { get { return _authProvider.FormatMessage; } }
 

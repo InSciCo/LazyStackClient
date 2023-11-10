@@ -16,7 +16,7 @@ public class LzEditContext<T1,T2>
         editItem.RegisterObservables();
         // EditContext contains a private Dictionary<FieldIdentifier,FieldState>
         EditContext = new EditContext(editItem);
-        // ValidationMessageStore contains an Item[FieldIdentifer] array containing Messages by field
+        // ValidationMessageStore contains an Item[FieldIdentifer] array containing LzMessages by field
         ValidationMessageStore = new ValidationMessageStore(EditContext);
         // Note that editItem instance properties are uniquely identified by a FieldIdentier and it is this
         // FieldIdentifier that provides "shared context" between the EditContext and ValidationMessageStore

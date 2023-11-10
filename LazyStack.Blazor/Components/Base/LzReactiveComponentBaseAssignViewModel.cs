@@ -44,8 +44,12 @@ public class LzReactiveComponentBaseAssignViewModel<T> : ComponentBase, IViewFor
     }
 
     [Inject]
-    public IMessages? Messages { get; set; }
-    protected MarkupString Msg(string key) => (MarkupString)Messages!.Msg(key);
+    public ILzMessages? Messages { get; set; }
+    protected MarkupString Msg(string key)
+    {
+        var msg = Messages!.Msg(key);
+        return (MarkupString)msg;
+    }
 
     /// <inheritdoc />
     object? IViewFor.ViewModel
