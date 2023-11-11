@@ -1,6 +1,8 @@
-﻿namespace LazyStack.ViewModels;
+﻿using System.ComponentModel;
 
-public interface ILzBaseSessionViewModel
+namespace LazyStack.ViewModels;
+
+public interface ILzBaseSessionViewModel : INotifyPropertyChanged
 {
     bool IsSignedIn { get; }
     IInternetConnectivitySvc InternetConnectivity { get; set; }
@@ -13,6 +15,7 @@ public interface ILzBaseSessionViewModel
     bool IsOnline { get; }
     bool IsLoaded { get; set; }
     bool IsLoading { get; set; }
+    LzMessageSet MessageSet { get; set; }    
     Task<bool> CheckInternetConnectivityAsync();
     Task LoadAsync();
     Task OnSignedInAsync();

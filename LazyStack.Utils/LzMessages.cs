@@ -9,6 +9,7 @@ public interface ILzMessages
     public void ReplaceVars();
     public void SetOSAccess(IOSAccess oSAccess);
     public Task SetMessageSetAsync(LzMessageSet messageSet);  
+    public Task SetMessageSetAsync(string culture, LzMessageUnits units);
     public void AddInternalMsg(string key, string msg);
     public List<string> MessageFiles { get; set; }
     public string Msg(string key);
@@ -32,11 +33,17 @@ public interface ILzMessages
 /// 
 /// External message resources are culture specific with a sufix determining the 
 /// culture of the messages. ex: "_content/{assembly}/LzMessages.en-US.json".
-/// External message resources are loaded using IOSAccess.ContentReadAsync. 
+/// External message resources are loaded using IOSAccess.ContentReadAsync so 
+/// you need to call SetOSAccess before loading external message resources. 
 /// 
 /// To load external message resources:
 /// 1. Set the MessageFiles property to the list of message files. ex:
-///     LzMessages.MessageFiles = new List<string> { "_content/MyApp/messages.en-US.json", "_content/MyApp/inventory.en-US.json };
+///     LzMessages.MessageFiles = new List<string> { 
+///     "_content/MyApp/data/messages.en-US.json", 
+///     "_content/MyApp/data/inventory.en-US.json,
+///     "_content/MyApp/tenant/messages.en-US.json", // tenant messages override data messages
+///     "_content/MyApp/tenant/inventory.en-US.json // tenant inventory override data inventory
+///     };
 /// 2. Call SetOSAccess() with an IOSAccess object. 
 /// 3. Call SetMessageSetAsync("en-US") with the culture to load and make current.
 /// 
@@ -44,6 +51,10 @@ public interface ILzMessages
 /// If a key is not found in the current culture, the key is searched for in the
 /// internal messages. If the key is not found in the internal messages, the key
 /// is returned.
+/// 
+/// A MessageSet is a combination of a culture and a unit of measure. The LzMessageSet 
+/// class is used to identify a MessageSet. The default Equals and GetHashCode methods 
+/// are ovdrridden so that MessageSet can be used as a key in a dictionary easily.
 /// 
 /// Overrides/Tenancy:
 /// When multiple message files are loaded for a culture, the keys in the last 
@@ -71,12 +82,20 @@ public class LzMessages : ILzMessages
     public List<LzMessageSet> MessageSets { get; } = new List<LzMessageSet>();
     public List<string> MessageFiles { get; set; } = new();
     protected IOSAccess? _oSAccess;
-    public LzMessageSet GetMessageSet(string culture, LzMessageUnits units)
+	public LzMessageUnits Units => MessageSet.Units;
+
+	public LzMessageSet GetMessageSet(string culture, LzMessageUnits units)
     {
         var messageSet = MessageSets.FirstOrDefault(ms => ms.Culture == culture && ms.Units == units)
             ?? throw new Exception($"MessageSet not found for culture: {culture} and units: {units}");
         return messageSet;
     }
+    public bool TryGetMessageSet(string culture, LzMessageUnits units, out LzMessageSet? messageSet)
+    {
+        messageSet = MessageSets.FirstOrDefault(ms => ms.Culture == culture && ms.Units == units);
+        return messageSet != null;  
+    }
+
     public void AddInternalMsg(string key, string msg)
     {
         _internalMsgs[key] = ReplaceUnits(msg);
@@ -86,6 +105,7 @@ public class LzMessages : ILzMessages
     {
         if (!msg.Contains("@Unit")) // typically, most messages don't have units, this is a quick check to see if we need to do anything
             return msg;
+        var msgIn = msg;    
         MatchCollection matches;
         // Process @Unit() functions 
         while ((matches = Regex.Matches(msg, "@Unit\\((.*?)\\)")).Count > 0)
@@ -122,10 +142,18 @@ public class LzMessages : ILzMessages
     {
         _oSAccess = oSAccess;
     }
+    public Task SetMessageSetAsync(string culture, LzMessageUnits units)
+    {
+        if (TryGetMessageSet(culture, units, out LzMessageSet? messageSet))
+            return SetMessageSetAsync(messageSet!);
+        else
+            return SetMessageSetAsync(new LzMessageSet(culture, units));
+    }
     public async Task SetMessageSetAsync(LzMessageSet messageSet)
     {
         if (_oSAccess == null)
-            throw new Exception("SetOSAccess must be called before SetLanguageAsync.");
+            throw new Exception("SetOSAccess must be called before SetMessageSetAsync.");
+        Console.WriteLine($"SetMessageSetAsync: {messageSet.Culture} {messageSet.Units}");
         MessageSet = messageSet;
         if (_messageSetData.ContainsKey(messageSet))
         {
@@ -152,15 +180,14 @@ public class LzMessages : ILzMessages
 
         if (key == "Nothing")
             return false;
-
+        var msgs = _messageSetData[MessageSet]; 
         // Try and get the message from the current culture messages
-        if (_msgs.TryGetValue(key, out string? value))
+        if (msgs.TryGetValue(key, out string? value))
             msg = string.IsNullOrEmpty(value) ? key : value;
         else
         // Try and get the message from the internal messages
         if (_internalMsgs.TryGetValue(key, out string? internalValue))
             msg = string.IsNullOrEmpty(value) ? key : internalValue;
-        Console.WriteLine($"{key}:{msg}");
         return !key.Equals(msg);
     }
     public string Msg(string key)
@@ -180,7 +207,6 @@ public class LzMessages : ILzMessages
             foreach (var msg in newMsgs)
                 _msgs[msg.Key] = msg.Value;
     }
-    public LzMessageUnits Units { get; set; } = LzMessageUnits.Imperial;  
 
     static string[] imperialUnits = { "in", "\"", "ft", "'", "yd", "mi", "oz", "lb", "sq in", "sq ft" };
     static string[] metricUnits = { "mm", "cm", "m", "km", "g", "kg", "sq mm", "sq cm", "sq m" };
