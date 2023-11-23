@@ -1,0 +1,40 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div id="svg" class="svgviewer" style="width: 100%; height: 100%;">
+</div>
+@code {
+    [Parameter] public string? SvgUrl { get; set; }
+    [Parameter] public EventCallback<string> PathSelected { get; set; }
+    [Parameter] public EventCallback<string> PathUnselected { get; set; }
+    [Parameter] public List<string> InitialPaths { get; set; } = new() { "" };   
+    private SvgViewerJS? svgViewerJS;
+    private ElementReference svg;
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        svgViewerJS ??= new SvgViewerJS(JSRuntime);
+        svgViewerJS.PathSelectedEvent += OnPathSelected;
+        svgViewerJS.PathUnselectedEvent += OnPathUnselected;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            await svgViewerJS!.InitAsync();
+            await svgViewerJS!.LoadSvgAsync(SvgUrl!);
+            foreach(var path in InitialPaths)
+                await svgViewerJS!.SelectPath(path);
+        }
+    }
+    public void OnPathSelected(string pathId)
+    {
+        PathSelected.InvokeAsync(pathId);
+    }
+    public void OnPathUnselected(string pathId) => PathUnselected.InvokeAsync(pathId);    
+    
+    public async Task SelectPath(string pathId) => await svgViewerJS!.SelectPath(pathId);
+    public async Task UnslectPath(string pathId) =>await svgViewerJS!.UnselectPath(pathId);
+    public async Task UnselectAllPaths() => await svgViewerJS!.UnselectAllPaths();
+    // todo - dispose
+}

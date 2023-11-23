@@ -79,7 +79,11 @@ public class JSCameraModule : BaseJSModule
     #region Properties
 
     /// <inheritdoc/>
-    public override string ModuleFileName => $"./_content/Blazorise.Camera/blazorise.camera.js?v={VersionProvider.Version}";
+    public override string ModuleFileName
+	{
+		get { return $"./_content/LazyStack.BlazoriseComponents/blazorise.camera.js"; }
+	}
+		
 
 	#endregion
 }

@@ -162,13 +162,14 @@ public class LzMessages : ILzMessages
         }
         _msgs = new Dictionary<string, string>();
         _messageSetData.Add(messageSet, _msgs);
-        foreach (var msgFile in MessageFiles)
-        {
-            // msgFile example: "messages.en-US.json"
-            var filePath = msgFile.Replace(".json", $".{messageSet.Culture}.json");
-            var json = await _oSAccess.ContentReadAsync(filePath);
-            MergeJson(json);
-        }
+        if(MessageFiles is not null)
+            foreach (var msgFile in MessageFiles)
+            {
+                // msgFile example: "messages.en-US.json"
+                var filePath = msgFile.Replace(".json", $".{messageSet.Culture}.json");
+                var json = await _oSAccess.ContentReadAsync(filePath);
+                MergeJson(json);
+            }
         ReplaceVars();
         return;
     }
@@ -187,7 +188,7 @@ public class LzMessages : ILzMessages
         else
         // Try and get the message from the internal messages
         if (_internalMsgs.TryGetValue(key, out string? internalValue))
-            msg = string.IsNullOrEmpty(value) ? key : internalValue;
+            msg = string.IsNullOrEmpty(internalValue) ? key : internalValue;
         return !key.Equals(msg);
     }
     public string Msg(string key)
