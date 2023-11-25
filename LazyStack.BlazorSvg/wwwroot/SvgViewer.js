@@ -19,51 +19,6 @@ export function initAsync(dotNetObjectReferenceArg) {
     });
 }
 // Application Code
-//export function loadSvgAsync(svgContent) {
-//    if (s) {
-//        s.selectAll("path").forEach(function (path) {
-//            let domPath = path.node;
-//            if (domPath._handleSelection) {
-//                domPath.removeEventListener("click", domPath._handleSelection);
-//                delete domPath._handleSelection; // Remove the reference
-//            }
-//        });
-//    }
-//    s = Snap("#svg");
-//    return new Promise((resolve, reject) => {
-//        fetch(svgContent).then(response => {
-//            let json = response.json();
-//            let f = Snap.parse(json);
-
-//            if (f) {
-//                s.append(f);
-//                let svg = s.select("svg");
-//                let viewBox = svg.attr("viewBox");
-//                svg.attr({ width: "100%", height: "100%", preserveAspectRatio: "xMidYMid meet" });
-//                s.selectAll("path").forEach(function (path) {
-//                    path.node.addEventListener("click", handleSelection);
-//                });
-//                resolve();
-//            }
-//            else
-//                reject('Svg could not be loaded');
-//        });
-//        //Snap.load(svgContent, function (f) {
-//        //    if (f) { 
-//        //        s.append(f);
-//        //        let svg = s.select("svg");
-//        //        let viewBox = svg.attr("viewBox");
-//        //        svg.attr({ width: "100%", height: "100%", preserveAspectRatio: "xMidYMid meet" });
-//        //        s.selectAll("path").forEach(function (path) {
-//        //            path.node.addEventListener("click", handleSelection);
-//        //        });
-//        //        resolve();
-//        //    }
-//        //    else 
-//        //        reject('Svg could not be loaded');
-//        //});
-//    });
-//}
 export function loadSvgAsync(svgContent) {
     if (s) {
         s.selectAll("path").forEach(function (path) {
@@ -73,7 +28,11 @@ export function loadSvgAsync(svgContent) {
                 delete domPath._handleSelection; // Remove the reference
             }
         });
+        
     }
+    let svgElement = document.querySelector("#svg");
+    if (svgElement)
+        svgElement.innerHTML = "";
     s = Snap("#svg");
     return new Promise((resolve, reject) => {
         // Using fetch instead of Snap.load because of CORS issues

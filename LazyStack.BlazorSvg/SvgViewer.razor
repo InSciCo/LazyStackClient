@@ -9,6 +9,8 @@
     [Parameter] public List<string> InitialPaths { get; set; } = new() { "" };   
     private SvgViewerJS? svgViewerJS;
     private ElementReference svg;
+    private string? lastSvgUrl;
+    private bool busy;
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -19,14 +21,35 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        if(firstRender)
+        if (firstRender)
         {
+            busy = true;
             await svgViewerJS!.InitAsync();
-            await svgViewerJS!.LoadSvgAsync(SvgUrl!);
-            foreach(var path in InitialPaths)
-                await svgViewerJS!.SelectPath(path);
+            busy = false;
+
         }
+        if (!busy && !SvgUrl!.Equals(lastSvgUrl))
+        {
+            busy = true;  
+            lastSvgUrl = SvgUrl;
+            await svgViewerJS!.LoadSvgAsync(SvgUrl!);
+            foreach (var path in InitialPaths)
+                await svgViewerJS!.SelectPath(path);
+            busy = false;
+
+        }
+        ;
     }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (svgViewerJS is null)
+            throw new InvalidOperationException("svgViewerJS is null");
+        if (SvgUrl is null)
+            throw new InvalidOperationException("SvgUrl is null");
+    }   
+
     public void OnPathSelected(string pathId)
     {
         PathSelected.InvokeAsync(pathId);
