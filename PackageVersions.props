@@ -8,8 +8,8 @@
         -->
         <Amazon_Extensions_CognitoAuthentication>2.5.2</Amazon_Extensions_CognitoAuthentication>
 		<AwsSignatureVersion4>4.0.1</AwsSignatureVersion4>
-		<AWSSDK_CloudFormation>3.7.108.1</AWSSDK_CloudFormation>
-        <AWSSDK_SecurityToken>3.7.202.4</AWSSDK_SecurityToken>
+		<AWSSDK_CloudFormation>3.7.301.7</AWSSDK_CloudFormation>
+        <AWSSDK_SecurityToken>3.7.300.13</AWSSDK_SecurityToken>
 		<Blazorise>1.3.1</Blazorise>
 		<Blazorise_Bootstrap5>1.3.1</Blazorise_Bootstrap5>
 		<Blazorise_Components>1.3.1</Blazorise_Components>
