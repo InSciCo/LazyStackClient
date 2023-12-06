@@ -145,17 +145,23 @@ public class LzItemsViewModelBase<TVM, TDTO, TModel> : LzViewModelBase, INotifyC
         var tasks = new List<Task<(bool success, string msg)>>();
         foreach (var item in list)
         {
-            var (vm, itemMsg) = NewViewModel(item);
-            var id = vm.Id;
-            if (id is null)
-                throw new Exception("NewViewModel return null id");
-            if (!ViewModels!.ContainsKey(id))
-                ViewModels!.Add(id, vm);
-            else
-                ViewModels![id] = vm;
-            vm.State = LzItemViewModelBaseState.Current;
-            if (AutoReadChildren)
-                tasks.Add(ViewModels![id].ReadChildrenAsync(forceload, storageAPI));
+            try
+            {
+                var (vm, itemMsg) = NewViewModel(item);
+                var id = vm.Id;
+                if (id is null)
+                    throw new Exception("NewViewModel return null id");
+                if (!ViewModels!.ContainsKey(id))
+                    ViewModels!.Add(id, vm);
+                else
+                    ViewModels![id] = vm;
+                vm.State = LzItemViewModelBaseState.Current;
+                if (AutoReadChildren)
+                    tasks.Add(ViewModels![id].ReadChildrenAsync(forceload, storageAPI));
+            } catch (Exception ex)
+            {
+                Console.WriteLine($"Could not load item:");
+            }
         }
         await Task.WhenAll(tasks);
         var result = tasks.Where(x => x.Result.success == false).Select(x => x.Result).FirstOrDefault((success: true, msg: string.Empty));

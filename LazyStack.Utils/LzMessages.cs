@@ -151,26 +151,35 @@ public class LzMessages : ILzMessages
     }
     public async Task SetMessageSetAsync(LzMessageSet messageSet)
     {
-        if (_oSAccess == null)
-            throw new Exception("SetOSAccess must be called before SetMessageSetAsync.");
-        Console.WriteLine($"SetMessageSetAsync: {messageSet.Culture} {messageSet.Units}");
-        MessageSet = messageSet;
-        if (_messageSetData.ContainsKey(messageSet))
+        try
         {
-            _msgs = _messageSetData[messageSet];
-            return;
-        }
-        _msgs = new Dictionary<string, string>();
-        _messageSetData.Add(messageSet, _msgs);
-        if(MessageFiles is not null)
-            foreach (var msgFile in MessageFiles)
+            if (_oSAccess == null)
+                throw new Exception("SetOSAccess must be called before SetMessageSetAsync.");
+            MessageSet = messageSet;
+            if (_messageSetData.ContainsKey(messageSet))
             {
-                // msgFile example: "messages.en-US.json"
-                var filePath = msgFile.Replace(".json", $".{messageSet.Culture}.json");
-                var json = await _oSAccess.ContentReadAsync(filePath);
-                MergeJson(json);
+                _msgs = _messageSetData[messageSet];
+                return;
             }
-        ReplaceVars();
+            _msgs = new Dictionary<string, string>();
+            _messageSetData.Add(messageSet, _msgs);
+            if (MessageFiles is not null)
+                foreach (var msgFile in MessageFiles)
+                {
+                    // msgFile example: "messages.en-US.json"
+                    var filePath = msgFile.Replace(".json", $".{messageSet.Culture}.json");
+                    var json = await _oSAccess.ContentReadAsync(filePath);
+                    if (!string.IsNullOrEmpty(json))
+                    {
+                        MergeJson(json);
+                    }
+                }
+            ReplaceVars();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error setting message set: {ex.Message}");
+        }   
         return;
     }
     public bool TryGetMsg(string key, out string msg)
@@ -201,12 +210,20 @@ public class LzMessages : ILzMessages
 
     public void MergeJson(string messagesJson)
     {
-        if (string.IsNullOrEmpty(messagesJson))
-            return;
-        var newMsgs = JsonConvert.DeserializeObject<Dictionary<string,string>>(messagesJson);
-        if(newMsgs != null) 
-            foreach (var msg in newMsgs)
-                _msgs[msg.Key] = msg.Value;
+        try
+        {
+            //Console.WriteLine(Msg($"Merging messages: {messagesJson}"));
+            if (string.IsNullOrEmpty(messagesJson))
+                return;
+            var newMsgs = JsonConvert.DeserializeObject<Dictionary<string, string>>(messagesJson);
+            if (newMsgs != null)
+                foreach (var msg in newMsgs)
+                    _msgs[msg.Key] = msg.Value;
+            Console.WriteLine(Msg($"Merged messages"));
+        } catch (Exception ex)
+        {
+            Console.WriteLine($"Error merging messages: {ex.Message}");
+        }   
     }
 
     static string[] imperialUnits = { "in", "\"", "ft", "'", "yd", "mi", "oz", "lb", "sq in", "sq ft" };
