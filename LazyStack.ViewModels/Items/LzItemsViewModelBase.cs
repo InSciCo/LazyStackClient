@@ -158,7 +158,7 @@ public class LzItemsViewModelBase<TVM, TDTO, TModel> : LzViewModelBase, INotifyC
                 vm.State = LzItemViewModelBaseState.Current;
                 if (AutoReadChildren)
                     tasks.Add(ViewModels![id].ReadChildrenAsync(forceload, storageAPI));
-            } catch (Exception ex)
+            } catch 
             {
                 Console.WriteLine($"Could not load item:");
             }

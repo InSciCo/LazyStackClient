@@ -12,7 +12,7 @@ public  class WASMOSAccess : IOSAccess
         {
             var text = await httpClient.GetStringAsync(url);
             return text;
-        } catch (Exception ex) 
+        } catch 
         {
             return string.Empty;
         }
@@ -24,7 +24,7 @@ public  class WASMOSAccess : IOSAccess
             var text = await httpClient.GetStringAsync(url);
             return text;
         }
-        catch (Exception ex)
+        catch
         {
             return string.Empty;
         }

@@ -87,7 +87,6 @@ public abstract class LzNotificationSvc : LzViewModelBase, ILzNotificationSvc, I
     public abstract Task<(bool success, string msg)> UnsubscribeAsync(List<string> topicIds);
     public abstract Task<(bool success, string msg)> UnsubscribeAllAsync();
     
-    private PropertyInfo? createdAtPropertyInfo;
     protected string createdAtFieldName = "CreatedAt";
 
     public async Task ConnectAsync()
