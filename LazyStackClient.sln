@@ -47,7 +47,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.MAUI", "LazyStack
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.LzItemViewModelGenerator", "LazyStack.LzItemViewModelGenerator\LazyStack.LzItemViewModelGenerator.csproj", "{2F3D9E84-AC8B-4036-829A-AEA9B1DA6383}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazyStack.BlazorSvg", "LazyStack.BlazorSvg\LazyStack.BlazorSvg.csproj", "{D77EB90B-1F1D-4E14-B1C3-F67B46DB3ED9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.BlazorSvg", "LazyStack.BlazorSvg\LazyStack.BlazorSvg.csproj", "{D77EB90B-1F1D-4E14-B1C3-F67B46DB3ED9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.DIHelper", "LazyStack.DIHelper\LazyStack.DIHelper.csproj", "{AE0C7966-6801-409E-9CF0-D4F9686EEF5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,6 +121,10 @@ Global
 		{D77EB90B-1F1D-4E14-B1C3-F67B46DB3ED9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D77EB90B-1F1D-4E14-B1C3-F67B46DB3ED9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D77EB90B-1F1D-4E14-B1C3-F67B46DB3ED9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE0C7966-6801-409E-9CF0-D4F9686EEF5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE0C7966-6801-409E-9CF0-D4F9686EEF5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE0C7966-6801-409E-9CF0-D4F9686EEF5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE0C7966-6801-409E-9CF0-D4F9686EEF5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
