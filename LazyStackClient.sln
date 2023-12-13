@@ -51,6 +51,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.BlazorSvg", "Lazy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.DIHelper", "LazyStack.DIHelper\LazyStack.DIHelper.csproj", "{AE0C7966-6801-409E-9CF0-D4F9686EEF5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazyStack.AuthTest", "LazyStack.AuthTest\LazyStack.AuthTest.csproj", "{27F5EAC2-1853-47CD-9156-3324ED320CFD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -125,6 +127,10 @@ Global
 		{AE0C7966-6801-409E-9CF0-D4F9686EEF5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE0C7966-6801-409E-9CF0-D4F9686EEF5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE0C7966-6801-409E-9CF0-D4F9686EEF5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27F5EAC2-1853-47CD-9156-3324ED320CFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27F5EAC2-1853-47CD-9156-3324ED320CFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27F5EAC2-1853-47CD-9156-3324ED320CFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27F5EAC2-1853-47CD-9156-3324ED320CFD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

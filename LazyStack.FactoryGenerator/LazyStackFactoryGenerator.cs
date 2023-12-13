@@ -152,7 +152,7 @@ namespace {namespaceName}
     }}
 }}
 ");
-                    Log(context, $"source: {sourceBuilder.ToString()}");
+                    // Log(context, $"source: {sourceBuilder.ToString()}");
                     SyntaxTree tree = CSharpSyntaxTree.ParseText(sourceBuilder.ToString());
                     SyntaxNode root = tree.GetRoot();
                     SyntaxNode formattedRoot = root.NormalizeWhitespace();
@@ -165,7 +165,7 @@ namespace {namespaceName}
 
 
             var source = GenerateRegistrationClass(context.Compilation.AssemblyName!, classes, namespaces);
-            Log(context, $"source: {source}");
+            // Log(context, $"source: {source}");
             context.AddSource($"{context.Compilation.AssemblyName}/RegisterFactories.cs", source);
 
         }
@@ -281,11 +281,10 @@ public static class RegisterFactories
         var parameters = constructor.ParameterList.Parameters;
         var prunedParameters = RemoveFactoryInjectAttributeFromParameters(parameters.ToList(), model);
         parameters = SyntaxFactory.SeparatedList(prunedParameters);
-        Log(context, "zapa");
         foreach(var param in parameters)
         {
             var parameterText = param.ToFullString();
-            Log(context, parameterText);
+            //Log(context, parameterText);
         }
 
         // 3. Generate the Create method.

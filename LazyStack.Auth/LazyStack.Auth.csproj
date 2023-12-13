@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="..\PackageVersions.props" />
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<UserSecretsId>76925471-91ff-459d-8f16-a8b8c691549b</UserSecretsId>
 		<Copyright>Copyright (c) 2021,2022 Insight Sciences Corporation. All rights reserved.</Copyright>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
@@ -38,7 +38,7 @@
 	<ItemGroup>
 		<PackageReference Include="Amazon.Extensions.CognitoAuthentication" />
 		<PackageReference Include="AwsSignatureVersion4" />
-		<PackageReference Include="MailKit" />
+		<!--<PackageReference Include="MailKit" />-->
 		<PackageReference Include="System.ComponentModel.Annotations" />
 		<PackageReference Include="JsonSubTypes" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" />
