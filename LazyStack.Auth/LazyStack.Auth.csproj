@@ -47,6 +47,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\LazyStackShared\LazyStack.ClientSDK\LazyStack.ClientSDK.csproj" />
 	  <ProjectReference Include="..\LazyStack.AwsSettings\LazyStack.AwsSettings.csproj" />
 	  <ProjectReference Include="..\LazyStack.Utils\LazyStack.Utils.csproj" />
 	</ItemGroup>

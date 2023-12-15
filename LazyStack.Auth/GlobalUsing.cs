@@ -6,6 +6,7 @@ global using Amazon.Runtime;
 global using Amazon;
 global using LazyStack.Auth;
 global using LazyStack.Base;
+global using LazyStack.ClientSDK;
 global using LazyStack.Utils;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection.Extensions;
