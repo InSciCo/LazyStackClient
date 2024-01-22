@@ -1,11 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\PackageVersions.props" />
+	<Import Project="..\CommonPackageHandling.targets" />
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
+
+		<Description>LazyStack ViewModels base</Description>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Content Remove="Session\LzSessionsViewModel.cs" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Remove="Config\Messages.json" />
@@ -30,8 +37,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\LazyStack.Auth\LazyStack.Auth.csproj" />
-		<ProjectReference Include="..\..\LazyStackShared\LazyStack.Notifications.Schema\LazyStack.Notifications.Schema.csproj" />
+		<ProjectReference Include="..\LazyStack.Base\LazyStack.Base.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

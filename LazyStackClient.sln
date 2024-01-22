@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Auth", "LazyStack
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.AwsSettings", "LazyStack.AwsSettings\LazyStack.AwsSettings.csproj", "{92854D63-BF9B-4D57-A1CC-26DF77B0E8EF}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LazyStack.AwsSettingsSharedCode", "LazyStack.AwsSettingsSharedCode\LazyStack.AwsSettingsSharedCode.shproj", "{36169D4F-FBD9-442A-97AD-6D763D8AA9D2}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Base", "LazyStack.Base\LazyStack.Base.csproj", "{599D4DEF-A04D-4DD2-A3BC-BEA46E802147}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Blazor", "LazyStack.Blazor\LazyStack.Blazor.csproj", "{8D0527CB-7399-42D0-AF9B-9C3ED29323C5}"
@@ -21,29 +19,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.GetAwsSettings", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1B69CA48-CBB7-4EB7-B034-F3BE7D8220D2}"
 	ProjectSection(SolutionItems) = preProject
+		CommonPackageHandling.targets = CommonPackageHandling.targets
 		Directory.Packages.props = Directory.Packages.props
 		LICENSE.txt = LICENSE.txt
-		PackageVersions.props = PackageVersions.props
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LazyStack.Notifciations.SharedSDK", "LazyStack.NotifciationsSharedSDK\LazyStack.Notifciations.SharedSDK.shproj", "{764DFBAD-2799-4C2F-9061-6CA377816A5F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Notifications.ViewModels", "LazyStack.Notifications.ViewModels\LazyStack.Notifications.ViewModels.csproj", "{7EC50523-A053-40B5-8C6B-0656CD4327C9}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Utils", "LazyStack.Utils\LazyStack.Utils.csproj", "{E74F641E-7B50-48BA-8B31-040483690B01}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.ViewModels", "LazyStack.ViewModels\LazyStack.ViewModels.csproj", "{12677965-F4C1-452A-A5A1-D635F11B9C98}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LazyStackShared", "LazyStackShared", "{D15965DC-8951-4663-BAE1-14EF3D6E3335}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ServiceClientShared", "ServiceClientShared", "{D15965DC-8951-4663-BAE1-14EF3D6E3335}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Notifications.Schema", "..\LazyStackShared\LazyStack.Notifications.Schema\LazyStack.Notifications.Schema.csproj", "{6F921CF6-3E57-490F-93F1-DA270B8CB8AA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.BlazoriseComponents", "LazyStack.Blazorise\LazyStack.BlazoriseComponents.csproj", "{08E9655D-1121-4EB4-87CB-3CBEF8EBA65A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.FactoryGenerator", "LazyStack.FactoryGenerator\LazyStack.FactoryGenerator.csproj", "{EB08194A-6AAE-4341-B57E-BBCA84389B70}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.MAUI", "LazyStack.MAUI\LazyStack.MAUI.csproj", "{CDDC3A01-A57C-41E2-9DCF-4481D5CAD541}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.LzItemViewModelGenerator", "LazyStack.LzItemViewModelGenerator\LazyStack.LzItemViewModelGenerator.csproj", "{2F3D9E84-AC8B-4036-829A-AEA9B1DA6383}"
 EndProject
@@ -53,7 +43,31 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.DIHelper", "LazyS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.AuthTest", "LazyStack.AuthTest\LazyStack.AuthTest.csproj", "{27F5EAC2-1853-47CD-9156-3324ED320CFD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.ClientSDK", "..\LazyStackShared\LazyStack.ClientSDK\LazyStack.ClientSDK.csproj", "{54A829FE-F099-48DA-A046-8C8982DEC4AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.ViewModels.Auth", "LazyStack.ViewModels.Auth\LazyStack.ViewModels.Auth.csproj", "{B677F274-8928-485E-80DF-A425AA1AC566}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.ViewModels.Auth.Notifications", "LazyStack.ViewModels.Auth.Notifications\LazyStack.ViewModels.Auth.Notifications.csproj", "{40AF386D-B092-498E-9610-294EBA521EC3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{48AC52DC-AF9B-4E81-9E04-56F7AC46F1B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AWS", "AWS", "{F95877BE-E70F-4B05-AC34-2B7EBBB85D17}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Auth", "Auth", "{B863BB40-09C4-4B14-9ABB-C039BC85E223}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ViewModels", "ViewModels", "{1B339ED2-D31A-47B1-AF21-B6626403066B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blazor", "Blazor", "{193E0079-874E-484A-896A-9AE206019D20}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Blazor.Auth", "LazyStack.Blazor.Auth\LazyStack.Blazor.Auth.csproj", "{45CC295F-D3FE-4C31-B6CD-4C8604F5FEC6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.BlazoriseComponents.Auth", "LazyStack.BlazoriseComponents.Auth\LazyStack.BlazoriseComponents.Auth.csproj", "{17A5A48A-AC1A-414B-9DED-7AE515C2DC6F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blazorise", "Blazorise", "{7C5BB394-D6C5-48A8-9C08-76FE87BD8AA8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Auth.Cognito", "LazyStack.Auth.Cognito\LazyStack.Auth.Cognito.csproj", "{C9FC7D69-E2F3-422F-8322-9D15EE455DB1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Auth.Cognito.SigV4", "LazyStack.Auth.Cognito.SigV4\LazyStack.Auth.Cognito.SigV4.csproj", "{B5A3A54C-F8CC-447B-B406-60B4034D5D3D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.ClientSDK", "LazyStack.ClientSDK\LazyStack.ClientSDK.csproj", "{75674D40-4D95-42E3-B73B-F77056601156}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,14 +103,6 @@ Global
 		{2CDCC465-CE33-4203-9F7F-7E6584DB4C86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CDCC465-CE33-4203-9F7F-7E6584DB4C86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CDCC465-CE33-4203-9F7F-7E6584DB4C86}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7EC50523-A053-40B5-8C6B-0656CD4327C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7EC50523-A053-40B5-8C6B-0656CD4327C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7EC50523-A053-40B5-8C6B-0656CD4327C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7EC50523-A053-40B5-8C6B-0656CD4327C9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E74F641E-7B50-48BA-8B31-040483690B01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E74F641E-7B50-48BA-8B31-040483690B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E74F641E-7B50-48BA-8B31-040483690B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E74F641E-7B50-48BA-8B31-040483690B01}.Release|Any CPU.Build.0 = Release|Any CPU
 		{12677965-F4C1-452A-A5A1-D635F11B9C98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{12677965-F4C1-452A-A5A1-D635F11B9C98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12677965-F4C1-452A-A5A1-D635F11B9C98}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -113,10 +119,6 @@ Global
 		{EB08194A-6AAE-4341-B57E-BBCA84389B70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB08194A-6AAE-4341-B57E-BBCA84389B70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB08194A-6AAE-4341-B57E-BBCA84389B70}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CDDC3A01-A57C-41E2-9DCF-4481D5CAD541}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CDDC3A01-A57C-41E2-9DCF-4481D5CAD541}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CDDC3A01-A57C-41E2-9DCF-4481D5CAD541}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CDDC3A01-A57C-41E2-9DCF-4481D5CAD541}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2F3D9E84-AC8B-4036-829A-AEA9B1DA6383}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2F3D9E84-AC8B-4036-829A-AEA9B1DA6383}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F3D9E84-AC8B-4036-829A-AEA9B1DA6383}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -133,24 +135,62 @@ Global
 		{27F5EAC2-1853-47CD-9156-3324ED320CFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27F5EAC2-1853-47CD-9156-3324ED320CFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27F5EAC2-1853-47CD-9156-3324ED320CFD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54A829FE-F099-48DA-A046-8C8982DEC4AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54A829FE-F099-48DA-A046-8C8982DEC4AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54A829FE-F099-48DA-A046-8C8982DEC4AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54A829FE-F099-48DA-A046-8C8982DEC4AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B677F274-8928-485E-80DF-A425AA1AC566}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B677F274-8928-485E-80DF-A425AA1AC566}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B677F274-8928-485E-80DF-A425AA1AC566}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B677F274-8928-485E-80DF-A425AA1AC566}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40AF386D-B092-498E-9610-294EBA521EC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40AF386D-B092-498E-9610-294EBA521EC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40AF386D-B092-498E-9610-294EBA521EC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40AF386D-B092-498E-9610-294EBA521EC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45CC295F-D3FE-4C31-B6CD-4C8604F5FEC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45CC295F-D3FE-4C31-B6CD-4C8604F5FEC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45CC295F-D3FE-4C31-B6CD-4C8604F5FEC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45CC295F-D3FE-4C31-B6CD-4C8604F5FEC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17A5A48A-AC1A-414B-9DED-7AE515C2DC6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17A5A48A-AC1A-414B-9DED-7AE515C2DC6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17A5A48A-AC1A-414B-9DED-7AE515C2DC6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17A5A48A-AC1A-414B-9DED-7AE515C2DC6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9FC7D69-E2F3-422F-8322-9D15EE455DB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9FC7D69-E2F3-422F-8322-9D15EE455DB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9FC7D69-E2F3-422F-8322-9D15EE455DB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9FC7D69-E2F3-422F-8322-9D15EE455DB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5A3A54C-F8CC-447B-B406-60B4034D5D3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5A3A54C-F8CC-447B-B406-60B4034D5D3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5A3A54C-F8CC-447B-B406-60B4034D5D3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5A3A54C-F8CC-447B-B406-60B4034D5D3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75674D40-4D95-42E3-B73B-F77056601156}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75674D40-4D95-42E3-B73B-F77056601156}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75674D40-4D95-42E3-B73B-F77056601156}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75674D40-4D95-42E3-B73B-F77056601156}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{A2A5D963-AC9B-42DC-B28C-007ED6E421EF} = {48AC52DC-AF9B-4E81-9E04-56F7AC46F1B7}
+		{75A862C7-7D35-445C-A89E-F49000C039D7} = {B863BB40-09C4-4B14-9ABB-C039BC85E223}
+		{92854D63-BF9B-4D57-A1CC-26DF77B0E8EF} = {F95877BE-E70F-4B05-AC34-2B7EBBB85D17}
+		{8D0527CB-7399-42D0-AF9B-9C3ED29323C5} = {193E0079-874E-484A-896A-9AE206019D20}
+		{F6030AAD-1BD6-4979-A18F-B46C25246DE9} = {B863BB40-09C4-4B14-9ABB-C039BC85E223}
+		{2CDCC465-CE33-4203-9F7F-7E6584DB4C86} = {F95877BE-E70F-4B05-AC34-2B7EBBB85D17}
+		{12677965-F4C1-452A-A5A1-D635F11B9C98} = {1B339ED2-D31A-47B1-AF21-B6626403066B}
 		{6F921CF6-3E57-490F-93F1-DA270B8CB8AA} = {D15965DC-8951-4663-BAE1-14EF3D6E3335}
-		{54A829FE-F099-48DA-A046-8C8982DEC4AB} = {D15965DC-8951-4663-BAE1-14EF3D6E3335}
+		{08E9655D-1121-4EB4-87CB-3CBEF8EBA65A} = {7C5BB394-D6C5-48A8-9C08-76FE87BD8AA8}
+		{EB08194A-6AAE-4341-B57E-BBCA84389B70} = {48AC52DC-AF9B-4E81-9E04-56F7AC46F1B7}
+		{2F3D9E84-AC8B-4036-829A-AEA9B1DA6383} = {48AC52DC-AF9B-4E81-9E04-56F7AC46F1B7}
+		{D77EB90B-1F1D-4E14-B1C3-F67B46DB3ED9} = {193E0079-874E-484A-896A-9AE206019D20}
+		{AE0C7966-6801-409E-9CF0-D4F9686EEF5B} = {48AC52DC-AF9B-4E81-9E04-56F7AC46F1B7}
+		{27F5EAC2-1853-47CD-9156-3324ED320CFD} = {B863BB40-09C4-4B14-9ABB-C039BC85E223}
+		{B677F274-8928-485E-80DF-A425AA1AC566} = {1B339ED2-D31A-47B1-AF21-B6626403066B}
+		{40AF386D-B092-498E-9610-294EBA521EC3} = {1B339ED2-D31A-47B1-AF21-B6626403066B}
+		{45CC295F-D3FE-4C31-B6CD-4C8604F5FEC6} = {193E0079-874E-484A-896A-9AE206019D20}
+		{17A5A48A-AC1A-414B-9DED-7AE515C2DC6F} = {7C5BB394-D6C5-48A8-9C08-76FE87BD8AA8}
+		{C9FC7D69-E2F3-422F-8322-9D15EE455DB1} = {B863BB40-09C4-4B14-9ABB-C039BC85E223}
+		{B5A3A54C-F8CC-447B-B406-60B4034D5D3D} = {B863BB40-09C4-4B14-9ABB-C039BC85E223}
+		{75674D40-4D95-42E3-B73B-F77056601156} = {D15965DC-8951-4663-BAE1-14EF3D6E3335}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8F515946-359D-4F5A-8F0C-AF7D8F422303}
-	EndGlobalSection
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		LazyStack.AwsSettingsSharedCode\LazyStack.AwsSettingsSharedCode.projitems*{36169d4f-fbd9-442a-97ad-6d763d8aa9d2}*SharedItemsImports = 13
-		LazyStack.NotifciationsSharedSDK\LazyStackNotifciationsSharedSDK.projitems*{764dfbad-2799-4c2f-9061-6ca377816a5f}*SharedItemsImports = 13
-		LazyStack.AwsSettingsSharedCode\LazyStack.AwsSettingsSharedCode.projitems*{92854d63-bf9b-4d57-a1cc-26df77b0e8ef}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

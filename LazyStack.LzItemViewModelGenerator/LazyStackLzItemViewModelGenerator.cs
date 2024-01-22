@@ -40,15 +40,16 @@ public class LazyStackLzItemViewModelGenerator : ISourceGenerator
                 var derivedClasses = syntaxTree.GetRoot()
                     .DescendantNodes()
                     .OfType<ClassDeclarationSyntax>()
-                    .Where(x => (bool)(x.BaseList?.Types.Any(y => y.Type.ToString().Contains("LzItemViewModelBase") || y.Type.ToString().Contains("LzItemViewModelNotificationsBase")) ?? false));
+                    .Where(x => (bool)(x.BaseList?.Types.Any(y => y.Type.ToString().Contains("LzItemViewModel")) ?? false));
 
-                //Log(context, $"derivedClasses: {derivedClasses.Count()}");
+                //Log(context, $"derivedClasses: {derivedClasses.Count()} null: {derivedClasses == null}");
                 if (derivedClasses != null && derivedClasses.Count() > 0)
                     foreach (var derivedClass in derivedClasses)
                     {
                         var namespaceName = GetNamespace(context, model, derivedClass);
-                        var dtoType = ExtractGenericDtoType(derivedClass); // example Yada  
-                        var modelType = ExtractGenericModelType(derivedClass); // example YadaModel 
+                        var dtoType = ExtractGenericDtoType(context, derivedClass); // example Yada  
+                        var modelType = ExtractGenericModelType(context,derivedClass); // example YadaModel 
+                        //Log(context, $"namespaceName: {namespaceName} dtoType: {dtoType} modelType: {modelType}");
                         if(dtoType != null && modelType != null)
                         {
                             var source = GenerateClassModelSource(context, namespaceName, dtoType, modelType);
@@ -95,7 +96,7 @@ public partial class {typename}Validator : AbstractValidator<{typename}>
         SyntaxNode formattedRoot = root.NormalizeWhitespace();
         return SourceText.From(formattedRoot.ToString(), Encoding.UTF8);
     }
-    private static string? ExtractGenericModelType(ClassDeclarationSyntax classDeclaration)
+    private static string? ExtractGenericModelType(GeneratorExecutionContext context, ClassDeclarationSyntax classDeclaration)
     {
         // 1. Get the BaseListSyntax
         var baseList = classDeclaration.BaseList;
@@ -107,8 +108,9 @@ public partial class {typename}Validator : AbstractValidator<{typename}>
                 // 2. Get the SimpleBaseTypeSyntax and check if it's a GenericNameSyntax
                 if (baseType.Type is GenericNameSyntax genericBaseType)
                 {
+                    //Log(context, $"genericBaseType: {genericBaseType.Identifier.Text}");
                     // Check the generic type name (optional)
-                    if (genericBaseType.Identifier.Text == "LzItemViewModelBase" || genericBaseType.Identifier.Text == "LzItemViewModelNotificationsBase")
+                    if (genericBaseType.Identifier.Text.Contains("LzItemViewModel"))
                     {
                         // 3. Navigate and get the generic type arguments
                         var typeArguments = genericBaseType.TypeArgumentList.Arguments;
@@ -123,7 +125,7 @@ public partial class {typename}Validator : AbstractValidator<{typename}>
         }
         return null;  // Return null if not found
     }
-    private static string? ExtractGenericDtoType(ClassDeclarationSyntax classDeclaration)
+    private static string? ExtractGenericDtoType(GeneratorExecutionContext context, ClassDeclarationSyntax classDeclaration)
     {
         // 1. Get the BaseListSyntax
         var baseList = classDeclaration.BaseList;
@@ -132,11 +134,12 @@ public partial class {typename}Validator : AbstractValidator<{typename}>
         {
             foreach (var baseType in baseList.Types)
             {
+                //Log(context, $"baseType: {baseType.Type}");
                 // 2. Get the SimpleBaseTypeSyntax and check if it's a GenericNameSyntax
                 if (baseType.Type is GenericNameSyntax genericBaseType)
                 {
                     // Check the generic type name (optional)
-                    if (genericBaseType.Identifier.Text == "LzItemViewModelBase" || genericBaseType.Identifier.Text == "LzItemViewModelNotificationsBase")
+                    if (genericBaseType.Identifier.Text.Contains("LzItemViewModel"))
                     {
                         // 3. Navigate and get the generic type arguments
                         var typeArguments = genericBaseType.TypeArgumentList.Arguments;

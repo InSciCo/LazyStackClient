@@ -1,7 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\PackageVersions.props" />
+
+	<Import Project="..\CommonPackageHandling.targets" />
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
+
+		<Description>LazyStack Utils</Description>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<IsPublishable>False</IsPublishable>

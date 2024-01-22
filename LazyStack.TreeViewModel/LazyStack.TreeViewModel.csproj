@@ -1,18 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\PackageVersions.props" />
+	<Import Project="..\CommonPackageHandling.targets"/>
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+		<Description>Extend LazyStack ViewModels with TreeView Support</Description>
 		<LangVersion>10.0</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+		<!-- Note we are including build output so that the annotations are available. If you don't 
+		     the namespace will not be available in the consuming project. -->
+		<IncludeBuildOutput>true</IncludeBuildOutput>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Common" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+		<PackageReference Include="Microsoft.CodeAnalysis"  PrivateAssets="all"/>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp"  PrivateAssets="all"/>
 	</ItemGroup>
-
+	<ItemGroup>
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
+		<None Include="$(OutputPath)\$(AssemblyName).pdb" Pack="true" PackagePath="analyzers/dotnet/cs" />
+		<!-- Include additional files like XML documentation -->
+	</ItemGroup>
 </Project>

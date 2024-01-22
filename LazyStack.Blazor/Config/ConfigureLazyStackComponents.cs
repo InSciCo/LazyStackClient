@@ -4,11 +4,9 @@ public static class ConfigureLazyStackComponents
 {
     public static IServiceCollection AddLazyStackComponents(this IServiceCollection services)
     {
-
-
-
         return services
-            //.AddTransient(typeof(BecknVersion))
+            
+
             ;
     }
 

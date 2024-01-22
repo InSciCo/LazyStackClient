@@ -7,7 +7,7 @@ namespace LazyStack.FactoryGenerator;
 
 // Source Class
 // Factory annotation specifies the class needs a DI factory 
-// FactoryInject annotation specifies the paramter needs to be injected by the DI factory
+// FactoryInject annotation specifies the parameter needs to be injected by the DI factory
 
 //[Factory]
 //public class YadaViewModel : LzItemViewModelNotificationsBase<Yada, YadaModel>

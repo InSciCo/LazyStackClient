@@ -11,8 +11,7 @@ public static class ConfigureLazyStackViewModels
     {
         var assembly = MethodBase.GetCurrentMethod()?.DeclaringType?.Assembly;
         var assemblyName = assembly!.GetName().Name;
-
-        messages.AddlazyStackAuth();
+        
         // Add/Overwrite messages with messages in this library's LzMessages.json
         using var messagesStream = assembly?.GetManifestResourceStream($"{assemblyName}.Config.Messages.json")!;
         if (messagesStream != null)

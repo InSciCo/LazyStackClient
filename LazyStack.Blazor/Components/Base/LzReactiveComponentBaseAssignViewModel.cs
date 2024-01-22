@@ -4,7 +4,7 @@
 // See the LICENSE file in the project root for full license information.
 
 // LazyStack modified to include handling for OnInitializedAsync() missing 
-// from ReactiveUI implementaiton.
+// from ReactiveUI implementation.
 namespace LazyStack.Blazor;
 
 /// <summary>

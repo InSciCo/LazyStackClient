@@ -1,18 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\PackageVersions.props"/>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\CommonPackageHandling.targets" />
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
+		
+		<Description>Dependency Injection Helper</Description>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+
 		<LangVersion>10.0</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Common" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" />
+		<PackageReference Include="Microsoft.CodeAnalysis" PrivateAssets="all"/>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" PrivateAssets="all" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
+		<None Include="$(OutputPath)\$(AssemblyName).pdb" Pack="true" PackagePath="analyzers/dotnet/cs" />
 	</ItemGroup>
 
 </Project>

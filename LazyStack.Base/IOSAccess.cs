@@ -2,17 +2,8 @@
 
 public interface IOSAccess
 {
-    /// <summary>
-    /// Read json file from _content folder.
-    /// WASM project implements this using
-    ///     Use HttpClient
-    /// MAUI project implements this using
-    ///     FileSystem.OpenAppPackageFileAsync(String)
-    /// if in MAUI. 
-    /// </summary>
-    /// <param name="path"></param>
-    /// <returns></returns>
-    public Task<string> ContentReadAsync(string url);
+    public Task<string> ReadConfigAsync(string filepath);
+    public Task<string> ReadContentAsync(string filepath);  
     public Task LocalCreateAsync(string filepath, string content);
     public Task<string> LocalReadAsync(string filepath); 
     public Task LocalUpdateAsync(string filepath, string content);

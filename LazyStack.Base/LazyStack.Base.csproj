@@ -1,13 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\PackageVersions.props"/>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\CommonPackageHandling.targets" />
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<LangVersion>10.0</LangVersion>
+
+		<Description>LazyStack Base</Description>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		
+		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json"/>
+	  <Content Remove="IInternetConnectivitySvc.cs" />
 	</ItemGroup>
+
 </Project>

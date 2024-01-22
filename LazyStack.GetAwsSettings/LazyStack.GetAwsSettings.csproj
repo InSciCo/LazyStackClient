@@ -1,16 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\PackageVersions.props"/>
+	<Import Project="..\CommonPackageHandling.targets"/>
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
-		<Copyright>Copyright (c) 2021,2022 Insight Sciences Corporation. All rights reserved.</Copyright>
-		<Authors>Tim May, Thomas May</Authors>
-		<Company>Insight Sciences Corporation</Company>
+
 		<Description>Console utility for getting AWS Settings from a published stack</Description>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-		<PackageProjectUrl>https://lazystack.io</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/InSciCo/LazyStack</RepositoryUrl>
-		<RepositoryType>GitHub</RepositoryType>
+		
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
 

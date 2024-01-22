@@ -1,0 +1,14 @@
+﻿global using System;
+global using System.Collections.Generic;
+global using System.Text;
+global using System.IO;
+global using System.Threading.Tasks;
+global using Amazon;
+global using Amazon.CloudFormation;
+global using Amazon.CloudFormation.Model;
+global using Amazon.SecurityToken;
+global using Amazon.SecurityToken.Model;
+global using Amazon.Runtime;
+global using Amazon.Runtime.CredentialManagement;
+global using Newtonsoft.Json.Linq;
+global using LazyStack.Base;

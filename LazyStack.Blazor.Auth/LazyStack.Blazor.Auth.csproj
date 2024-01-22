@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+	<Import Project="..\CommonPackageHandling.targets" />
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		
+		<Description>LazyStack Blazor Auth Component</Description>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+		<RootNamespace>LazyStack.Blazor</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\LazyStack.Auth\LazyStack.Auth.csproj" />
+	  <ProjectReference Include="..\LazyStack.Blazor\LazyStack.Blazor.csproj" />
+	</ItemGroup>
+
+</Project>
