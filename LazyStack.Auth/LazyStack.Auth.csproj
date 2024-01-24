@@ -31,10 +31,10 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+		<PackageReference Include="LazyStack.ClientSDK" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\LazyStack.ClientSDK\LazyStack.ClientSDK.csproj" />
 		<ProjectReference Include="..\LazyStack.AwsSettings\LazyStack.AwsSettings.csproj" />
 		<ProjectReference Include="..\LazyStack.Base\LazyStack.Base.csproj" />
 	</ItemGroup>
