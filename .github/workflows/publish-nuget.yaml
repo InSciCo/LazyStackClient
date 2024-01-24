@@ -41,7 +41,6 @@ jobs:
 
     - name: Restore dependencies
       run: |
-        dotnet nuget add source https://nuget.pkg.github.com/InSciCo/index.json -n InSciCoPackages
         dotnet restore
 
     - name: Build # Build solution
