@@ -16,6 +16,29 @@ jobs:
       with:
         dotnet-version: '8.x' # Update to your .NET version
 
+    - name: Create NuGet.Config
+      run: |
+        cat > NuGet.Config << EOF
+        <?xml version="1.0" encoding="utf-8"?>
+        <configuration>
+          <packageSources>
+            <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+            <add key="InSciCo" value="https://nuget.pkg.github.com/InSciCo/index.json" />
+            <!-- Other package sources -->
+          </packageSources>
+
+          <packageSourceMapping>
+            <packageSource key="nuget.org">
+              <package pattern="*" />
+            </packageSource>
+            <packageSource key="InSciCo">
+              <package pattern="InSciCo.*" />
+              <!-- Add other patterns as needed -->
+            </packageSource>
+          </packageSourceMapping>
+        </configuration>
+        EOF
+
     - name: Restore dependencies
       run: |
         dotnet nuget add source https://nuget.pkg.github.com/InSciCo/index.json -n InSciCoPackages
