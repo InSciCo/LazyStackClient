@@ -29,7 +29,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\LazyStack.Blazorise\LazyStack.BlazoriseComponents.csproj" />
-	  <ProjectReference Include="..\LazyStack.ViewModels.Auth\LazyStack.ViewModels.Auth.csproj" />
+	  <ProjectReference Include="..\LazyStack.Client.ViewModels.Auth\LazyStack.Client.ViewModels.Auth.csproj" />
 	</ItemGroup>
 
 </Project>

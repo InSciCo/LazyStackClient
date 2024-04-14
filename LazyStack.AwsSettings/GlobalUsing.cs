@@ -11,4 +11,4 @@ global using Amazon.SecurityToken.Model;
 global using Amazon.Runtime;
 global using Amazon.Runtime.CredentialManagement;
 global using Newtonsoft.Json.Linq;
-global using LazyStack.Base;
+global using LazyStack.Client.Base;

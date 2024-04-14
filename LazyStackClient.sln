@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.TreeViewModel", "LazyStack.TreeViewModel\LazyStack.TreeViewModel.csproj", "{A2A5D963-AC9B-42DC-B28C-007ED6E421EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.TreeViewModel", "LazyStack.Client.TreeViewModel\LazyStack.Client.TreeViewModel.csproj", "{A2A5D963-AC9B-42DC-B28C-007ED6E421EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Auth", "LazyStack.Auth\LazyStack.Auth.csproj", "{75A862C7-7D35-445C-A89E-F49000C039D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.Auth", "LazyStack.Client.Auth\LazyStack.Client.Auth.csproj", "{75A862C7-7D35-445C-A89E-F49000C039D7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.AwsSettings", "LazyStack.AwsSettings\LazyStack.AwsSettings.csproj", "{92854D63-BF9B-4D57-A1CC-26DF77B0E8EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Base", "LazyStack.Base\LazyStack.Base.csproj", "{599D4DEF-A04D-4DD2-A3BC-BEA46E802147}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.Base", "LazyStack.Client.Base\LazyStack.Client.Base.csproj", "{599D4DEF-A04D-4DD2-A3BC-BEA46E802147}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Blazor", "LazyStack.Blazor\LazyStack.Blazor.csproj", "{8D0527CB-7399-42D0-AF9B-9C3ED29323C5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.CognitoValidation", "LazyStack.CognitoValidation\LazyStack.CognitoValidation.csproj", "{F6030AAD-1BD6-4979-A18F-B46C25246DE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.CognitoValidation", "LazyStack.Client.CognitoValidation\LazyStack.Client.CognitoValidation.csproj", "{F6030AAD-1BD6-4979-A18F-B46C25246DE9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.GetAwsSettings", "LazyStack.GetAwsSettings\LazyStack.GetAwsSettings.csproj", "{2CDCC465-CE33-4203-9F7F-7E6584DB4C86}"
 EndProject
@@ -26,23 +26,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.ViewModels", "LazyStack.ViewModels\LazyStack.ViewModels.csproj", "{12677965-F4C1-452A-A5A1-D635F11B9C98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.ViewModels", "LazyStack.Client.ViewModels\LazyStack.Client.ViewModels.csproj", "{12677965-F4C1-452A-A5A1-D635F11B9C98}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.BlazoriseComponents", "LazyStack.Blazorise\LazyStack.BlazoriseComponents.csproj", "{08E9655D-1121-4EB4-87CB-3CBEF8EBA65A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.FactoryGenerator", "LazyStack.FactoryGenerator\LazyStack.FactoryGenerator.csproj", "{EB08194A-6AAE-4341-B57E-BBCA84389B70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.FactoryGenerator", "LazyStack.Client.FactoryGenerator\LazyStack.Client.FactoryGenerator.csproj", "{EB08194A-6AAE-4341-B57E-BBCA84389B70}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.LzItemViewModelGenerator", "LazyStack.LzItemViewModelGenerator\LazyStack.LzItemViewModelGenerator.csproj", "{2F3D9E84-AC8B-4036-829A-AEA9B1DA6383}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.BlazorSvg", "LazyStack.BlazorSvg\LazyStack.BlazorSvg.csproj", "{D77EB90B-1F1D-4E14-B1C3-F67B46DB3ED9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.DIHelper", "LazyStack.DIHelper\LazyStack.DIHelper.csproj", "{AE0C7966-6801-409E-9CF0-D4F9686EEF5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.DIHelper", "LazyStack.Client.DIHelper\LazyStack.Client.DIHelper.csproj", "{AE0C7966-6801-409E-9CF0-D4F9686EEF5B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.AuthTest", "LazyStack.AuthTest\LazyStack.AuthTest.csproj", "{27F5EAC2-1853-47CD-9156-3324ED320CFD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.AuthTest", "LazyStack.Client.AuthTest\LazyStack.Client.AuthTest.csproj", "{27F5EAC2-1853-47CD-9156-3324ED320CFD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.ViewModels.Auth", "LazyStack.ViewModels.Auth\LazyStack.ViewModels.Auth.csproj", "{B677F274-8928-485E-80DF-A425AA1AC566}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.ViewModels.Auth", "LazyStack.Client.ViewModels.Auth\LazyStack.Client.ViewModels.Auth.csproj", "{B677F274-8928-485E-80DF-A425AA1AC566}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.ViewModels.Auth.Notifications", "LazyStack.ViewModels.Auth.Notifications\LazyStack.ViewModels.Auth.Notifications.csproj", "{40AF386D-B092-498E-9610-294EBA521EC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.ViewModels.Auth.Notifications", "LazyStack.Client.ViewModels.Auth.Notifications\LazyStack.Client.ViewModels.Auth.Notifications.csproj", "{40AF386D-B092-498E-9610-294EBA521EC3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{48AC52DC-AF9B-4E81-9E04-56F7AC46F1B7}"
 EndProject
@@ -60,9 +60,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.BlazoriseComponen
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blazorise", "Blazorise", "{7C5BB394-D6C5-48A8-9C08-76FE87BD8AA8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Auth.Cognito", "LazyStack.Auth.Cognito\LazyStack.Auth.Cognito.csproj", "{C9FC7D69-E2F3-422F-8322-9D15EE455DB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.Auth.Cognito", "LazyStack.Client.Auth.Cognito\LazyStack.Client.Auth.Cognito.csproj", "{C9FC7D69-E2F3-422F-8322-9D15EE455DB1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Auth.Cognito.SigV4", "LazyStack.Auth.Cognito.SigV4\LazyStack.Auth.Cognito.SigV4.csproj", "{B5A3A54C-F8CC-447B-B406-60B4034D5D3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorTest.WASM", "BlazorTest.WASM\BlazorTest.WASM.csproj", "{80E474CE-7D45-492F-92B7-67A1ABD65CD7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2F3D9E84-AC8B-4036-829A-AEA9B1DA6383} = {2F3D9E84-AC8B-4036-829A-AEA9B1DA6383}
+		{AE0C7966-6801-409E-9CF0-D4F9686EEF5B} = {AE0C7966-6801-409E-9CF0-D4F9686EEF5B}
+		{EB08194A-6AAE-4341-B57E-BBCA84389B70} = {EB08194A-6AAE-4341-B57E-BBCA84389B70}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.Auth.Cognito.SigV4", "LazyStack.Client.Auth.Cognito.SigV4\LazyStack.Client.Auth.Cognito.SigV4.csproj", "{E3FDA1AA-689E-462C-BB9E-5F2ABC809212}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.Analyziers", "LazyStack.Client.Analyziers\LazyStack.Client.Analyziers.csproj", "{F4324EF1-BAB6-47A5-89CF-2C4C2434E932}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -146,10 +155,18 @@ Global
 		{C9FC7D69-E2F3-422F-8322-9D15EE455DB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9FC7D69-E2F3-422F-8322-9D15EE455DB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9FC7D69-E2F3-422F-8322-9D15EE455DB1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B5A3A54C-F8CC-447B-B406-60B4034D5D3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B5A3A54C-F8CC-447B-B406-60B4034D5D3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B5A3A54C-F8CC-447B-B406-60B4034D5D3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B5A3A54C-F8CC-447B-B406-60B4034D5D3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80E474CE-7D45-492F-92B7-67A1ABD65CD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80E474CE-7D45-492F-92B7-67A1ABD65CD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80E474CE-7D45-492F-92B7-67A1ABD65CD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80E474CE-7D45-492F-92B7-67A1ABD65CD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3FDA1AA-689E-462C-BB9E-5F2ABC809212}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3FDA1AA-689E-462C-BB9E-5F2ABC809212}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3FDA1AA-689E-462C-BB9E-5F2ABC809212}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3FDA1AA-689E-462C-BB9E-5F2ABC809212}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4324EF1-BAB6-47A5-89CF-2C4C2434E932}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4324EF1-BAB6-47A5-89CF-2C4C2434E932}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4324EF1-BAB6-47A5-89CF-2C4C2434E932}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4324EF1-BAB6-47A5-89CF-2C4C2434E932}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,7 +190,9 @@ Global
 		{45CC295F-D3FE-4C31-B6CD-4C8604F5FEC6} = {193E0079-874E-484A-896A-9AE206019D20}
 		{17A5A48A-AC1A-414B-9DED-7AE515C2DC6F} = {7C5BB394-D6C5-48A8-9C08-76FE87BD8AA8}
 		{C9FC7D69-E2F3-422F-8322-9D15EE455DB1} = {B863BB40-09C4-4B14-9ABB-C039BC85E223}
-		{B5A3A54C-F8CC-447B-B406-60B4034D5D3D} = {B863BB40-09C4-4B14-9ABB-C039BC85E223}
+		{80E474CE-7D45-492F-92B7-67A1ABD65CD7} = {193E0079-874E-484A-896A-9AE206019D20}
+		{E3FDA1AA-689E-462C-BB9E-5F2ABC809212} = {B863BB40-09C4-4B14-9ABB-C039BC85E223}
+		{F4324EF1-BAB6-47A5-89CF-2C4C2434E932} = {48AC52DC-AF9B-4E81-9E04-56F7AC46F1B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8F515946-359D-4F5A-8F0C-AF7D8F422303}

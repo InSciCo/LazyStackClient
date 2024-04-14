@@ -10,7 +10,7 @@ using Amazon.SecurityToken.Model;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
 using Newtonsoft.Json.Linq;
-using LazyStack.Base;
+using LazyStack.Client.Base;
 
 namespace LazyStack.AwsSettings
 {

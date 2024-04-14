@@ -28,7 +28,7 @@ public class BlazorContentAccess : IAsyncDisposable
         }
         catch (Exception ex)
         {
-            return ex.Message;
+            return string.Empty;
         }   
 
     }

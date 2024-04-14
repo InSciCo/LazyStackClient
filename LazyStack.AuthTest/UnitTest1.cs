@@ -1,6 +1,6 @@
 //TODO: Move tests from old LazyStack solution to this project
 
-namespace LazyStack.AuthTest
+namespace LazyStack.Client.AuthTest
 {
     [TestClass]
     public class UnitTest1

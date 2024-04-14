@@ -45,6 +45,8 @@ public class BlazorOSAccess : IOSAccess
         {
             blazorContentAccess ??= new BlazorContentAccess(jSRuntime);
             var text = await blazorContentAccess.GetBlazorContentAsync(url);
+            if(text.StartsWith("Failed to fetch"))
+                return string.Empty;
             return text;
         }
         catch

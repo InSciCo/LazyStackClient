@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "LazyStack.GetAwsSettings": {
-      "commandName": "Project",
-      "commandLineArgs": "PetStore -n T2DevJoe"
-    }
-  }
-}

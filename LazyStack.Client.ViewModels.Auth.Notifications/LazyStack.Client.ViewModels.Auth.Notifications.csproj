@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\CommonPackageHandling.targets" />
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+
+		<Description>LazyStack ViewModels with Auth and Notifications</Description>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>LazyStack.Client.ViewModels</RootNamespace>
+		<Nullable>enable</Nullable>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ReactiveUI.Fody" />
+		<PackageReference Include="ReactiveUI" />
+		<PackageReference Include="LazyStack.Shared" />
+		<ProjectReference Include="..\LazyStack.Client.ViewModels.Auth\LazyStack.Client.ViewModels.Auth.csproj" />
+	</ItemGroup>
+
+</Project>

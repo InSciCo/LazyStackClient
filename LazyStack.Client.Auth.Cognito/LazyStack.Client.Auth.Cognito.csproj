@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\CommonPackageHandling.targets" />
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<Nullable>enable</Nullable>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+		<IsTrimmable>false</IsTrimmable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Amazon.Extensions.CognitoAuthentication" />
+		<ProjectReference Include="..\LazyStack.Client.Auth\LazyStack.Client.Auth.csproj" />
+	</ItemGroup>
+
+</Project>

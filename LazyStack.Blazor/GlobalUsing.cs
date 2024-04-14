@@ -1,4 +1,4 @@
-﻿global using LazyStack.Base;
+﻿global using LazyStack.Client.Base;
 global using Microsoft.AspNetCore.Components;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.JSInterop;

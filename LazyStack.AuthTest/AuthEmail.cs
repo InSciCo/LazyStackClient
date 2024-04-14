@@ -1,4 +1,4 @@
-﻿namespace LazyStack.Auth;
+﻿namespace LazyStack.Client.Auth;
 
 /// <summary>
 /// Opens your email account and retrieves authorization codes sent to that 
