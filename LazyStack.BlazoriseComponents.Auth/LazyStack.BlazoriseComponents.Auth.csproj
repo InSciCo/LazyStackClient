@@ -12,22 +12,6 @@
 		<RootNamespace>LazyStack.BlazoriseComponents</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="Auth.razor" />
-	  <None Remove="AuthBase.razor" />
-	  <None Remove="AuthBaseCopy.razor" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Content Include="Auth.razor">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	  </Content>
-	  <Content Include="AuthBase.razor">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	  </Content>
-	  <Content Include="AuthBaseCopy.razor">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	  </Content>
-	</ItemGroup>
-	<ItemGroup>
 	  <ProjectReference Include="..\LazyStack.Blazorise\LazyStack.BlazoriseComponents.csproj" />
 	  <ProjectReference Include="..\LazyStack.Client.ViewModels.Auth\LazyStack.Client.ViewModels.Auth.csproj" />
 	</ItemGroup>

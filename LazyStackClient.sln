@@ -73,6 +73,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.Auth.Cogni
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazyStack.Client.Analyziers", "LazyStack.Client.Analyziers\LazyStack.Client.Analyziers.csproj", "{F4324EF1-BAB6-47A5-89CF-2C4C2434E932}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazyStack.MudBlazorComponents.Auth", "LazyStack.MudBlazorComponents.Auth\LazyStack.MudBlazorComponents.Auth.csproj", "{73A061BE-FC2B-4AE4-A246-D13FAFA391A6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MudBlazor", "MudBlazor", "{5F09E10C-7D9E-44BC-B0E5-C48D58F2AACA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazyStack.MudBlazor.Components", "LazyStack.MudBlazor.Components\LazyStack.MudBlazor.Components.csproj", "{4ED7247F-FA0A-41E6-BCC6-98ED006C146A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -167,6 +173,14 @@ Global
 		{F4324EF1-BAB6-47A5-89CF-2C4C2434E932}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4324EF1-BAB6-47A5-89CF-2C4C2434E932}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4324EF1-BAB6-47A5-89CF-2C4C2434E932}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73A061BE-FC2B-4AE4-A246-D13FAFA391A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73A061BE-FC2B-4AE4-A246-D13FAFA391A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73A061BE-FC2B-4AE4-A246-D13FAFA391A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73A061BE-FC2B-4AE4-A246-D13FAFA391A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4ED7247F-FA0A-41E6-BCC6-98ED006C146A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ED7247F-FA0A-41E6-BCC6-98ED006C146A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ED7247F-FA0A-41E6-BCC6-98ED006C146A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ED7247F-FA0A-41E6-BCC6-98ED006C146A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -193,6 +207,8 @@ Global
 		{80E474CE-7D45-492F-92B7-67A1ABD65CD7} = {193E0079-874E-484A-896A-9AE206019D20}
 		{E3FDA1AA-689E-462C-BB9E-5F2ABC809212} = {B863BB40-09C4-4B14-9ABB-C039BC85E223}
 		{F4324EF1-BAB6-47A5-89CF-2C4C2434E932} = {48AC52DC-AF9B-4E81-9E04-56F7AC46F1B7}
+		{73A061BE-FC2B-4AE4-A246-D13FAFA391A6} = {5F09E10C-7D9E-44BC-B0E5-C48D58F2AACA}
+		{4ED7247F-FA0A-41E6-BCC6-98ED006C146A} = {5F09E10C-7D9E-44BC-B0E5-C48D58F2AACA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8F515946-359D-4F5A-8F0C-AF7D8F422303}

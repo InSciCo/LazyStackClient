@@ -954,7 +954,10 @@ public class AuthProcess : NotifyBase, IAuthProcess
     {
         _authProvider.SetAuthenticator(authenticator);
     }
-
+    public virtual void SetSignUpAllowed(bool isAllowed)
+    {
+        _authProvider.SetSignUpAllowed(isAllowed);
+    }
     #endregion
 
 }

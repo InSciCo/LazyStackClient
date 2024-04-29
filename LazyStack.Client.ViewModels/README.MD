@@ -13,9 +13,7 @@
 If the Component inherits from ReactiveComponentBase<T> then the StateHasChanged() method will be called when the bound values are updated. In other words, 
 you don't have to do anything special to get two-way binding to work with Models that implement INotifyPropertyChanged. 
 
-[ObservableAsProperty] handle read properties that emit events that can be subscribed to by ViewModels and/or Components (both the ViewModel they 
-are defined in and other ViewModels). Generally, it is better to implement most event handling at the ViewModel level for testability and simplicity. 
-
+[ObservableAsProperty] handle read properties that emit events that can be subscribed to by ViewModels and/or Components (both the ViewModel they are defined in and other ViewModels). Generally, it is better to implement most event handling at the ViewModel level for testability and simplicity. 
 
 ## ViewModel Classes 
 This library provides a set of base classes that you can use to create your own ViewModels. 
@@ -55,43 +53,55 @@ StorageAPI that is used for CRUDL operations.
 ```
 public enum StorageAPI
 {
-    Default, // Usually Rest API
-    Rest, // API calls, generally requires auth
+    Default, // Usually DTO API
+    DTO, // API calls, usually database access, generally requires auth
+    Model, // Manpulate Model objects, primarly used for updating in memory objects. Rarely used. Somewhat experimental.
     S3, // bucket access, generally requireds auth
     Http, // limited to gets, no auth
     Local, // local device storage
     Content, // _content access
-    Internal // class implementation handles persistence (if any). Use for updating data in place.
+    None // Use for updating data in place.
 }
 ```
+
 
 ## Service APIs 
 When you create a ViewModel, you will need to provide a ServiceAPI. This is the API that is used to perform 
 CRUDL operations. Here are the ServiceAPIs that are available, some have default implementations, some do not. 
 
 ### LzItemViewModelBase 
-API Access 
-- SvcCreateAsync(DTO)
-- SvcCreateIdAsync(Id,DTO)
-- SvcReadAsync(), this.Id to read the item 
-- SvcReadIdAsync(Id)
-- SvcUpdateAsync(DTO)
-- SvcDeleteIdAsync(Id)
+
+DTO Access 
+- _DTOCreateAsync(DTO)
+- _DTOCreateIdAsync(Id,DTO)
+- _DTOReadAsync(), this.Id to read the item 
+- _DTOReadIdAsync(Id)
+- _DTOUpdateAsync(DTO)
+- _DTODeleteIdAsync(Id)
  
+Model Access 
+- _ModelCreateAsync(DTO)
+- _ModelCreateIdAsync(Id,DTO)
+- _ModelReadAsync(), this.Id to read the item 
+- _ModelReadIdAsync(Id)
+- _ModelUpdateAsync(DTO)
+- _ModelDeleteIdAsync(Id)
+
+
 S3 Access 
-- S3CreateIdAsync(s3objectname) = IContentAccess.S3CreateIdAsync(s3objectname)
-- S3ReadIdAsync(s3objectname) = IContentAccess.S3ReadIdAsync(s3objectname)
-- S3UpdateIdAsync(s3objectname) = IContentAccess.S3UpdateIdAsync(s3objectname)
-- S3DeleteIdAsync(s3objectname) = IContentAccess.S3DeleteIdAsync(s3objectname)
+- _S3CreateIdAsync(s3objectname) = IContentAccess.S3CreateIdAsync(s3objectname)
+- _S3ReadIdAsync(s3objectname) = IContentAccess.S3ReadIdAsync(s3objectname)
+- _S3UpdateIdAsync(s3objectname) = IContentAccess.S3UpdateIdAsync(s3objectname)
+- _S3DeleteIdAsync(s3objectname) = IContentAccess.S3DeleteIdAsync(s3objectname)
 
 Http Access 
-- HttpSvcReadIdAsync(url) = IContentAccess.HttpSvcReadIdAsync(url)
+- _HttpSvcReadIdAsync(url) = IContentAccess.HttpSvcReadIdAsync(url)
 
 Local Access
-- LocalSvcCreateIdAsync(filename,filecontent)
-- LocalSvcReadIdAsync(filename)
-- LocalSvcUpdateIdAsync(filename,filecontent)
-- LocalSvcDeleteIdAsync(filename)
+- _LocalSvcCreateIdAsync(filename,filecontent)
+- _LocalSvcReadIdAsync(filename)
+- _LocalSvcUpdateIdAsync(filename,filecontent)
+- _LocalSvcDeleteIdAsync(filename)
 
 Content Access
 - ContentSvcReadIdAsync(filename) // ex: "_content/MyApp/MyFile.txt"
@@ -104,67 +114,41 @@ Internal
 - User  implemented methods. Override the default CRUD implementations you want to use. 
 
 
-## Configuration Content 
-Configuration content is content that is used to configure the app. Configuration content can reside in:
-- Content Storage ( Blazor static content. e.g. _content/* )
-- S3 Storage
-- Http Storage 
-- Assembly Embedded Resources
-- Environment Variables 
+## Notes on manipulating Nested Classes
+It is common to manipulate a document that contains nested data types. Our main approach to handling this situation is to create a class for that document that implements Create, Read, Update and Delete methods with the same signature as a DTO service interface. 
 
-By convention, each LazyStack viewmodel project will have a Config folder containing Configuration class that loads configuration content from embedded resources. This class also provides default DI registrations for classes in the assembly.
+An example of when this approach is useful is when you load a DTO from a service and that DTO contains nested classes. If you want to create view models for the nested classes , you can create a new class that implements the same CRUDL interface as the DTO service and use that class when you create the nested view models.
 
-Configuration data typically includes:
-- Connection data (e.g. API endpoints, S3 buckets, etc.)
-- Tenancy data (e.g. static content, default settings, etc.)
-- Embedded resources configuration (configuration data loaded from assemblies)
+If your database doesn't contain types with nested types, you use the DTO service directly. If you have nested types, you have two choices:
+- Create a ViewModel for the type.
+  - Create a class that provides the Create, Read, Update and Delete methods for the nested classes.
+ 
+## How to use the ViewModel Classes
+ItemsViewModel manages a list of ItemViewModel instances.
+ItemViewModel manages a single item.
 
-### WASM Apps
-WASM apps are loaded from AWS CloudFront. CloudFront maps URL paths to Origins. There are typically four origins in a WASM app:
-- S3 Spa bucket contains the SPA app
-- S3 Config bucket contains connection information for the app
-- S3 Tenancy bucket contains static content for a tenancy 
+### ItemViewModel 
+We can create an ItemViewModel in three ways:
+- Create a new() item. Usually used when we are creating a new item.
+- Create a new item from a DTO. new(dto: value). Usually used when we have loaded an item through a DTO service.
+- Create a new item from a Model. new(model: value). Raely used.
 
-CloudFront plays an important role by orchestrating these three origins based on the domain used to access the app. 
+## ItemsViewModel
+Normally we create an ItemsViewModel and then call ReadAsync() to load the items from a service. 
+The ReadAsync() method will create a new ItemViewModel for each item in the list using the new(dto: value) constructor.
 
-WASM apps provide access to static content through the _content path.
-The Config bucket is accessed through _content/Config/\*.
-The Tenancy bucket is accessed through _content/Tenancy/\*.
+## Add, Edit
+When we want to add a new item, we call the New() method. This will create a new ItemViewModel instance with the state set to New. This does not add the new item to the ItemsViewModel.ViewModels collection. If we subsequently Cancel the edit, the new item is discarded. If we Save the edit, the new item is added to the ItemsViewModel.ViewModels collection.
 
-### Local Development Configuration 
-When developing locally, we don't use CloudFront. Instead, we use local projects to proxy the Config and Tenancy origins. 
-
-#### Config Project
-The Config project is a Razor Class Library that contains configuration content in the wwwroot folder.
-
-#### Tenancy Project
-The Tenancy project is a Razor Class Library that contains tenancy content in the wwwroot folder.
-
-When running locally, the dev server hosting the app will serve content from the Config and Tenancy projects via the _content paths. 
-
-## Deployment 
-The deployment pipeline doesn't use the Config Project or the Tenancy Project. Instead, it is responsible for writing the configuration content to the Config and Tenancy buckets.
-
-1. AWS utilities to gather AWS configuration data and write it to the Config bucket.
-2. Tenancy buckets are generally configured by checking out tenancy content from a git repo and writing it to the Tenancy bucket or by an application specific process. For instance, a client tenancy onboarding/configuration application may be responsible for writing tenancy content to the Tenancy bucket.
-
-Note: The Tenancy and Config projects csproj files contain directives to exclude all content for publishing so no internal development configuration is deployed to the cloud.
-
-### PWA WASM Apps 
-PWA service workers precache content from the SPA, Config and Tenancy buckets to support offline access. From the PWA's perspective, there is no difference between content from the SPA, Config or Tenancy buckets.
-
-### BlazorWebView MAUI Apps
-MAUI apps use the BlazorWebView to host the SPA. The BlazorWebView is a Chromium based browser that is embedded in the MAUI app. The Config project and Tenancy project data must be packaged with the app. For this reason, the production build of a MAUI app requires we replace the development versions of the Config and Tenancy projects with the production versions specific to the tenancy the app is being built for. This is done by the deployment pipeline. 
-
-## Development Config Project
-This project contains build directives to copy connection information from the main project content to the wwwroot config.json file based on the development environment.
+When we want to edit an item, we call the Edit() method. This will set the state to Edit and make a copy of the item data. If we subsequently Cancel the edit, the item data is restored from the copy. If we Save the edit, the item data is updated in the service.
 
 ## ViewModel StorageAPI Behaviors
 
 ItemViewModel handles CRUDL operations for a single item.
 ItemsViewModel handles Read operations for a collection of items.
 
-StorageAPI.DTO
+
+StorageAPI.DTO States
 Note that Data is of Type TModel.
 
 |ViewModel|State|Method|Action|EndState|IsLoaded|
@@ -191,30 +175,6 @@ Note that Data is of Type TModel.
 Notes:
 - MakeDataCopy() ```{_DataCopyJson = JsonConvert.SerializeObject((TDTO)Data);}``` Please note that only the DTO properties are copied. You can defeat this behavior by overloading the MakeDataCopy() method but you usually don't want to do that. Often, the additional properties are ItemsViewModels and you don't want to serialize ViewModels.
 - RestoreFromDataCopy() ```{JsonConvert.PopulateObject(_DataCopyJson, Data);}```
-
-StorageAPI.Model
-Note that Data is of Type TModel.
-
-|ViewModel|State|Method|Action|EndState|IsLoaded|
-|---|---|---|---|---|
-|ItemViewModel|na|new(dto: null, model: null)| Data = new().|New||
-|ItemViewModel|na|new(dto: value)| dto.DeepClone(Data). | Current||
-|ItemViewModel|na|new(model: value)| Data = value | Current||
-|ItemViewModel|New|Create|UpdateData(_ModelCreateAsync(id,(TDTO)Data))|Current|True|
-|ItemViewModel|any|Read|UpdateData(_ModelReadIdAsync(id)).|Current|True|
-|ItemViewModel|Edit|Update|UpdateData(_ModelUpdateAsync((TDTO)Data))|Current|True|
-|ItemViewModel|Current|Delete|_ModelDeleteIdAsync(id)|Current|True|
-|ItemViewModel|New|OpenEdit|MakeDataCopy()|New||
-|ItemViewModel|Current|OpenEdit|MakeDataCopy()|Edit||
-|ItemViewModel|New|SaveEdit|Create(id)|Current||
-|ItemViewModel|Edit|SaveEdit|Update(id)|Current||
-|ItemViewModel|New|CancelEdit|RestoreDataCopy()|New||
-|ItemViewModel|Edit|CancelEdit|RestoreDataCopy()|Current||
-|ItemsViewModel||New(dtos: null, models: null)| ViewModels.Count = 0 ||
-|ItemsViewModel||New()| ViewModels = new()||
-|ItemsViewModel||Read|_ModelReadListASync(). foreach(value in values) ViewModels.Add(new ItemViewModel(dto:value)||
-|ItemsViewModel||Insert|||
-|ItemsViewModel||Remove|||
 
 Notes: 
 - StoreageAPi.Model is used when the ViewModel references a existing class instance of type DTO or TModel. The _ModelCreateAsync, _ModelReadAsync, _ModelUpdateAsync and _ModelDeleteAsync methods are provided for implementing side effects only. For instance, you may want to do a referential integrity check.

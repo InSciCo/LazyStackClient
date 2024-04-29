@@ -63,7 +63,7 @@ public abstract class LzItemViewModelAuthNotifications<TDTO, TModel> : LzItemVie
                 UpdateData(dataObj);
                 LastNotificationTick = UpdatedAt;
                 NotificationReceived = true; // Fires off event in case we want to inform the user an update occurred
-                Console.WriteLine("Data object updated from dataObj");
+                //Console.WriteLine("Data object updated from dataObj");
                 return;
             }
 

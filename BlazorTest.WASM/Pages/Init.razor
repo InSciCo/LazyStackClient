@@ -23,13 +23,12 @@ Note: The ISessionsViewModel is generally first injected in the MainLayout.razor
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 
-
 @if (!configFound)
 {
     if (configError)
     {
         <p>Could not read configuration </p>
-        <button @onclick="GetAuthConfig">Retry</button>
+        <button @onclick="GetAuthConfigAsync">Retry</button>
     }
     else
     {
@@ -42,13 +41,12 @@ Note: The ISessionsViewModel is generally first injected in the MainLayout.razor
     private bool configError = false;
     protected override async Task OnInitializedAsync()
     {
-
         if (!ViewModel!.IsInitialized)
         {
             var osAccess = new BlazorOSAccess(HttpClient, JSRuntime);
             var internetConnectivity = new InternetConnectivity(JSRuntime);
             await ViewModel.InitAsync(osAccess, internetConnectivity);
-            await GetAuthConfig();
+            await GetAuthConfigAsync();
         }
 
         await base.OnInitializedAsync();
@@ -61,6 +59,7 @@ Note: The ISessionsViewModel is generally first injected in the MainLayout.razor
         if (ViewModel!.SessionViewModel is null && configFound)
         {
             await ViewModel.CreateSessionAsync();
+            ViewModel!.SessionViewModel!.AuthProcess.SetSignUpAllowed(true);
         }
 
         if (ViewModel.IsInitialized && ViewModel.SessionViewModel is not null)
@@ -75,9 +74,10 @@ Note: The ISessionsViewModel is generally first injected in the MainLayout.razor
     /// in the ViewModel.ClientConfig.AuthConfig.
     /// </summary>
     /// <returns></returns>
-    private async Task GetAuthConfig()
+    private async Task GetAuthConfigAsync()
     {
-        var authconfigurl = Host.Url + "/config";
+        ViewModel!.ClientConfig ??= new LzClientConfig();
+        var authconfigurl = Host.Url + "config";
         configError = false;
         try
         {
@@ -94,10 +94,11 @@ Note: The ISessionsViewModel is generally first injected in the MainLayout.razor
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Console.WriteLine("GetAuthConfig Failed. " + ex.Message);
         }
         finally
         {
+
             configFound = !string.IsNullOrEmpty(ViewModel!.ClientConfig?.AuthConfig["awsRegion"]?.ToString());
             configError = !configFound;
         }

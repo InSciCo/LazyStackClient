@@ -21,9 +21,10 @@ public class LzHttpClient : NotifyBase, ILzHttpClient
     }
     protected ILzClientConfig clientConfig;
 
-    // AuthConfig is not currently being used. It is here in case we need 
-    // to use additional configuration information in the future.
+    // We currently only use AuthConfig when in debug mode 
+    // to grab the TenancyKey.
     protected JObject authConfig => clientConfig.AuthConfig;
+    protected string? tenantKey => authConfig != null ? authConfig["tenantKey"]?.ToString() : "";
 
     protected IMethodMapWrapper methodMap;
     protected IAuthProvider authProvider;
@@ -65,6 +66,10 @@ public class LzHttpClient : NotifyBase, ILzHttpClient
             httpClient.BaseAddress = new Uri(baseUrl);
         }
 
+        // Only add tenantKey to local requests, cloudfront should 
+        // add the tenantKey the request header.
+        if (!string.IsNullOrEmpty(tenantKey) && lzHost.IsLocal)
+            requestMessage.Headers.Add("tenantKey", tenantKey);   
 
         try
         {

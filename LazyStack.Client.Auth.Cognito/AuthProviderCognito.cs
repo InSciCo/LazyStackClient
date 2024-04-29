@@ -1,5 +1,7 @@
 
 
+using Amazon.CognitoIdentityProvider.Model;
+
 /// <summary> 
 /// AWS Authentication and Authorization Strategy
 /// AWS Cognito User Pools are used for Authentication
@@ -98,6 +100,8 @@ public class AuthProviderCognito : IAuthProviderCognito
     protected IPhoneFormat? phoneFormat;
     //protected IStacksConfig stacksConfig;
 
+    private bool allowAdminCreateUserOnly;
+
     private string? login; // set by VerifyLogin
     private string? newLogin; // set by VerifyNewLogin
     private string? password; // set by VerifyPassword
@@ -172,7 +176,7 @@ public class AuthProviderCognito : IAuthProviderCognito
     public bool HasChallenge { get { return AuthChallengeList.Count > 0; } }
     public bool CanSignOut => IsSignedIn && CurrentAuthProcess == AuthProcessEnum.None;
     public bool CanSignIn => !IsSignedIn && CurrentAuthProcess == AuthProcessEnum.None;
-    public bool CanSignUp => !IsSignedIn && CurrentAuthProcess == AuthProcessEnum.None;
+    public bool CanSignUp => !allowAdminCreateUserOnly && !IsSignedIn && CurrentAuthProcess == AuthProcessEnum.None;
     public bool CanResetPassword => !IsSignedIn && CurrentAuthProcess == AuthProcessEnum.None;
     public bool CanUpdateLogin => false; // not supported in AWS Cognito
     public bool CanUpdateEmail => IsSignedIn && CurrentAuthProcess == AuthProcessEnum.None;
@@ -268,10 +272,11 @@ public class AuthProviderCognito : IAuthProviderCognito
 
         identityPoolId = (string?)authConfig["identityPoolId"];
 
-        Console.WriteLine($"About to call AmazonCognitoIdentityProviderClient(.., {regionEndpoint.DisplayName})");
+        //Console.WriteLine($"About to call AmazonCognitoIdentityProviderClient(.., {regionEndpoint.DisplayName})");
         try
         {
             providerClient = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), regionEndpoint);
+
         }
         catch (Exception ex)
         {
@@ -280,10 +285,23 @@ public class AuthProviderCognito : IAuthProviderCognito
             Console.WriteLine($"InnerExcpetion3 {ex.InnerException?.InnerException?.InnerException?.Message}");
             throw ex;   
         }
-        Console.WriteLine($"SetAuthenticator. userPoolId:{userPoolId}, clientId:{clientId}");
+        //Console.WriteLine($"SetAuthenticator. userPoolId:{userPoolId}, clientId:{clientId}");
         userPool = new CognitoUserPool(userPoolId, clientId, providerClient);
 
         AuthInitialized = true;
+    }
+
+    /// <summary>
+    /// allowAdminCreateUserOnly can't be queried from AWS without 
+    /// credentials.
+    //  We allow the client to set it here so it's value  can be
+    //  used in the auth state machine. Of course this value 
+    //  and the one in the Cognito User Pool must match.
+    /// </summary>
+    /// <param name="isAllowed"></param>
+    public void SetSignUpAllowed(bool isAllowed)
+    {
+        allowAdminCreateUserOnly = !isAllowed;
     }
 
     #region Challenge Flow Methods -- affect AuthChallengeList or IsAuthorized

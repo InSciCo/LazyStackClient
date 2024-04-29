@@ -1,29 +1,23 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 	<Import Project="..\CommonPackageHandling.targets"/>
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-
-		<Description>LazyStack Blazorise Components</Description>
-		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<Description>LazyStack MudBlazor Components</Description>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
-
 
 	<ItemGroup>
 		<SupportedPlatform Include="browser" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Blazorise.Bootstrap5" />
-		<PackageReference Include="Blazorise.Components" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web"/>
+		<PackageReference Include="MudBlazor" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\LazyStack.Blazor\LazyStack.Blazor.csproj" />
 	</ItemGroup>
-
 </Project>

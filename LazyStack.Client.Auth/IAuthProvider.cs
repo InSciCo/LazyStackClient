@@ -88,4 +88,6 @@ public interface IAuthProvider
     public Task<Creds?> GetCredsAsync();
     public Task<string?> GetJWTAsync();
     public void SetAuthenticator(JObject authenticator);
+    public void SetSignUpAllowed(bool isAllowed);
+
 }

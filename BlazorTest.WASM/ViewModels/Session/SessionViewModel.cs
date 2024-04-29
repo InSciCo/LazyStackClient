@@ -16,6 +16,7 @@ public class SessionViewModel : LzSessionViewModelAuth, ISessionViewModel, ILzTr
         : base(authProcess, osAccess, clientConfig, internetConnectivity, messages)
     {
         authProcess.SetAuthenticator(clientConfig.AuthConfig);
+
     }
 
 

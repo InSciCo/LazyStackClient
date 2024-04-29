@@ -20,7 +20,7 @@ public abstract class LzSessionViewModelAuth : LzSessionViewModel, ILzSessionVie
         // never used ReactiveUI
         // When AuthProcess.IsSignedIn changes, update this classes observable IsSignedIn property
         this.WhenAnyValue(x => x.AuthProcess.IsSignedIn)
-            .Select(x => { Console.WriteLine("LzSessionViewModel.IsSignedIn:" + x); return x; })
+            .Select(x => { return x; })
             .ToPropertyEx(this, x => x.IsSignedIn);
 
         // When AuthProcess.IsBusy changes, update this classes observable IsBusy property
