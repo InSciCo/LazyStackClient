@@ -30,14 +30,6 @@
 		<Content Remove="Components\Base\LzLayoutComponentBasePassViewModel.cs" />
 		<Content Remove="Components\Base\LzLReactiveLayoutComponentBase.cs" />
 		<Content Remove="Components\Base\LzReactiveLayoutComponentBaseAssignViewModel.cs" />
-		<Content Remove="Config\Messages.json" />
-		<Content Remove="LzBlazorClientConfig.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Config\Messages.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
 	</ItemGroup>
 
 

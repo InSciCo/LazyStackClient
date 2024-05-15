@@ -2,7 +2,7 @@
 
 namespace LazyStack.Client.ViewModels;
 
-public class LzSessionsViewModelAuthNotifications<T> : LzSessionsViewModelAuth<T>, ILzSessionsViewModelAuthNotifications<T>
+public abstract class LzSessionsViewModelAuthNotifications<T> : LzSessionsViewModelAuth<T>, ILzSessionsViewModelAuthNotifications<T>
     where T : ILzSessionViewModelAuthNotifications
 {
     public LzSessionsViewModelAuthNotifications(

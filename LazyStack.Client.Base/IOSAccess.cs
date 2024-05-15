@@ -2,8 +2,9 @@
 
 public interface IOSAccess
 {
-    public Task<string> ReadConfigAsync(string filepath);
-    public Task<string> ReadContentAsync(string filepath);  
+    public Task<string> ReadAuthConfigAsync(string filepath);
+    public Task<string> ReadTenancyConfigAsync(string filepath);
+    public Task<string> ReadContentAsync(string filepath); 
     public Task LocalCreateAsync(string filepath, string content);
     public Task<string> LocalReadAsync(string filepath); 
     public Task LocalUpdateAsync(string filepath, string content);

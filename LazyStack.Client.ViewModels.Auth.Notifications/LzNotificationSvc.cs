@@ -1,6 +1,4 @@
-﻿
-
-namespace LazyStack.Client.ViewModels;
+﻿namespace LazyStack.Client.ViewModels;
 /// <summary>
 /// Derive this class and 
 /// - Implement ReadNotifications() // even if you are using WebSockets
@@ -113,9 +111,7 @@ public abstract class LzNotificationSvc : LzViewModel, ILzNotificationSvc, IDisp
         if(ws.State != WebSocketState.None)
             return;
 
-        //wsBaseUri = (string)clientConfig?.AuthConfig["Url"]!;
-        wsBaseUri = lzHost.Url;
-        var uri = new Uri(wsBaseUri);   
+        var uri = new Uri(lzHost.WsUrl);   
         try
         {
             Console.WriteLine("Calling ws.ConnectAsync");

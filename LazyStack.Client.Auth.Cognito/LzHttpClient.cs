@@ -10,7 +10,7 @@ public class LzHttpClient : NotifyBase, ILzHttpClient
     public LzHttpClient(
         ILzClientConfig clientConfig, // service connection info
         IMethodMapWrapper methodMap, // map of methods to api endpoints
-        IAuthProvider authProvider, // Auth service. ex: AuthProviderCognito
+        IAuthProvider? authProvider, // Auth service. ex: AuthProviderCognito
         ILzHost lzHost // Runtime environment. IsMAUI, IsWASM, URL etc.
         )
     {
@@ -27,7 +27,7 @@ public class LzHttpClient : NotifyBase, ILzHttpClient
     protected string? tenantKey => authConfig != null ? authConfig["tenantKey"]?.ToString() : "";
 
     protected IMethodMapWrapper methodMap;
-    protected IAuthProvider authProvider;
+    protected IAuthProvider? authProvider;
     protected ILzHost lzHost;
     protected HttpClient? httpClient;
     protected bool isServiceAvailable = false;

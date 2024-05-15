@@ -2,7 +2,7 @@
 
 namespace LazyStack.Client.ViewModels;
 
-public class LzSessionsViewModel<T> : LzViewModel, ILzSessionsViewModel<T>
+public abstract class LzSessionsViewModel<T> : LzViewModel, ILzSessionsViewModel<T>
     where T : ILzSessionViewModel
 {
     public LzSessionsViewModel(
@@ -35,14 +35,22 @@ public class LzSessionsViewModel<T> : LzViewModel, ILzSessionsViewModel<T>
         OSAccess = osAccess;
         InternetConnectivity = internetConnectivitySvc;
         Messages.SetOSAccess(OSAccess); // allows MessageSets to be read from configuration files
+        ClientConfig!.SetOSAccess(OSAccess);    // allows ClientConfig to read configuration files
         await ReadConfigAsync();
         IsInitialized = true;
     }
 
-    public virtual async Task ReadConfigAsync()
-    {
-        await Task.Delay(0);
-    }
+    /// <summary>
+    /// Implement ReadConfigAsync in your derived class to read the configuration file(s).
+    /// Example:
+    ///    ClientConfig.ReadAuthConfigAsync("path", "employeeuserpool");
+    ///    // You can call ReadTenancyConfigAsync multiple times with different paths. Config content
+    ///    // is merged.
+    ///    ClientConfig.ReadTenancyConfigAsync("..");
+    /// </summary>
+    /// <returns></returns>
+    public abstract Task ReadConfigAsync();
+
     public virtual async Task<bool> CreateSessionAsync()
     {
         if (SessionViewModel != null) return false;

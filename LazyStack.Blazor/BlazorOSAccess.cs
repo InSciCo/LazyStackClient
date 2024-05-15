@@ -9,7 +9,20 @@ public class BlazorOSAccess : IOSAccess
     HttpClient httpClient;
     IJSRuntime jSRuntime;
     BlazorContentAccess? blazorContentAccess;
-    public virtual async Task<string> ReadConfigAsync(string url)
+
+    public virtual async Task<string> ReadAuthConfigAsync(string url)
+    {
+        try
+        {
+            var text = await httpClient.GetStringAsync(url);
+            return text;
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+    public virtual async Task<string> ReadTenancyConfigAsync(string url)
     {
         if(jSRuntime == null)
             throw new Exception("JSRuntime not set.");  
@@ -22,8 +35,9 @@ public class BlazorOSAccess : IOSAccess
         // to use the Blazor app's wwwroot folder in a hybrid app.
         try
         {
-            blazorContentAccess ??= new BlazorContentAccess(jSRuntime); 
-            var text = await blazorContentAccess.GetBlazorContentAsync(url);
+            //blazorContentAccess ??= new BlazorContentAccess(jSRuntime); 
+            //var text = await blazorContentAccess.GetBlazorContentAsync(url);
+            var text = await httpClient.GetStringAsync(url);
             return text;
         } catch 
         {

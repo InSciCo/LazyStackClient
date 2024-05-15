@@ -4,21 +4,25 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 
-		<Description>Generates Factory Classes for classes annotated with [Factory]</Description>
+		<Description>Gnerate LazyStack ViewModel Helper Classes</Description>
 		<LangVersion>10.0</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-		<!-- Note we are including build output so that the annotations are available. If you don't 
-		     the namespace will not be available in the consuming project. -->
 		<IncludeBuildOutput>true</IncludeBuildOutput>
 	</PropertyGroup>
-	
 	<ItemGroup>
+	  <Content Remove="LazyStackModelValidatorGenerator.cs" />
+	  <Content Remove="LzModelSyntaxReceiver.cs" />
+	  <Content Remove="LzModelValidatorSyntaxReceiver.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
-		<None Include="$(OutputPath)\$(AssemblyName).pdb" Pack="true" PackagePath="analyzers/dotnet/cs" />
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<None Include="$(OutputPath)\$(AssemblyName).pdb" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 </Project>

@@ -12,8 +12,6 @@ namespace BlazorTest.WASM
 
             ILzMessages messages = new LzMessages();
             messages
-                .AddLazyStackComponents()
-                .AddLazyStackViewModels()
                 .AddLazyStackAuth()
                 .ReplaceVars();
 
@@ -69,7 +67,6 @@ namespace BlazorTest.WASM
                 isAndroid: false,
                 isLocal: isLocal))
                 .AddSingleton(messages)
-                .AddLazyStackComponents()
                 .AddLazyStackAuthCognito()
                 .AddSingleton<ISessionsViewModel, SessionsViewModel>();
                 

@@ -4,10 +4,12 @@ public class SessionsViewModel : LzSessionsViewModelAuth<ISessionViewModel>, ISe
 {
     public SessionsViewModel(
         ILzMessages messages,
-        ISessionViewModelFactory sessionViewModelFactory
+        ISessionViewModelFactory sessionViewModelFactory,
+        ILzClientConfig clientConfig
         ) : base(messages)
     {
         _sessionViewModelFactory = sessionViewModelFactory;
+        ClientConfig = clientConfig ?? throw new ArgumentNullException(nameof(clientConfig));
     }
     private ISessionViewModelFactory _sessionViewModelFactory;
 
@@ -19,7 +21,8 @@ public class SessionsViewModel : LzSessionsViewModelAuth<ISessionViewModel>, ISe
     // ReadConfigAsync is called from InitAsync() just prior to the IsInitialized being set to true.
     public override async Task ReadConfigAsync()
     {
-        await base.ReadConfigAsync();
+        await ClientConfig!.ReadAuthConfigAsync("authconfig.json", "employeeuserpool");
+        await ClientConfig.ReadTenancyConfigAsync("tenancyconfig.json");
         await Messages.SetMessageSetAsync(new LzMessageSet("en-US", LzMessageUnits.Imperial));
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace LazyStack.Client.ViewModels;
 
-public class LzSessionsViewModelAuth<T> : LzSessionsViewModel<T>, ILzSessionsViewModelAuth<T>
+public abstract class LzSessionsViewModelAuth<T> : LzSessionsViewModel<T>, ILzSessionsViewModelAuth<T>
     where T : ILzSessionViewModelAuth
 {
     public LzSessionsViewModelAuth(

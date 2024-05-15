@@ -17,4 +17,5 @@ public interface ILzSessionsViewModel<T>: INotifyPropertyChanged
     Task SetAsync(string sessionId);
 	Task InitAsync(IOSAccess osAccess, IInternetConnectivitySvc internetConnectivitySvc);
 	Task ReadConfigAsync();
+
 }

@@ -228,7 +228,7 @@ public class LzMessages : ILzMessages
                 {
                     // msgFile example: "messages.en-US.json"
                     var filePath = msgFile.Replace(".json", $".{messageSet.Culture}.json");
-                    var json = await _oSAccess.ReadConfigAsync(filePath);
+                    var json = await _oSAccess.ReadContentAsync(filePath);
                     if (!string.IsNullOrEmpty(json))
                     {
                         MergeJson(json);
