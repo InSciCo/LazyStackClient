@@ -279,7 +279,7 @@ public class LzMessages : ILzMessages
             if (newMsgs != null)
                 foreach (var msg in newMsgs)
                     _msgs[msg.Key] = msg.Value;
-            Console.WriteLine(Msg($"Merged messages"));
+            //Console.WriteLine(Msg($"Merged messages"));
         } catch (Exception ex)
         {
             Console.WriteLine($"Error merging messages: {ex.Message}");
