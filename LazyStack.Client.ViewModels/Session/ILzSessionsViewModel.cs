@@ -9,7 +9,7 @@ public interface ILzSessionsViewModel<T>: INotifyPropertyChanged
     bool IsInitialized { get; }
     bool IsOnline { get; }
     ILzMessages Messages { get; set; }
-    IOSAccess OSAccess { get; set; } 
+    IOSAccess? OSAccess { get; set; } 
     IInternetConnectivitySvc? InternetConnectivity { get; set; }
     ILzClientConfig? ClientConfig { get; set; }
     Task<bool> CreateSessionAsync();
