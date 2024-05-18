@@ -19,7 +19,7 @@ public abstract class LzSessionsViewModel<T> : LzViewModel, ILzSessionsViewModel
     [Reactive] public virtual T? SessionViewModel { get; set; }
     private Dictionary<string, T> _sessions = new();
     public ILzMessages Messages { get; set; }
-    public IOSAccess OSAccess { get; set; } = null!;
+    public IOSAccess? OSAccess { get; set; } = null!;
     public IInternetConnectivitySvc? InternetConnectivity { get; set; }
     public ILzClientConfig? ClientConfig { get; set; } = null!;
     [Reactive] public bool IsInitialized { get; protected set; }
@@ -28,12 +28,11 @@ public abstract class LzSessionsViewModel<T> : LzViewModel, ILzSessionsViewModel
     //public virtual async Task InitAsync(IOSAccess osAccess, ILzClientConfig clientConfig, IInternetConnectivitySvc internetConnectivitySvc)
     public virtual async Task InitAsync(IOSAccess osAccess, IInternetConnectivitySvc internetConnectivitySvc)
 	{
+
         await Task.Delay(0);
         // The objects passed in to init are those that must be created within a WebView context.
-        if (osAccess == null) throw new Exception("OSAccess is null");
-        if (internetConnectivitySvc == null) throw new Exception("InternetConnectivitySvc is null");
-        OSAccess = osAccess;
-        InternetConnectivity = internetConnectivitySvc;
+        OSAccess = osAccess ?? throw new ArgumentNullException(nameof(osAccess));
+        InternetConnectivity = internetConnectivitySvc ?? throw new ArgumentNullException(nameof(internetConnectivitySvc));
         Messages.SetOSAccess(OSAccess); // allows MessageSets to be read from configuration files
         ClientConfig!.SetOSAccess(OSAccess);    // allows ClientConfig to read configuration files
         await ReadConfigAsync();
