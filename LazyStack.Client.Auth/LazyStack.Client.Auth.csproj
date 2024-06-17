@@ -14,16 +14,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Remove="Config\Messages.json" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Config\Messages.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
-	</ItemGroup>
-
-	<ItemGroup>
 		<!--<PackageReference Include="MailKit" />-->
 		<PackageReference Include="System.ComponentModel.Annotations" />
 		<PackageReference Include="JsonSubTypes" />

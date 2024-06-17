@@ -10,11 +10,6 @@ namespace BlazorTest.WASM
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            ILzMessages messages = new LzMessages();
-            messages
-                .AddLazyStackAuth()
-                .ReplaceVars();
-
             // We use the launchSettings.json profile ASPNETCORE_ENVIRONMENT environment variable
             // to determine the host addresses for the API host and Tenancy host.
             //
@@ -66,7 +61,6 @@ namespace BlazorTest.WASM
                 isMAUI: false, // sets isWASM to true
                 isAndroid: false,
                 isLocal: isLocal))
-                .AddSingleton(messages)
                 .AddLazyStackAuthCognito()
                 .AddSingleton<ISessionsViewModel, SessionsViewModel>();
                 

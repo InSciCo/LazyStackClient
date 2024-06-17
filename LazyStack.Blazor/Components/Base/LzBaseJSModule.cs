@@ -68,7 +68,7 @@ public abstract class LzBaseJSModule : ILzBaseJSModule, INotifyPropertyChanged, 
     }
 
     /// <inheritdoc/>
-    public async ValueTask DisposeAsync()
+    public virtual async ValueTask DisposeAsync()
     {
         await DisposeAsync(true);
     }

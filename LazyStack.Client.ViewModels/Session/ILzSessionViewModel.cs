@@ -12,7 +12,7 @@ public interface ILzSessionViewModel : INotifyPropertyChanged
     bool IsOnline { get; }
     bool IsLoaded { get; set; }
     bool IsLoading { get; set; }
-    LzMessageSet MessageSet { get; set; }
+    LzMessageSetSelector MessageSetSelector { get; set; }
     Task InitAsync();
     Task<bool> CheckInternetConnectivityAsync();
     Task LoadAsync();

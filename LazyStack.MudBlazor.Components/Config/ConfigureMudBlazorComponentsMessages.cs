@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using LazyStack.Client.Base;
+
+namespace LazyStack.MudBlazor.Components;
+
+
+public static class ConfigureMudBlazorComponentsMessages
+{
+public static ILzMessages AddMudBlazorComponentsMessages(this ILzMessages lzMessages)
+    {
+        List<string> messages = [
+            "_content/LazyStack.MudBlazor.Components/Messages.json"
+            ];
+        lzMessages.MessageFiles.AddRange(messages);
+        return lzMessages;
+    }
+
+}

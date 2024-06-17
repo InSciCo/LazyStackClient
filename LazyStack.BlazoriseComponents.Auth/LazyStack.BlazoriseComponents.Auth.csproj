@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\CommonPackageHandling.targets"/>
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+	<Import Project="..\CommonPackageHandling.targets" />
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 
@@ -12,8 +12,20 @@
 		<RootNamespace>LazyStack.BlazoriseComponents</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Remove="Config\ConfigureLazyStackBlazoriseComponentsAuthMessages.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\LazyStack.Blazorise\LazyStack.BlazoriseComponents.csproj" />
 	  <ProjectReference Include="..\LazyStack.Client.ViewModels.Auth\LazyStack.Client.ViewModels.Auth.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="_imports.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="_imports.razor" />
 	</ItemGroup>
 
 </Project>

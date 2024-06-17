@@ -11,6 +11,9 @@
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 		<RootNamespace>LazyStack.Blazor</RootNamespace>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Content Remove="Config\ConfigureLazyStackBlazorAuthMessages.cs" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\LazyStack.Client.Auth\LazyStack.Client.Auth.csproj" />

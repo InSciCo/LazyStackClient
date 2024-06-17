@@ -7,11 +7,20 @@
 // from ReactiveUI implementation.
 namespace LazyStack.Blazor;
 
+public class LzComponentBase : ComponentBase
+{
+    [Inject]
+    public virtual ILzMessages? Messages { get; set; }
+    protected virtual MarkupString Msg(string key, bool ignoreUseInspect = false) => (MarkupString)Messages!.Msg(key, ignoreUseInspect);
+
+}
+
+
 /// <summary>
 /// A base component for handling property changes and updating the blazer view appropriately.
 /// </summary>
 /// <typeparam name="T">The type of view model. Must support INotifyPropertyChanged.</typeparam>
-public class LzReactiveComponentBaseAssignViewModel<T> : ComponentBase, IViewFor<T>, INotifyPropertyChanged, ICanActivate, IDisposable
+public class LzComponentBase<T> : LzComponentBase, IViewFor<T>, INotifyPropertyChanged, ICanActivate, IDisposable
     where T : class, INotifyPropertyChanged
 {
     private readonly Subject<Unit> _initSubject = new();
@@ -19,7 +28,7 @@ public class LzReactiveComponentBaseAssignViewModel<T> : ComponentBase, IViewFor
     private readonly Subject<Unit> _deactivateSubject = new();
     private readonly CompositeDisposable _compositeDisposable = new();
 
-    private T? _viewModel;
+    protected T? _viewModel;
 
     private bool _disposedValue; // To detect redundant calls
 
@@ -41,14 +50,6 @@ public class LzReactiveComponentBaseAssignViewModel<T> : ComponentBase, IViewFor
             _viewModel = value;
             OnPropertyChanged();
         }
-    }
-
-    [Inject]
-    public ILzMessages? Messages { get; set; }
-    protected MarkupString Msg(string key)
-    {
-        var msg = Messages!.Msg(key);
-        return (MarkupString)msg;
     }
 
     /// <inheritdoc />

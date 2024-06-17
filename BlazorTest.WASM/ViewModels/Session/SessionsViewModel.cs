@@ -21,8 +21,9 @@ public class SessionsViewModel : LzSessionsViewModelAuth<ISessionViewModel>, ISe
     // ReadConfigAsync is called from InitAsync() just prior to the IsInitialized being set to true.
     public override async Task ReadConfigAsync()
     {
-        await ClientConfig!.ReadAuthConfigAsync("authconfig.json", "employeeuserpool");
-        await ClientConfig.ReadTenancyConfigAsync("tenancyconfig.json");
-        await Messages.SetMessageSetAsync(new LzMessageSet("en-US", LzMessageUnits.Imperial));
+        //await ClientConfig!.ReadAuthConfigAsync("authconfig.json", "employeeuserpool");
+        //await ClientConfig.ReadTenancyConfigAsync("tenancyconfig.json");
+        //await Messages.SetMessageSetAsync("en-US", LzMessageUnits.Imperial);
+        await Task.Delay(0);
     }
 }

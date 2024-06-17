@@ -10,30 +10,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
-
 	<ItemGroup>
-		<Compile Remove="Util\**" />
-		<Content Remove="Util\**" />
-		<EmbeddedResource Remove="Util\**" />
-		<None Remove="Util\**" />
+	  <Content Remove="Config\ConfigureLazyStackBlazorMessages.cs" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Compile Remove="BlazorContentAccess.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Remove="Components\Base\ILzBaseJSModule.cs" />
-		<Content Remove="Components\Base\LzBaseJSModule.cs" />
-		<Content Remove="Components\Base\LzCoreComponentBaseInjectViewModel.cs" />
-		<Content Remove="Components\Base\LzLayoutComponentBase.cs" />
-		<Content Remove="Components\Base\LzLayoutComponentBaseAssignViewModel.cs" />
-		<Content Remove="Components\Base\LzLayoutComponentBaseInjectViewModel.cs" />
-		<Content Remove="Components\Base\LzLayoutComponentBasePassViewModel.cs" />
-		<Content Remove="Components\Base\LzLReactiveLayoutComponentBase.cs" />
-		<Content Remove="Components\Base\LzReactiveLayoutComponentBaseAssignViewModel.cs" />
-	</ItemGroup>
-
 
 	<ItemGroup>
 		<SupportedPlatform Include="browser" />
@@ -45,14 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Properties\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <ProjectReference Include="..\LazyStack.Client.Base\LazyStack.Client.Base.csproj" />
 	</ItemGroup>
-	
-	
-	
 
 </Project>

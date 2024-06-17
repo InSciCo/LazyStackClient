@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-	<Import Project="..\CommonPackageHandling.targets"/>
+	<Import Project="..\CommonPackageHandling.targets" />
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -8,10 +8,19 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Content Remove="Config\ConfigureLazyStackMudBlazorComponentsMessages.cs" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\LazyStack.MudBlazor.Components\LazyStack.MudBlazor.Components.csproj" />
 		<ProjectReference Include="..\LazyStack.Client.ViewModels.Auth\LazyStack.Client.ViewModels.Auth.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="wwwroot\Messages.en-US.json">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 </Project>

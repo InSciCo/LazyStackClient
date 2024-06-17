@@ -1,0 +1,328 @@
+﻿using System.Data;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace LazyStack.Client.Base;
+
+/// <summary>
+/// Loads the messages for a specific culture. Provides them in 
+/// both Imperial and Metric units. 
+/// This class implements a lazy process pattern where only the 
+/// default units are processed initially.
+/// </summary>
+public class LzMessageSet 
+{
+    /// <summary> 
+    /// 
+    /// </summary>
+    /// <param name="culture">Culture to load. ex: en-US</param>
+    /// <param name="defaultUnits">Initial units. Ex: LzMessageUnits.Imperial </param>
+    public LzMessageSet(string culture, LzMessageUnits defaultUnits)
+    { 
+        Culture = culture;
+        Units = defaultUnits;
+    }   
+    public string Culture { get; private set;  }
+    public LzMessageUnits Units { get; set; }
+    protected IOSAccess? _oSAccess;
+    private Dictionary<string,string> _msgsImperial = new Dictionary<string, string>();
+    private Dictionary<string, string> _msgsMetric = new Dictionary<string, string>();
+    private bool _keepDocs = false;
+    private List<string> _messageFiles = new List<string>();
+    private Dictionary<string, MessageDoc> _messageDocs = new Dictionary<string, MessageDoc>();
+   
+
+    /// <summary>
+    /// Get a message by key and optionally override the units.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="unitsArg">Optional units </param>
+    /// <returns></returns>
+    public string Msg(string key, LzMessageUnits? unitsArg = null)
+    {
+        var units = unitsArg ?? Units;
+        var msgs = (units == LzMessageUnits.Imperial) ? _msgsImperial : _msgsMetric;
+
+        if(msgs.Count == 0)
+            UpdateMsgs(units);
+
+        msgs = (units == LzMessageUnits.Imperial) ? _msgsImperial : _msgsMetric;
+
+        if (msgs.TryGetValue(key, out string value))
+            return value;
+
+        return key;
+    }
+
+    public List<(string file, DocMetaData docMetaData, string culture, MsgItem msgItem)> MsgItems(string key)
+    {
+        var items = new List<(string file, DocMetaData docMetaData, string culture, MsgItem msgItem)>();
+        foreach (var messageDoc in _messageDocs)
+            if(messageDoc.Value.Messages.TryGetValue(key, out MsgItem? msgItem))
+            {
+                msgItem.Editable = messageDoc.Value.DocMetaData.Editable || msgItem.Editable;
+                msgItem.SetParent(this);
+                items.Add((messageDoc.Key, messageDoc.Value.DocMetaData, Culture, msgItem));
+            }
+            else 
+            if(messageDoc.Value.DocMetaData.Editable)
+            {
+                var newMsgItem = new MsgItem(this) { Editable = true, Msg = "" };
+                newMsgItem.SetIsNew();
+                items.Add((messageDoc.Key, messageDoc.Value.DocMetaData, Culture, newMsgItem));
+            }
+
+        return items;
+    }
+ 
+    public async Task LoadMessagesAsync(List<string> messageFiles, IOSAccess osAccess, bool keepDocs = false)
+    {
+        _messageFiles = messageFiles;
+        _keepDocs = keepDocs;   
+        _oSAccess = osAccess;
+        foreach (var msgFile in messageFiles)
+        {
+            // msgFile example: "messages.en-US.json"
+            var filePath = "";
+            try
+            {
+                filePath = FilePathWithCulture(msgFile, Culture);
+
+                var json = await _oSAccess.ReadContentAsync(filePath);
+                if (!string.IsNullOrEmpty(json))
+                {
+                    var doc = JsonConvert.DeserializeObject<MessageDoc>(json)!;
+                    _messageDocs[filePath] = doc;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading messages file: {filePath} {ex.Message}");
+            }
+        }
+        UpdateMsgs();
+    }
+    public void UpdateMsgs(LzMessageUnits? unitsArg = null)
+    {
+        var units = unitsArg ?? Units;
+        var msgs = (units == LzMessageUnits.Imperial) 
+            ? _msgsImperial = new Dictionary<string, string>()
+            : _msgsMetric = new Dictionary<string, string>();
+        try
+        {
+            if (_oSAccess == null)
+                throw new Exception("SetOSAccess must be called before SetMessageSetAsync.");
+            foreach (var msgFile in _messageFiles) // preserve the precidence order of the files
+            {
+                var filePath = FilePathWithCulture(msgFile, Culture);
+                if (_messageDocs.TryGetValue(filePath, out MessageDoc? doc))
+                    foreach (var msg in doc.Messages)
+                        msgs[msg.Key] = msg.Value.Msg;
+            }
+            ReplaceVars(units); // Performs variable substitution and Units conversion in msgs
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error setting message set: {ex.Message}");
+        }
+    }
+    protected string MergeMessages(string key)
+    {
+        var msg = key;
+        foreach(var messageDoc in _messageDocs.Values)
+            if (messageDoc.Messages.TryGetValue(key, out MsgItem? msgItem))
+                msg = msgItem.Msg;
+        return msg;
+    }
+    protected string FilePathWithCulture(string fileName, string culture) => fileName.Replace(".json", $".{culture}.json");
+    protected bool TryGetMsg(string key, out string msg, LzMessageUnits? unitsArg = null)
+    {
+        var units = unitsArg ?? Units;
+        var msgs = (units == LzMessageUnits.Imperial) ? _msgsImperial : _msgsMetric;
+        msg = key;
+        if (key == null)
+            return false;
+
+        if (key == "Nothing")
+            return false;
+        // Try and get the message from the current culture messages
+        if (msgs.TryGetValue(key, out string? value))
+            msg = string.IsNullOrEmpty(value) ? key : value;
+        return !key.Equals(msg);
+    }
+    protected string ReplaceUnits(string msg, LzMessageUnits? unitsArg = null)
+    {
+        if (!msg.Contains("@Unit")) // typically, most messages don't have units, this is a quick check to see if we need to do anything
+            return msg;
+
+        var units = unitsArg ?? Units;
+
+        var msgIn = msg;
+        MatchCollection matches;
+
+        // Process @Unit() functions 
+        while ((matches = Regex.Matches(msg, "@Unit\\((.*?)\\)")).Count > 0)
+        {
+            foreach (Match match in matches)
+            {
+                var val = match.Value.Substring(6, match.Value.Length - 7);
+                msg = msg.Replace(match.Value, ProcessUnitConversion(val, units));
+            }
+        }
+
+        // Process @UnitS() functions 
+        while ((matches = Regex.Matches(msg, "@UnitS\\((.*?)\\)")).Count > 0)
+        {
+            foreach (Match match in matches)
+            {
+                var val = match.Value.Substring(7, match.Value.Length - 8);
+                msg = msg.Replace(match.Value, ProcessUnitS(val, units));
+            }
+        }
+
+        return msg;
+    }
+    protected void ReplaceVars(LzMessageUnits? unitsArg = null)
+    {
+        var units = unitsArg ?? Units;  
+        var msgs = (units == LzMessageUnits.Imperial) ? _msgsImperial : _msgsMetric;
+        // Refactored to support C# 8.0 which is the latest supported by .netstandard2.0 target
+        for (var i = 0; i < msgs.Count; i++)
+        {
+            // replace variables satisfying the keyPattern '__.*__' with the value of the key
+            var msg = msgs.ElementAt(i).Value;
+            var key = msgs.ElementAt(i).Key;
+            ReplaceVars(msg, units);
+            msgs[key] = ReplaceUnits(msg, units);
+        }
+    }
+    protected string ReplaceVars(string msg, LzMessageUnits? unitsArg = null)
+    {
+        var units = unitsArg ?? Units;
+        var msgs = (units == LzMessageUnits.Imperial) ? _msgsImperial : _msgsMetric;
+
+        // replace variables satisfying the keyPattern '__.*__' with the value of the key
+        MatchCollection matches;
+        while ((matches = Regex.Matches(msg, keyPattern)).Count > 0)
+        {
+            foreach (Match match in matches)
+            {
+                // Using Substring instead of range operator
+                var matchValue = match.Value.Substring(2, match.Value.Length - 4);
+
+                if (msgs.TryGetValue(matchValue, out string? replacement))
+                    msg = msg.Replace(match.Value, replacement);
+                else
+                    throw new Exception($"Msgs[{matchValue}] not found.");
+            }
+        }
+        return msg;
+    }
+
+
+    const string keyPattern = "__.*__";
+    static string[] imperialUnits = { "in", "\"", "ft", "'", "yd", "mi", "oz", "lb", "sq in", "sq ft" };
+    static string[] metricUnits = { "mm", "cm", "m", "km", "g", "kg", "sq mm", "sq cm", "sq m" };
+    static Dictionary<string, string> defaultConversions() => new()
+    {
+        { "in", "mm" },
+        { "\"", "mm" },
+        { "ft", "m" },
+        { "'", "m" },
+        { "yd", "m" },
+        { "mi", "km" },
+        { "oz", "g" },
+        { "lb", "kg" },
+        { "sq in", "sq cm" },
+        { "sq ft", "sq m"},
+        { "mm", "\"" },
+        { "cm", "\"" },
+        { "m", "'" },
+        { "km", "mi" },
+        { "g", "oz" },
+        { "kg", "lb" },
+        { "sq mm", "sq in" },
+        { "sq cm", "sq in" },
+        { "sq m", "sq ft"}
+    };
+    static Dictionary<string, (double factor, int precision)> conversionFactors = new()
+    {
+        { "in,mm", (25.4, 2)},
+        { "\",mm", (25.4, 2)},
+        { "ft,m",  (0.3048, 1)},
+        { "',m",  (0.3048, 1)},
+        { "yd,m", (0.9144,1) },
+        { "mi,km", (1.609344, 2) },
+        { "oz,g", (28.349523125,0) },
+        { "lb,kg", (0.45359237, 1) },
+        { "sq in,sq cm", (6.4516, 0) },
+        { "sq ft,sq m", (0.09290304, 1)},
+        { "mm,in", (0.0393700787, 2) },
+        { "mm,\"", (0.0393700787, 2) },
+        { "cm,in", (0.393700787, 2) },
+        { "cm,\"", (0.393700787, 2) },
+        { "m,ft", (3.2808399, 1) },
+        { "m,'", (3.2808399, 1) },
+        { "km,mi", (0.621371192, 2) },
+        { "g,oz", (0.0352739619, 2) },
+        { "kg,lb", (2.20462262, 1) },
+        { "sq mm,sq in", (0.0015500031,1) },
+        { "sq cm,sq in", (0.15500031, 1) },
+        { "sq m,sq ft", (10.7639104, 1)}
+    };
+
+    protected string ProcessUnitConversion(string arguments, LzMessageUnits? unitsArg = null)
+    {
+        var units = unitsArg ?? Units;
+
+        var args = arguments.Split(',');
+        if (args.Length != 2)
+            throw new Exception($"@Unit() function requires at least two arguments: {arguments}");
+        if (args.Length == 2)
+            return UnitConversion(units, args[0], args[1]);
+        if (args.Length == 3)
+            return UnitConversion(units, args[0], args[1], int.Parse(args[2]));
+        if (args.Length == 4)
+            return UnitConversion(units,args[0], args[1], int.Parse(args[2]), args[3]);
+        throw new Exception($"@Unit() too many arguments passed: {arguments}");
+    }
+    protected string UnitConversion(LzMessageUnits units, string value, string valueUnit, int? precision = null, string? toUnit = null)
+    {
+        LzMessageUnits valueUnits = LzMessageUnits.Imperial;
+        if (imperialUnits.Contains(valueUnit))
+            valueUnits = LzMessageUnits.Imperial;
+        else if (metricUnits.Contains(valueUnit))
+            valueUnits = LzMessageUnits.Metric;
+        else
+            throw new Exception($"UnitConversion: {valueUnit} is not a recognized unit.");
+
+        if (valueUnits == units)
+            return $"{value}{valueUnit}";
+        try
+        {
+            double convertedValue = double.Parse(value);
+            string convertedUnit = valueUnit;
+            toUnit ??= defaultConversions()[valueUnit];
+            var conversionFactor = conversionFactors[$"{valueUnit},{toUnit}"].factor;
+            convertedValue *= conversionFactor;
+            var strValue = convertedValue.ToString();
+            precision ??= conversionFactors[$"{valueUnit},{toUnit}"].precision;
+            string formatSpecifier = precision.HasValue ? $"F{precision.Value}" : "G";
+            return $"{convertedValue.ToString(formatSpecifier)} {toUnit}";
+        }
+        catch
+        {
+            return $"{value} {valueUnit} can't be converted.";
+        }
+    }
+    protected string ProcessUnitS(string arguments, LzMessageUnits? unitsArg = null)
+    {
+        var units = unitsArg ?? Units;  
+        var args = arguments.Split(',');
+        if (args.Length != 2)
+            return $"UnitS requires two arguments. ";
+
+        return (units == LzMessageUnits.Imperial) ? args[0] : args[1];
+    }
+}

@@ -16,22 +16,22 @@ public abstract class LzSessionViewModel : LzViewModel, ILzSessionViewModel, INo
         ClientConfig = clientConfig ?? throw new ArgumentNullException(nameof(clientConfig));
         InternetConnectivity = internetConnectivity ?? throw new ArgumentNullException(nameof(internetConnectivity));
         Messages = messages ?? throw new ArgumentNullException(nameof(messages));
-        // Maintain a local instance of the MessageSet so we can react to changes in that value 
-        // to update the current MessageSet in Messages.
-        MessageSet = new LzMessageSet(Messages.MessageSet.Culture, Messages.MessageSet.Units);
+        // Maintain a local instance of the MessageSetSelector so we can react to changes in that value 
+        // to update the current MessageSetSelector in Messages.
+        MessageSetSelector = new LzMessageSetSelector(Messages.MessageSet.Culture, Messages.MessageSet.Units);
 
         this.WhenAnyValue(x => x.InternetConnectivity.IsOnline)
             .ToPropertyEx(this, x => x.IsOnline);
 
-        this.WhenAnyValue(x => x.MessageSet)
+        this.WhenAnyValue(x => x.MessageSetSelector)
             .DistinctUntilChanged()
-            .Subscribe(async (messageSet) =>
+            .Subscribe(async (messageSetSelector) =>
             { 
-                // Note: The LzMessage instance MessageSet is not the same instance as the one in 
+                // Note: The LzMessage instance MessageSetSelector is not the same instance as the one in 
                 // LzMessages. When it changes, we make a call to the LzMessages instance to update
                 // the current message set.
                 if(OSAccess != null)
-				    await Messages.SetMessageSetAsync(messageSet.Culture, messageSet.Units);
+				    await Messages.SetMessageSetAsync(messageSetSelector.Culture, messageSetSelector.Units);
 			});
     }
     public IInternetConnectivitySvc InternetConnectivity { get; set; }  
@@ -45,7 +45,7 @@ public abstract class LzSessionViewModel : LzViewModel, ILzSessionViewModel, INo
     [ObservableAsProperty] public bool IsOnline { get; }
     [Reactive] public bool IsLoading { get; set; }
     [Reactive] public bool IsLoaded { get; set; }
-    [Reactive] public LzMessageSet MessageSet { get; set; }
+    [Reactive] public LzMessageSetSelector MessageSetSelector { get; set; }
     public Task<bool> CheckInternetConnectivityAsync()
         => InternetConnectivity.CheckInternetConnectivityAsync();
     public virtual async Task LoadAsync()

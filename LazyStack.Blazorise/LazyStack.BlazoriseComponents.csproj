@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-	<Import Project="..\CommonPackageHandling.targets"/>
+	<Import Project="..\CommonPackageHandling.targets" />
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 
@@ -10,6 +10,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="Config\ConfigureLazyStackBlazoriseComponentsMessages.cs" />
+	</ItemGroup>
 
 
 	<ItemGroup>
@@ -19,7 +22,6 @@
 	<ItemGroup>
 		<PackageReference Include="Blazorise.Bootstrap5" />
 		<PackageReference Include="Blazorise.Components" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web"/>
 	</ItemGroup>
 
 	<ItemGroup>
