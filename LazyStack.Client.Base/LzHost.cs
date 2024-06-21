@@ -13,10 +13,10 @@ public interface ILzHost
 
 public class LzHost : ILzHost
 {
-    public LzHost(string? url = null, string? tenancyUrl = null, string? wsUrl = null, bool isMAUI = true, bool isAndroid = false, bool isLocal = false)
+    public LzHost(string? url = null, string? assetsUrl = null, string? wsUrl = null, bool isMAUI = true, bool isAndroid = false, bool isLocal = false)
     {
         Url = url ?? "";
-        AssetsUrl = tenancyUrl ?? "";
+        AssetsUrl = assetsUrl ?? "";
         WsUrl = wsUrl ?? "";
         IsMAUI = isMAUI;
         IsAndroid = isAndroid;

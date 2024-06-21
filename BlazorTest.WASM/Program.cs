@@ -57,7 +57,7 @@ namespace BlazorTest.WASM
             .AddSingleton(sp => new HttpClient { BaseAddress = new Uri(apiUrl) })
             .AddSingleton<ILzHost>(sp => new LzHost(
                 url: apiUrl,  // api url
-                tenancyUrl: tenancyUrl, // tenancy assets url
+                assetsUrl: tenancyUrl, // tenancy assets url
                 isMAUI: false, // sets isWASM to true
                 isAndroid: false,
                 isLocal: isLocal))
