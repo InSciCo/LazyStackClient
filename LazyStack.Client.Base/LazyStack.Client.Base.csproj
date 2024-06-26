@@ -14,12 +14,5 @@
 	<ItemGroup>
 	  <Compile Remove="ILzMessages.cs" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Content Remove="IInternetConnectivitySvc.cs" />
-	  <Content Remove="Messages\DocMetaData.cs" />
-	  <Content Remove="Messages\LzMessageSetSelector.cs" />
-	  <Content Remove="Messages\MessageDoc.cs" />
-	  <Content Remove="Messages\MsgItem.cs" />
-	</ItemGroup>
 
 </Project>

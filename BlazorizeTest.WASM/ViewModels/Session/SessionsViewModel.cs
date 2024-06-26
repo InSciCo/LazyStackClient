@@ -1,4 +1,4 @@
-﻿namespace BlazorTest.ViewModels;
+﻿namespace BlazorizeTest.ViewModels;
 [Factory]
 
 public class SessionsViewModel : LzSessionsViewModelAuth<ISessionViewModel>, ISessionsViewModel

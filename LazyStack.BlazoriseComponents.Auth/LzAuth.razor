@@ -1,6 +1,5 @@
 ﻿@namespace LazyStack.BlazoriseComponents
 @inherits LzComponentBasePassViewModel<IAuthProcess>
-
 @if (ViewModel != null)
 {
     <Div>
@@ -8,12 +7,13 @@
         {
             <Field>
                 <FieldLabel>@Msg("AuthComponent_LoginLabel")</FieldLabel>
-                <TextEdit @bind-Text="@ViewModel.Login"
-                  Class="@fieldClass"
-                  Style="@fieldStyle"
-                  Immediate="false"
-                  Autofocus="true"
-                  KeyUp="Verify" />
+                <TextEdit 
+                    Text="@ViewModel.Login" 
+                    Autofocus="true"
+                    Blur="OnBlur"
+                    KeyDown="OnKeyDown"
+                    TextChanged="OnTextChanged" 
+                    />
                 <FieldHelp>@Msg(@ViewModel.LoginFormatMessage)</FieldHelp>
             </Field>
         }
@@ -22,12 +22,13 @@
         {
             <Field>
                 <FieldLabel>@Msg("AuthComponent_NewLoginLabel")</FieldLabel>
-                <TextEdit @bind-Text="@ViewModel.NewLogin"
-                  Class="@fieldClass"
-                  Style="@fieldStyle"
-                  Immediate="false"
-                  Autofocus="true"
-                  KeyUp="Verify" />
+                <TextEdit 
+                    Text="@ViewModel.NewLogin"
+                    Autofocus="true"
+                    Blur="OnBlur"
+                    KeyDown="OnKeyDown"
+                    TextChanged="OnTextChanged" 
+                    />
                 <FieldHelp>@Msg(ViewModel.NewLoginFormatMessage)</FieldHelp>
             </Field>
         }
@@ -36,13 +37,14 @@
         {
             <Field>
                 <FieldLabel>@Msg("AuthComponent_PasswordLabel")</FieldLabel>
-                <TextEdit @bind-Text="@ViewModel.Password"
-                  Class="@fieldClass"
-                  Style="@fieldStyle"
-                  Immediate="false"
-                  Autofocus="true"
-                  Role="TextRole.Password"
-                  KeyUp="Verify" />
+                <TextEdit 
+                    Text="@ViewModel.Password"
+                    Autofocus="true"
+                    Blur="OnBlur"
+                    KeyDown="OnKeyDown"
+                    TextChanged="OnTextChanged"                   
+                    Role="TextRole.Password"
+                  />
                 <FieldHelp>@Msg(ViewModel.PasswordFormatMessage)</FieldHelp>
             </Field>
         }
@@ -51,13 +53,14 @@
         {
             <Field>
                 <FieldLabel>@Msg("AuthComponent_NewPasswordLabel")</FieldLabel>
-                <TextEdit @bind-Text="@ViewModel.NewPassword"
-                  Class="@fieldClass"
-                  Style="@fieldStyle"
-                  Immediate="false"
-                  Autofocus="true"
-                  Role="TextRole.Password"
-                  KeyUp="Verify" />
+                <TextEdit 
+                    Text="@ViewModel.NewPassword"
+                    Autofocus="true"
+                    Blur="OnBlur"
+                    KeyDown="OnKeyDown"
+                    TextChanged="OnTextChanged"                   
+                    Role="TextRole.Password"
+                  />
                 <FieldHelp>@Msg(ViewModel.NewPasswordFormatMessage)</FieldHelp>
             </Field>
         }
@@ -66,13 +69,14 @@
         {
             <Field>
                 <FieldLabel>@Msg("AuthComponent_EmailLabel")</FieldLabel>
-                <TextEdit @bind-Text="@ViewModel.Email"
-                  Class="@fieldClass"
-                  Style="@fieldStyle"
-                  Immediate="false"
-                  Autofocus="true"
-                  Role="TextRole.Email"
-                  KeyUp="Verify" />
+                <TextEdit 
+                    Text="@ViewModel.Email"
+                    Autofocus="true"
+                    Blur="OnBlur"
+                    KeyDown="OnKeyDown"
+                    TextChanged="OnTextChanged" 
+                    Role="TextRole.Email"
+                    />
                 <FieldHelp>@Msg(ViewModel.EmailFormatMessage)</FieldHelp>
             </Field>
         }
@@ -81,13 +85,14 @@
         {
             <Field>
                 <FieldLabel>@Msg("AuthComponent_NewEmailLabel")</FieldLabel>
-                <TextEdit @bind-Text="@ViewModel.NewEmail"
-                  Class="@fieldClass"
-                  Style="@fieldStyle"
-                  Immediate="false"
-                  Autofocus="true"
-                  Role="TextRole.Email"
-                  KeyUp="Verify" />
+                <TextEdit 
+                    Text="@ViewModel.NewEmail"
+                    Autofocus="true"
+                    Blur="OnBlur"
+                    KeyDown="OnKeyDown"
+                    TextChanged="OnTextChanged" 
+                    Role="TextRole.Email"
+                    />
                 <FieldHelp>@Msg(ViewModel.NewEmailFormatMessage)</FieldHelp>
             </Field>
         }
@@ -96,12 +101,13 @@
         {
             <Field>
                 <FieldLabel>@Msg("AuthComponent_PhoneLabel")</FieldLabel>
-                <TextEdit @bind-Text="@ViewModel.Phone"
-                  Class="@fieldClass"
-                  Style="@fieldStyle"
-                  Immediate="false"
-                  Autofocus="true"
-                  KeyUp="Verify" />
+                <TextEdit 
+                    Text="@ViewModel.Phone"
+                    Autofocus="true"
+                    Blur="OnBlur"
+                    KeyDown="OnKeyDown"
+                    TextChanged="OnTextChanged" 
+                    />
                 <FieldHelp>@ViewModel.PhoneFormatMessage</FieldHelp>
             </Field>
         }
@@ -110,12 +116,13 @@
         {
             <Field>
                 <FieldLabel>@Msg("AuthComponent_NewPhoneLabel")</FieldLabel>
-                <TextEdit @bind-Text="@ViewModel.NewPhone"
-                  Class="@fieldClass"
-                  Style="@fieldStyle"
-                  Immediate="false"
-                  Autofocus="true"
-                  KeyUp="Verify" />
+                <TextEdit 
+                    Text="@ViewModel.NewPhone"
+                    Autofocus="true"
+                    Blur="OnBlur"
+                    KeyDown="OnKeyDown"
+                    TextChanged="OnTextChanged" 
+                    />
                 <FieldHelp>@Msg(ViewModel.NewPhoneFormatMessage)</FieldHelp>
             </Field>
         }
@@ -124,18 +131,19 @@
         {
             <Field>
                 <FieldLabel>@Msg("AuthComponent_CodeLabel")</FieldLabel>
-                <TextEdit @bind-Text="@ViewModel.Code"
-                  Class="@fieldClass"
-                  Style="@fieldStyle"
-                  Immediate="false"
-                  Autofocus="true"
-                  KeyUp="Verify" />
+                <TextEdit 
+                    Text="@ViewModel.Code"
+                    Autofocus="true"
+                    Blur="OnBlur"
+                    KeyDown="OnKeyDown"
+                    TextChanged="OnTextChanged" 
+                    />
                 <FieldHelp>@Msg(ViewModel.CodeFormatMessage)</FieldHelp>
             </Field>
         }
 
     </Div>
-    <Div Flex="Flex.Column">
+    <Div Flex="Flex.Row">
         @if (ViewModel.CanSignIn)
         {
             <Button Class="@btnClass" Color="@btnColor" Style="@btnStyle" Clicked="@(async() => await ViewModel.StartSignInAsync())">@Msg("AuthComponent_SignIn")</Button>
@@ -207,6 +215,7 @@
     private bool cancelButtonDisabled = false;
     const KeyboardEventArgs emptyKeyboardEventArgs = null;
 
+
     protected override async Task OnInitializedAsync() 
     {
         //ViewModel.AssignFieldOnCheck = true;
@@ -214,9 +223,61 @@
         await base.OnInitializedAsync();
     }
 
+
+    private void OnTextChanged(string value)
+    {
+        switch(ViewModel!.CurrentChallenge)
+        {
+            case AuthChallengeEnum.Login:
+                ViewModel!.Login = value;
+                break;
+            case AuthChallengeEnum.NewLogin:
+                ViewModel!.NewLogin = value;
+                break;
+            case AuthChallengeEnum.Password:
+                ViewModel!.Password = value;
+                break;
+            case AuthChallengeEnum.NewPassword:
+                ViewModel!.NewPassword = value;
+                break;
+            case AuthChallengeEnum.Email:
+                ViewModel!.Email = value;
+                break;
+            case AuthChallengeEnum.NewEmail:
+                ViewModel!.NewEmail = value;
+                break;
+            case AuthChallengeEnum.Phone:
+                ViewModel!.Phone = value;
+                break;
+            case AuthChallengeEnum.NewPhone:
+                ViewModel!.NewPhone = value;
+                break;
+            case AuthChallengeEnum.Code:
+                ViewModel!.Code = value;
+                break;
+        }
+
+        ViewModel!.CheckFormat();
+
+    }
+
+    private void OnBlur(FocusEventArgs e)
+    {
+        ViewModel!.Verify();
+    }   
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            ViewModel!.Verify();
+        }
+    }
+
+
     protected async Task VerifyNoArg()
     {
         await ViewModel!.Verify();
+        Console.WriteLine("LogFormatMessage: " + ViewModel.LoginFormatMessage);
     }
 
     protected async Task Verify(KeyboardEventArgs e)
@@ -224,7 +285,10 @@
         if (e == null || e.Key == "Enter")
         {
             await ViewModel!.Verify();
+
+        } else
+        {
+            ViewModel!.CheckFormat();
         }
     }
-    
 }

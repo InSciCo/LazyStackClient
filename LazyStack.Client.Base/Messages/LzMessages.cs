@@ -105,13 +105,21 @@ public class LzMessages : NotifyBase, ILzMessages
 	/// <inheritdoc />
 	public string Msg(string key, bool ignoreUseInspect = false, LzMessageUnits? unitsArg = null)
     {
-		if (_oSAccess == null)
-			return "";
-		var msg = MessageSet.Msg(key,unitsArg);
+		if (string.IsNullOrEmpty(key)) return "";
+        try
+		{
+			if (_oSAccess == null)
+				return "";
+			var msg = MessageSet.Msg(key, unitsArg);
 
-        if (UseInspect && !ignoreUseInspect)
-            msg = $"<span class=\"static-content-message\" key=\"{key}\">{msg}</span>" ;
-        return msg;
+			if (UseInspect && !ignoreUseInspect)
+				msg = $"<span class=\"static-content-message\" key=\"{key}\">{msg}</span>";
+			return msg;
+		}
+		catch (Exception ex)
+		{
+            return $"<span style='color:red;'>{key}, {ex.Message}</span>";
+        }
     }
 	/// <inheritdoc />
 	public List<(string file, DocMetaData docMetaData, string culture, MsgItem msgItem)> MsgItems(string key)

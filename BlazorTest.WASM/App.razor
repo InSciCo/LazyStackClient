@@ -1,4 +1,11 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿
+@inherits LzComponentBaseInjectViewModel<ISessionsViewModel>
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject ILzHost Host
+@inject HttpClient HttpClient
+
+<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -10,3 +17,41 @@
         </LayoutView>
     </NotFound>
 </Router>
+@code {
+    private bool isConfigured = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!ViewModel!.IsInitialized)
+        {
+            // We new these up because the DI container doens't have access
+            // to the JSRuntime until the first render in MAUI.
+            var osAccess = new BlazorOSAccess(HttpClient, JSRuntime);
+            var internetConnectivity = new InternetConnectivity(JSRuntime);
+
+            try
+            {
+                Console.WriteLine($"AssetUrl: {Host.AssetsUrl}");
+                await JSRuntime.InvokeVoidAsync("setAssetHostUrl", Host.AssetsUrl);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            await ViewModel!.InitAsync(osAccess, internetConnectivity);
+            var messages = ViewModel.Messages;
+            // The following extension methods add to the Mesaages.MessageFiles list
+            messages
+                .AddLazyStackBlazorMessages()
+                .AddLazyStackBlazorAuthMessages()
+                ;
+            messages.MessageFiles.AddRange([Host.AssetsUrl + "Tenancy/SetsApp-en-US/Messages.json"]);
+
+            await messages.SetMessageSetAsync("en-US", LzMessageUnits.Imperial);
+
+            isConfigured = true;
+        }
+
+        await base.OnInitializedAsync();
+    }
+}

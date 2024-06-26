@@ -1,0 +1,14 @@
+﻿global using BlazorizeTest.ViewModels;
+global using LazyStack.Client.Auth;
+global using LazyStack.Client.Base;
+global using LazyStack.Blazor;
+global using LazyStack.BlazoriseComponents;
+global using LazyStack.Client.FactoryGenerator;
+global using LazyStack.Client.ViewModels;
+global using LazyStack.Shared;
+global using Microsoft.AspNetCore.Components.Web;
+global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+global using Newtonsoft.Json;
+global using Newtonsoft.Json.Linq;
+global using System.ComponentModel;
+global using System.Reactive.Linq;

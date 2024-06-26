@@ -1,6 +1,8 @@
+using Blazorise;
+using Blazorise.Bootstrap5;
 using System.Diagnostics;
 
-namespace BlazorTest.WASM
+namespace BlazorizeTest.WASM
 {
     public class Program
     {
@@ -54,7 +56,7 @@ namespace BlazorTest.WASM
 
 
             builder.Services
-            .AddSingleton<ILzMessages,LzMessages>()
+            .AddSingleton<ILzMessages, LzMessages>()
             .AddSingleton<ILzClientConfig, LzClientConfig>()
             .AddSingleton(sp => new HttpClient { BaseAddress = new Uri(apiUrl) })
             .AddSingleton<ILzHost>(sp => new LzHost(
@@ -63,8 +65,12 @@ namespace BlazorTest.WASM
                 isMAUI: false, // sets isWASM to true
                 isAndroid: false,
                 isLocal: isLocal))
-                .AddLazyStackAuthCognito()
-                .AddSingleton<ISessionsViewModel, SessionsViewModel>();
+            .AddLazyStackAuthCognito()
+            .AddSingleton<ISessionsViewModel, SessionsViewModel>()
+            .AddBlazorise(options => { options.Immediate = true; })
+            .AddBootstrap5Providers();
+            //.AddFontAwesomeIcons();
+           
                 
             RegisterFactories.Register(builder.Services);
             

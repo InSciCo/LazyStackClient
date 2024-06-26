@@ -17,12 +17,16 @@
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
 		<PackageReference Include="ReactiveUI.Fody" />
 		<PackageReference Include="ReactiveUI" />
+		<PackageReference Include="Blazorise.Animate" />
+		<PackageReference Include="Blazorise.Components" />
+		<PackageReference Include="Blazorise.Icons.FontAwesome" />
+		<PackageReference Include="Blazorise.LoadingIndicator" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\LazyStack.BlazoriseComponents.Auth\LazyStack.BlazoriseComponents.Auth.csproj" />
 		<ProjectReference Include="..\LazyStack.Client.FactoryGenerator\LazyStack.Client.FactoryGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
 		<ProjectReference Include="..\LazyStack.Client.Auth.Cognito\LazyStack.Client.Auth.Cognito.csproj" />
-		<ProjectReference Include="..\LazyStack.Blazor.Auth\LazyStack.Blazor.Auth.csproj" />
 		<ProjectReference Include="..\LazyStack.Client.ViewModels.Auth\LazyStack.Client.ViewModels.Auth.csproj" />
 	</ItemGroup>
 

@@ -12,14 +12,17 @@ public class BlazorOSAccess : IOSAccess
 
     public virtual async Task<string> ReadAuthConfigAsync(string url)
     {
+       
         try
         {
             var text = await httpClient.GetStringAsync(url);
             return text;
         }
-        catch
+        catch (Exception ex)
         {
-            return string.Empty;
+           
+                Console.WriteLine($"ReadAuthConfigAsync error reading: {url}, {ex.Message}");
+                return string.Empty;
         }
     }
     public virtual async Task<string> ReadTenancyConfigAsync(string url)

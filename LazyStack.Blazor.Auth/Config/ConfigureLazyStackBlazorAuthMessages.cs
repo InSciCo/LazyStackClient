@@ -11,7 +11,7 @@ namespace LazyStack.Blazor;
 public static class ConfigureLazyStackBlazorAuthMessages
 {
 
-    public static ILzMessages AddLazyStackBlazorMessages(this ILzMessages lzMessages)
+    public static ILzMessages AddLazyStackBlazorAuthMessages(this ILzMessages lzMessages)
     {
         List<string> messages = [
             "_content/LazyStack.Blazor.Auth/Messages.json"

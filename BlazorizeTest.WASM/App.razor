@@ -1,0 +1,93 @@
+﻿
+@namespace BlazorizeTest.WASM
+@inherits LzComponentBaseInjectViewModel<ISessionsViewModel>
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject ILzHost Host
+@inject HttpClient HttpClient
+
+<Blazorise.ThemeProvider Theme="@theme">
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</Blazorise.ThemeProvider>
+@code {
+    private bool isConfigured = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!ViewModel!.IsInitialized)
+        {
+            // We new these up because the DI container doens't have access
+            // to the JSRuntime until the first render in MAUI.
+            var osAccess = new BlazorOSAccess(HttpClient, JSRuntime);
+            var internetConnectivity = new InternetConnectivity(JSRuntime);
+
+            try
+            {
+                Console.WriteLine($"AssetUrl: {Host.AssetsUrl}");
+                await JSRuntime.InvokeVoidAsync("setAssetHostUrl", Host.AssetsUrl);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            await ViewModel!.InitAsync(osAccess, internetConnectivity);
+            var messages = ViewModel.Messages;
+            // The following extension methods add to the Mesaages.MessageFiles list
+            messages
+                .AddLazyStackBlazorMessages()
+                .AddLazyStackBlazoriseComponentsAuthMessages()
+                ;
+            messages.MessageFiles.AddRange([Host.AssetsUrl + "Tenancy/SetsApp-en-US/Messages.json"]);
+
+            await messages.SetMessageSetAsync("en-US", LzMessageUnits.Imperial);
+
+            isConfigured = true;
+        }
+
+        await base.OnInitializedAsync();
+    }
+    private Theme theme = new()
+        {
+            // BarOptions = new()
+            // {
+            //     HorizontalHeight = "72px"
+            // },
+            // ColorOptions = new()
+            // {
+            //     Primary = "#0288D1",
+            //     Secondary = "#A65529",
+            //     Success = "#23C02E",
+            //     Info = "#9BD8FE",
+            //     Warning = "#F8B86C",
+            //     Danger = "#F95741",
+            //     Light = "#F0F0F0",
+            //     Dark = "#535353",
+            // },
+            // BackgroundOptions = new()
+            // {
+            //     Primary = "#0288D1",
+            //     Secondary = "#A65529",
+            //     Success = "#23C02E",
+            //     Info = "#9BD8FE",
+            //     Warning = "#F8B86C",
+            //     Danger = "#F95741",
+            //     Light = "#F0F0F0",
+            //     Dark = "#535353",
+            // },
+            // InputOptions = new()
+            // {
+            //     CheckColor = "#0288D1",
+            // }
+        };
+}

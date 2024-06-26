@@ -10,7 +10,7 @@ public abstract class LzSessionsViewModel<T> : LzViewModel, ILzSessionsViewModel
         )
     {
         Messages = messages;
-        Messages.MessageFiles = new List<string>() { };
+        Messages.MessageFiles ??= new List<string>() { };
 
         this.WhenAnyValue(x => x.InternetConnectivity!.IsOnline)
             .Select(x => { Console.WriteLine("IsOnline:" + x); return x; })

@@ -6,10 +6,10 @@
     "AppName": {
       "Msg": "LazyStackSaaS.AdminApp"
     },
-    "AuthProcessLabels_SigningIn": {
+    "AuthProcessLabels_SignIn": {
       "Msg": "Sign In"
     },
-    "AuthProcessLabels_SigningUp": {
+    "AuthProcessLabels_SignUp": {
       "Msg": "Sign Up"
     },
     "AuthProcessLabels_ResettingPassword": {
@@ -27,7 +27,7 @@
     "AuthProcessLabels_UpdatingPassword": {
       "Msg": "Update Password"
     },
-    "AuthProcessLabels_SigningOut": {
+    "AuthProcessLabels_SignOut": {
       "Msg": "Sign Out"
     },
     "AuthFormatMessages_Login01": {
