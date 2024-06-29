@@ -1,25 +1,29 @@
-﻿namespace LazyStack.Client.Base;
+﻿using System.Net.Http;
+using System;
+
+namespace LazyStack.Client.Base;
 
 public class LzClientConfig : ILzClientConfig
 {
-    public LzClientConfig(ILzHost host)
+    public LzClientConfig(ILzHost host, HttpClient httpClient)
     {
         _host = host ?? throw new ArgumentNullException(nameof(host));
-    }
-    public JObject AuthConfig { get; set; } = new();
-    public JObject TenancyConfig { get; set; } = JObject.Parse("{}");   
+        _httpClient = httpClient;
 
-    protected IOSAccess _oSAccess;
+    }
+    public Dictionary<string,JObject> AuthConfigs { get; set; } = new();
+    public JObject TenancyConfig { get; set; } = JObject.Parse("{}");
+    public string TenantKey { get; set; } = "";
+    public string Type { get; set; } = "";
+    public string Region { get; set; } = "";
+  
+
     protected ILzHost _host;
+    protected HttpClient _httpClient;
 
     public bool ConfigureError { get; set; }
-    public bool ConfigFound { get; set; }
-
-
-    public void SetOSAccess(IOSAccess osAccess)
-    {
-        _oSAccess = osAccess ?? throw new ArgumentNullException(nameof(osAccess));
-    }
+    public bool Configured { get; set; }
+    public string ConfigError { get; set; } = "";   
 
     /// <summary>
     /// You may call ReadTenancyConfigAsync multiple times with different paths. Config content 
@@ -29,12 +33,11 @@ public class LzClientConfig : ILzClientConfig
     /// <returns></returns>
     public virtual async Task ReadTenancyConfigAsync(string tenancyConfigPath)
     {
+        ConfigError = "";   
         try
         {
-            if (_oSAccess == null)
-                throw new Exception("OSAccess not set.");
 
-            var json = await _oSAccess!.ReadTenancyConfigAsync(tenancyConfigPath);
+            var json = await _httpClient.GetStringAsync(tenancyConfigPath);
             TenancyConfig.Merge(JObject.Parse(json), new JsonMergeSettings
             {
                 MergeArrayHandling = MergeArrayHandling.Union
@@ -43,7 +46,9 @@ public class LzClientConfig : ILzClientConfig
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error reading tenancy config: {ex.Message}");
+            var msg = $"Error reading tenancy config: {ex.Message}";
+            ConfigError = msg;
+            Console.WriteLine(msg);
         }
     }
 
@@ -53,34 +58,46 @@ public class LzClientConfig : ILzClientConfig
     /// <param name="authConfigPath"></param>
     /// <param name="userPoolName"></param>
     /// <returns></returns>
-    public virtual async Task ReadAuthConfigAsync(string authConfigPath, string? userPoolName = null)
+    public virtual async Task ReadAuthConfigAsync(string authConfigPath)
     {
+        ConfigError = "";
         try
         {
-            if (_oSAccess == null)
-                throw new Exception("OSAccess not set.");
 
-            var authConfigJson = await _oSAccess!.ReadAuthConfigAsync(authConfigPath);
-            var authConfigs = JArray.Parse(authConfigJson);
+            var configJson = await _httpClient.GetStringAsync(authConfigPath);
+            var configDoc = JObject.Parse(configJson);
 
-            if (!string.IsNullOrEmpty(userPoolName))
+            var meta = configDoc["meta"];
+            if (meta is null)
             {
-                foreach (var authConfig in authConfigs)
-                {
-                    if (authConfig["userPoolName"]!.ToString().ToLower() == userPoolName)
-                    {
-                        AuthConfig = (JObject)authConfig;
-                        var wsUrl = authConfig["wsUrl"]!.ToString();
-                        if (!string.IsNullOrEmpty(wsUrl))
-                            _host.WsUrl = wsUrl;
-                        break;
-                    }
-                }
+                ConfigureError = true;
+                ConfigError = "AuthConfig missing meta data.";
+                return;
             }
+
+            var wsUrl = meta["wsUrl"]?.ToString();
+            if (!string.IsNullOrEmpty(wsUrl))
+                _host.WsUrl = wsUrl!;
+
+            var tenantKey = meta["tenantKey"]?.ToString();
+            if(!string.IsNullOrEmpty(tenantKey))
+                TenantKey = tenantKey!;
+
+            var region = meta["awsRegion"]?.ToString();    
+            if(!string.IsNullOrEmpty(region))
+                Region = region!;
+
+            Configured = true;
+
+            AuthConfigs = configDoc["authConfigs"]?.ToObject<Dictionary<string, JObject>>() 
+                ?? new Dictionary<string, JObject>();
+
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error reading AuthConfig: {ex.Message}");
+            var msg = $"Error reading AuthConfig: {ex.Message}";
+            ConfigError = msg;
+            Console.WriteLine(msg);
         }
     }
 

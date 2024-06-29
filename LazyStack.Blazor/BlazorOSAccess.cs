@@ -2,19 +2,24 @@
 
 public class BlazorOSAccess : IOSAccess
 {
-    public BlazorOSAccess(HttpClient httpClient, IJSRuntime jSRuntime) { 
+    public BlazorOSAccess(HttpClient httpClient) { 
         this.httpClient = httpClient;
-        this.jSRuntime = jSRuntime;
     }
     HttpClient httpClient;
-    IJSRuntime jSRuntime;
+    IJSRuntime? jSRuntime;
     BlazorContentAccess? blazorContentAccess;
+
+    public void SetJSRuntime(object jSRuntime)
+    {
+        this.jSRuntime = (JSRuntime)jSRuntime;
+    }
 
     public virtual async Task<string> ReadAuthConfigAsync(string url)
     {
-       
         try
         {
+            if (jSRuntime == null)
+                throw new Exception("JSRuntime not set.");
             var text = await httpClient.GetStringAsync(url);
             return text;
         }
@@ -75,6 +80,9 @@ public class BlazorOSAccess : IOSAccess
     {
         try
         {
+            if (jSRuntime == null)
+                throw new Exception("JSRuntime not set.");
+
             var text = await httpClient.GetStringAsync(url);
             return text;
         }

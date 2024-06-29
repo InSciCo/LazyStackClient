@@ -54,20 +54,23 @@ namespace BlazorTest.WASM
 
 
             builder.Services
-            .AddSingleton<ILzMessages,LzMessages>()
+            .AddSingleton<ILzMessages, LzMessages>()
             .AddSingleton<ILzClientConfig, LzClientConfig>()
             .AddSingleton(sp => new HttpClient { BaseAddress = new Uri(apiUrl) })
+            .AddSingleton<BlazorInternetConnectivity>()
+            .AddSingleton<IBlazorInternetConnectivity>(sp => sp.GetRequiredService<BlazorInternetConnectivity>())
+            .AddSingleton<IInternetConnectivitySvc>(sp => sp.GetRequiredService<BlazorInternetConnectivity>())
             .AddSingleton<ILzHost>(sp => new LzHost(
                 url: apiUrl,  // api url
                 assetsUrl: assetsUrl, // tenancy assets url
                 isMAUI: false, // sets isWASM to true
                 isAndroid: false,
                 isLocal: isLocal))
-                .AddLazyStackAuthCognito()
-                .AddSingleton<ISessionsViewModel, SessionsViewModel>();
+            .AddSingleton<IOSAccess, BlazorOSAccess>()
+            .AddLazyStackAuthCognito()
+            .AddSingleton<ISessionsViewModel, SessionsViewModel>();
                 
             RegisterFactories.Register(builder.Services);
-            
 
             await builder.Build().RunAsync();
         }

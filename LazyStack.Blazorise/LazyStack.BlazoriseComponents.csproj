@@ -22,6 +22,7 @@
 	<ItemGroup>
 		<PackageReference Include="Blazorise.Bootstrap5" />
 		<PackageReference Include="Blazorise.Components" />
+		<PackageReference Include="Blazorise.LoadingIndicator" />
 	</ItemGroup>
 
 	<ItemGroup>

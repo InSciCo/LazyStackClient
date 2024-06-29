@@ -8,10 +8,11 @@ public partial class LzHttpClientSigV4 : LzHttpClient, ILzHttpClient
 {
     public LzHttpClientSigV4(
         ILzClientConfig clientConfig, // service connection info
+        string apiConfigKey, // key to the api config in the clientConfig   
         IMethodMapWrapper methodMap, // map of methods to api endpoints
         IAuthProvider authProvider, // Auth service. ex: AuthProviderCognito
         ILzHost lzHost // Runtime environment. IsMAUI, IsWASM, URL etc.
-        ) : base(clientConfig, methodMap, authProvider, lzHost)
+        ) : base(clientConfig, apiConfigKey, methodMap, authProvider, lzHost)
     {
     }
     public override async Task<HttpResponseMessage> SendV4SigAsync(
@@ -31,7 +32,7 @@ public partial class LzHttpClientSigV4 : LzHttpClient, ILzHttpClient
         var iCreds = await authProvider.GetCredsAsync();
         var awsCreds = new ImmutableCredentials(iCreds!.AccessKey, iCreds.SecretKey, iCreds.Token);
 
-        var regionName = clientConfig.AuthConfig["awsRegion"]!.ToString();    
+        var regionName = clientConfig.AuthConfigs["awsRegion"]!.ToString();    
 
         // Note. Using named parameters to satisfy version >= 3.x.x  signature of 
         // AwsSignatureVersion4 SendAsync method.

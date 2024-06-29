@@ -15,7 +15,5 @@ public interface ILzSessionsViewModel<T>: INotifyPropertyChanged
     Task<bool> CreateSessionAsync();
     Task DeleteAsync(string sessionId);
     Task SetAsync(string sessionId);
-	Task InitAsync(IOSAccess osAccess, IInternetConnectivitySvc internetConnectivitySvc);
-	Task ReadConfigAsync();
 
 }

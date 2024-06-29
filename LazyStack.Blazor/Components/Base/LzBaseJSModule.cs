@@ -3,7 +3,7 @@ namespace LazyStack.Blazor;
 
 public abstract class LzBaseJSModule : ILzBaseJSModule, INotifyPropertyChanged, IAsyncDisposable
 {
-    private readonly IJSRuntime jsRuntime;
+    protected IJSRuntime jsRuntime;
     private Task<IJSObjectReference>? moduleTask;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -29,15 +29,13 @@ public abstract class LzBaseJSModule : ILzBaseJSModule, INotifyPropertyChanged, 
     /// </summary>
     public IJSRuntime JSRuntime => jsRuntime;
 
-
-    public LzBaseJSModule(IJSRuntime jsRuntime)
+    public virtual void SetJSRuntime(object jsRuntime)
     {
-        this.jsRuntime = jsRuntime;
+        this.jsRuntime = (JSRuntime)jsRuntime;
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
-        Console.WriteLine("OnPropertyChanged: " + propertyName);
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
@@ -172,6 +170,9 @@ public abstract class LzBaseJSModule : ILzBaseJSModule, INotifyPropertyChanged, 
 
     private Task<IJSObjectReference> GetModule()
     {
+        if (jsRuntime is null)
+            throw new InvalidOperationException("SetJSRuntime must be called before using this object.");
+
         return moduleTask ??= InitializeModule();
 
         async Task<IJSObjectReference> InitializeModule()

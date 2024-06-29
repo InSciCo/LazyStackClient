@@ -26,29 +26,6 @@ public abstract class LzSessionsViewModel<T> : LzViewModel, ILzSessionsViewModel
     [ObservableAsProperty] public bool IsOnline { get; }
     protected readonly CompositeDisposable sessionDisposables = new();
     //public virtual async Task InitAsync(IOSAccess osAccess, ILzClientConfig clientConfig, IInternetConnectivitySvc internetConnectivitySvc)
-    public virtual async Task InitAsync(IOSAccess osAccess, IInternetConnectivitySvc internetConnectivitySvc)
-	{
-
-        await Task.Delay(0);
-        // The objects passed in to init are those that must be created within a WebView context.
-        OSAccess = osAccess ?? throw new ArgumentNullException(nameof(osAccess));
-        InternetConnectivity = internetConnectivitySvc ?? throw new ArgumentNullException(nameof(internetConnectivitySvc));
-        Messages.SetOSAccess(OSAccess); // allows MessageSets to be read from configuration files
-        ClientConfig!.SetOSAccess(OSAccess);    // allows ClientConfig to read configuration files
-        await ReadConfigAsync();
-        IsInitialized = true;
-    }
-
-    /// <summary>
-    /// Implement ReadConfigAsync in your derived class to read the configuration file(s).
-    /// Example:
-    ///    ClientConfig.ReadAuthConfigAsync("path", "employeeuserpool");
-    ///    // You can call ReadTenancyConfigAsync multiple times with different paths. Config content
-    ///    // is merged.
-    ///    ClientConfig.ReadTenancyConfigAsync("..");
-    /// </summary>
-    /// <returns></returns>
-    public abstract Task ReadConfigAsync();
 
     public virtual async Task<bool> CreateSessionAsync()
     {

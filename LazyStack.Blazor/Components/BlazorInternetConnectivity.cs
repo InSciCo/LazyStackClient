@@ -1,5 +1,11 @@
 namespace LazyStack.Blazor;
 
+
+public interface IBlazorInternetConnectivity : IInternetConnectivitySvc
+{     
+    public void SetJSRuntime(IJSRuntime jsRuntime);
+}   
+
 /// <summary>
 /// Monitor Internet connectivity using browser's navigator.offline and navigator.online events.
 /// Inject this class early on in the app setup.
@@ -9,24 +15,29 @@ namespace LazyStack.Blazor;
 /// makes use of JSInterop. However, since it use JSInterop, you need to be using 
 /// Blazor! 
 /// </summary>
-public class InternetConnectivity : NotifyBase, IInternetConnectivitySvc, IDisposable
+public class BlazorInternetConnectivity : NotifyBase, IBlazorInternetConnectivity, IDisposable
 {
-    public InternetConnectivity(IJSRuntime jsRuntime)
+    public void SetJSRuntime(IJSRuntime jsRuntime)
     {
         moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-            "import", "./_content/LazyStack.Blazor/internetConnectivity.js").AsTask());
+    "import", "./_content/LazyStack.Blazor/internetConnectivity.js").AsTask());
+        isInitialized = true;   
     }
-    private readonly Lazy<Task<IJSObjectReference>> moduleTask;
+
+    private bool isInitialized = false;
+    private Lazy<Task<IJSObjectReference>> moduleTask;
     private bool isOnline;  
     public bool IsOnline { 
         get => isOnline;  
         private set => SetProperty(ref isOnline, value);
     }
     public event Action<bool>? NetworkStatusChanged;
-    private DotNetObjectReference<InternetConnectivity>? dotNetReference;
+    private DotNetObjectReference<BlazorInternetConnectivity>? dotNetReference;
    
     private async Task Initialize()
     {
+        if (!isInitialized)
+            throw new InvalidOperationException("SetJSRuntime must be called before calling this method.");
         var jsRuntime = await moduleTask.Value;
         if(dotNetReference == null) {
             dotNetReference = DotNetObjectReference.Create(this);
@@ -35,6 +46,9 @@ public class InternetConnectivity : NotifyBase, IInternetConnectivitySvc, IDispo
     }
     public async Task<bool> CheckInternetConnectivityAsync()
     {
+        if (!isInitialized)
+            throw new InvalidOperationException("SetJSRuntime must be called before calling this method.");
+
         var jsRuntime = await moduleTask.Value;   
         await Initialize();
         IsOnline = await jsRuntime.InvokeAsync<bool>("checkInternetConnectivity");
@@ -47,11 +61,15 @@ public class InternetConnectivity : NotifyBase, IInternetConnectivitySvc, IDispo
     }
     public async void Dispose()
     {
-        if(moduleTask.IsValueCreated)
+
+        if (moduleTask.IsValueCreated)
         {
-            var jsRuntime = await moduleTask.Value;
-            // Dispose of the DotNetObjectReference and remove event listeners
-            await jsRuntime.InvokeVoidAsync("removeInternetStatusInterop");
+            if (isInitialized)
+            {
+                var jsRuntime = await moduleTask.Value;
+                // Dispose of the DotNetObjectReference and remove event listeners
+                await jsRuntime.InvokeVoidAsync("removeInternetStatusInterop");
+            }
             dotNetReference?.Dispose();
             GC.SuppressFinalize(this);
         }

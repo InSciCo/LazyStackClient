@@ -9,12 +9,14 @@ public class LzHttpClient : NotifyBase, ILzHttpClient
 {
     public LzHttpClient(
         ILzClientConfig clientConfig, // service connection info
+        string authConfigKey, // user pool settings etc.
         IMethodMapWrapper methodMap, // map of methods to api endpoints
         IAuthProvider? authProvider, // Auth service. ex: AuthProviderCognito
         ILzHost lzHost // Runtime environment. IsMAUI, IsWASM, URL etc.
         )
     {
         this.clientConfig = clientConfig; 
+        this.authConfigKey = authConfigKey; // user pool settings etc.
         this.methodMap = methodMap; // map of methods to api endpoints
         this.authProvider = authProvider;
         this.lzHost= lzHost;
@@ -23,7 +25,8 @@ public class LzHttpClient : NotifyBase, ILzHttpClient
 
     // We currently only use AuthConfig when in debug mode 
     // to grab the TenancyKey.
-    protected JObject authConfig => clientConfig.AuthConfig;
+    protected string authConfigKey;
+    protected JObject authConfig => clientConfig.AuthConfigs[authConfigKey];
     protected string? tenantKey => authConfig != null ? authConfig["tenantKey"]?.ToString() : "";
 
     protected IMethodMapWrapper methodMap;

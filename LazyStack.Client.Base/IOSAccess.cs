@@ -2,6 +2,7 @@
 
 public interface IOSAccess
 {
+    public void SetJSRuntime(object jSRuntime); 
     public Task<string> ReadAuthConfigAsync(string filepath);
     public Task<string> ReadTenancyConfigAsync(string filepath);
     public Task<string> ReadContentAsync(string filepath); 

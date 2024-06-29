@@ -12,4 +12,5 @@ public interface ILzBaseJSModule
     /// Gets the awaitable <see cref="IJSObjectReference"/> task.
     /// </summary>
     Task<IJSObjectReference> Module { get; }
+    void SetJSRuntime(object jsRuntime);
 }
