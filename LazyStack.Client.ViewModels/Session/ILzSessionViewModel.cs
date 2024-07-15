@@ -5,7 +5,6 @@ namespace LazyStack.Client.ViewModels;
 public interface ILzSessionViewModel : INotifyPropertyChanged
 {
     IInternetConnectivitySvc InternetConnectivity { get; set; }
-    ILzClientConfig ClientConfig { get; set; }
     IOSAccess OSAccess { get; set; }
     string SessionName { get; set; }
     string SessionId { get; set; }

@@ -6,7 +6,7 @@
 
 <h1>Login</h1>
 
-@if(SessionsViewModel.IsSignedIn)
+@if(ViewModel!.IsSignedIn)
 {
  <h1>Welcome!</h1>   
 }
@@ -19,6 +19,7 @@ else
 
 
 @code {
+
     protected override async Task OnInitializedAsync()
     {
 

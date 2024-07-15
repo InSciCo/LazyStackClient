@@ -5,23 +5,11 @@ namespace LazyStack.Client.ViewModels;
 public abstract class LzSessionsViewModel<T> : LzViewModel, ILzSessionsViewModel<T>
     where T : ILzSessionViewModel
 {
-    public LzSessionsViewModel(
-        ILzMessages messages
-        )
+    public LzSessionsViewModel()
     {
-        Messages = messages;
-        Messages.MessageFiles ??= new List<string>() { };
-
-        this.WhenAnyValue(x => x.InternetConnectivity!.IsOnline)
-            .Select(x => { Console.WriteLine("IsOnline:" + x); return x; })
-            .ToPropertyEx(this, x => x.IsOnline);
     }
     [Reactive] public virtual T? SessionViewModel { get; set; }
     private Dictionary<string, T> _sessions = new();
-    public ILzMessages Messages { get; set; }
-    public IOSAccess? OSAccess { get; set; } = null!;
-    public IInternetConnectivitySvc? InternetConnectivity { get; set; }
-    public ILzClientConfig? ClientConfig { get; set; } = null!;
     [Reactive] public bool IsInitialized { get; protected set; }
     [ObservableAsProperty] public bool IsOnline { get; }
     protected readonly CompositeDisposable sessionDisposables = new();
@@ -30,16 +18,6 @@ public abstract class LzSessionsViewModel<T> : LzViewModel, ILzSessionsViewModel
     public virtual async Task<bool> CreateSessionAsync()
     {
         if (SessionViewModel != null) return false;
-        if (!IsInitialized) throw new Exception("SessionsViewModel not initialized");
-
-        try
-        {
-            var online = await InternetConnectivity!.CheckInternetConnectivityAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
         T sessionViewModel = CreateSessionViewModel();
         await sessionViewModel.InitAsync();
         SessionViewModel = sessionViewModel;

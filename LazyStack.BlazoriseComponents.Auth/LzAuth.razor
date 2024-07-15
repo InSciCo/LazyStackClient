@@ -218,6 +218,18 @@
     private bool cancelButtonDisabled = false;
     const KeyboardEventArgs emptyKeyboardEventArgs = null;
 
+    [Parameter]
+    public string? BtnClass
+    {
+        get => btnClass;
+        set => btnClass = value;
+    }
+    [Parameter]
+    public Color BtnColor 
+    {
+        get => btnColor;
+        set => btnColor = value;
+    }   
 
     protected override async Task OnInitializedAsync() 
     {

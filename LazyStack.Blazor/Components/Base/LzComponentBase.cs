@@ -117,7 +117,36 @@ public class LzComponentBase<T> : LzComponentBase, IViewFor<T>, INotifyPropertyC
                 .Switch()
                 .Subscribe(_ => InvokeAsync(StateHasChanged))
                 .DisposeWith(_compositeDisposable);
-        }
+
+            // Here we are subscribing to the Messages property to know when it changes and to update the view accordingly.
+            // Messages is responsible for providing custom text messages to the view.
+			var messagesModelChanged =
+				this.WhenAnyValue(x => x.Messages)
+					.Where(x => x is not null)
+					.Publish()
+					.RefCount(2);
+
+			messagesModelChanged
+				.Subscribe(_ => InvokeAsync(StateHasChanged))
+				.DisposeWith(_compositeDisposable);
+
+			messagesModelChanged
+				.WhereNotNull()
+				.Select(x =>
+							Observable
+								.FromEvent<PropertyChangedEventHandler?, Unit>(
+																			   eventHandler =>
+																			   {
+																				   void Handler(object? sender, PropertyChangedEventArgs e) => eventHandler(Unit.Default);
+																				   return Handler;
+																			   },
+																			   eh => x.PropertyChanged += eh,
+																			   eh => x.PropertyChanged -= eh))
+				.Switch()
+				.Subscribe(_ => InvokeAsync(StateHasChanged))
+				.DisposeWith(_compositeDisposable);
+
+		}
 
         base.OnAfterRender(firstRender);
     }

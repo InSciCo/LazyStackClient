@@ -7,13 +7,11 @@ public abstract class LzSessionViewModel : LzViewModel, ILzSessionViewModel, INo
 {
     public LzSessionViewModel(
         IOSAccess oSAccess,
-        ILzClientConfig clientConfig, 
         IInternetConnectivitySvc internetConnectivity,
     	ILzMessages messages
 		)
 	{
         OSAccess = oSAccess ?? throw new ArgumentNullException(nameof(oSAccess));   
-        ClientConfig = clientConfig ?? throw new ArgumentNullException(nameof(clientConfig));
         InternetConnectivity = internetConnectivity ?? throw new ArgumentNullException(nameof(internetConnectivity));
         Messages = messages ?? throw new ArgumentNullException(nameof(messages));
         // Maintain a local instance of the MessageSetSelector so we can react to changes in that value 
@@ -36,7 +34,6 @@ public abstract class LzSessionViewModel : LzViewModel, ILzSessionViewModel, INo
     }
     public IInternetConnectivitySvc InternetConnectivity { get; set; }  
     public string SessionId { get; set; } = Guid.NewGuid().ToString();
-    public ILzClientConfig ClientConfig { get; set; }
     public IOSAccess OSAccess { get; set; }
     public ILzMessages Messages { get; set; }
     public string SessionName { get; set; } = "Session";

@@ -6,8 +6,7 @@ public abstract class LzSessionsViewModelAuthNotifications<T> : LzSessionsViewMo
     where T : ILzSessionViewModelAuthNotifications
 {
     public LzSessionsViewModelAuthNotifications(
-                      ILzMessages messages
-                      ) : base(messages)
+                      ) 
     {
     }
 }

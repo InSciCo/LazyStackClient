@@ -18,16 +18,53 @@ public interface ILzMessages : INotifyPropertyChanged
     /// ex: "_content/MyApp/data/messages.json" -> "_content/MyApp/data/messages.en-US.json"
     /// </summary>
     public List<string> MessageFiles { get; set; }
-    public string Culture { get; }
-    public LzMessageUnits Units { get; }
-    public LzMessageSet MessageSet { get; }
-    public bool UseInspect { get; set; }
-
-
-    // Methods
-    public void SetOSAccess(IOSAccess oSAccess);
     /// <summary>
-    /// Loads the specified message files for the specified culture.
+    /// The current culter for the current message set.
+    /// </summary>
+    public string Culture { get; }
+    /// <summary>
+    /// The current units of measure for the current message set.
+    /// </summary>
+    public LzMessageUnits Units { get; }
+    /// <summary>
+    /// The current message set. The message set is a combination of the culture and the units of measure.
+    /// </summary>
+    public LzMessageSet MessageSet { get; }
+    /// <summary>
+    /// UseInspect is a flag that indicates that the message should be wrapped in a span tag
+    /// which enables the WYSIWYG editor to display the key in the Assets editor.
+    /// </summary>
+    public bool UseInspect { get; set; }
+    /// <summary>
+    /// The number of times the message set has been refreshed. This is 
+    /// useful for ReactiveUI to trigger a UI refresh. See the 
+    /// Refresh() method.
+    /// </summary>
+    public int RefreshCount { get; set; }
+    /// <summary>
+    /// Dirty is true when there are unsaved changes to any of the loaded
+    /// message sets.
+    /// </summary>
+    public bool Dirty { get; }
+
+	// Methods
+    /// <summary>
+    /// Refresh the UI. This is useful for ReactiveUI to trigger a UI refresh.
+    /// </summary>
+    /// </summary>
+	public void Refresh();
+    /// <summary>
+    /// Set the OSAccess object. This object abstracts the method 
+    /// used to load the message files.
+    /// </summary>
+    /// <param name="oSAccess"></param>
+    /// </summary>
+    /// <param name="oSAccess"></param>
+	public void SetOSAccess(IOSAccess oSAccess);
+    /// <summary>
+    /// Loads the specified message files for the specified culture and 
+    /// units. Makes this message set the current message set. Affects 
+    /// the MessageSet, Culture and Units properties.
     /// </summary>
     /// <param name="culture"></param>
     /// <param name="units"></param>
@@ -37,7 +74,7 @@ public interface ILzMessages : INotifyPropertyChanged
     /// Returns the message for the specified key. If the key is not found, the key is returned.
     /// When the UseInspect property is true and ignoreUseInspect is false, the key is returned 
     /// in a span tag with the attributes class="static-content-message" and key="{key}". This
-    /// enables the WYSIWYG editor to display the key in the editor.
+    /// enables the WYSIWYG editor to display the key in the asset editor.
     /// Note that this method uses the current _msgs dictionary where all the merging, variable 
     /// substitution and unit processing has been done. This is the method to use when displaying
     /// messages in the UI.
@@ -47,21 +84,27 @@ public interface ILzMessages : INotifyPropertyChanged
     /// <returns></returns>
     public string Msg(string key, bool ignoreUseInspect = false, LzMessageUnits? unitsArg = null);
     /// <summary>
+    /// Returns a list of MsgItemModels for the specified key where each MsgItem is associated with 
+    /// one of the message files in the current message set. This method is used by the WYSIWYG editor to
+    /// present all the MsgItemModels for the key. 
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public List<(string file, DocMetaData docMetaData, string culture, MsgItem msgItem)> MsgItems(string key);
+    public List<MsgItemModel> MsgItemModels(string key);
     /// <summary>
-    ///  This method returns an array of tuples containing the file name and the message for the specified key.
-    ///  This method is used by the WYSIWYG editor to display the messages for the key.
+    /// Sets the MsgItem for the specified culture and key. Each MsgItem knows what
+    /// message set it it belongs to. Using the culture and key, it is possible to
+    /// resolve the specific message file and update the MsgItem.
     /// </summary>
     /// <param name="culture"></param>
     /// <param name="key"></param>
     /// <param name="msgItem"></param>
-    /// <returns></returns>
     public void SetMsgItem(string culture, string key, MsgItem msgItem);
 
-    //public string PreviewMsg(string culture, string key);
+    /// <summary>
+    /// Save any dirty message sets.
+    /// </summary>
+    public Task SaveMessageSetsAsync();
 
 
 }

@@ -10,7 +10,7 @@ namespace LazyStack.Client.Base;
 /// This class implements a lazy process pattern where only the 
 /// default units are processed initially.
 /// </summary>
-public class LzMessageSet 
+public class LzMessageSet
 {
     /// <summary> 
     /// 
@@ -18,19 +18,32 @@ public class LzMessageSet
     /// <param name="culture">Culture to load. ex: en-US</param>
     /// <param name="defaultUnits">Initial units. Ex: LzMessageUnits.Imperial </param>
     public LzMessageSet(string culture, LzMessageUnits defaultUnits)
-    { 
+    {
         Culture = culture;
         Units = defaultUnits;
-    }   
-    public string Culture { get; private set;  }
+    }
+    public string Culture { get; private set; }
     public LzMessageUnits Units { get; set; }
+    public bool Dirty 
+    { 
+        get 
+        { 
+            foreach(var messageDoc in MessageDocs.Values)
+                if (messageDoc.Dirty)
+                    return true;
+            return false;   
+        } 
+    }
+    public Dictionary<string, MessageDoc> MessageDocs { get; private set; } = new Dictionary<string, MessageDoc>();
+
     protected IOSAccess? _oSAccess;
-    private Dictionary<string,string> _msgsImperial = new Dictionary<string, string>();
+    private Dictionary<string, string> _msgsImperial = new Dictionary<string, string>();
     private Dictionary<string, string> _msgsMetric = new Dictionary<string, string>();
     private bool _keepDocs = false;
     private List<string> _messageFiles = new List<string>();
-    private Dictionary<string, MessageDoc> _messageDocs = new Dictionary<string, MessageDoc>();
-   
+    
+
+    private Dictionary<(string,string), MsgItemModel> CurrentMsgItemModels = new Dictionary<(string,string), MsgItemModel>();
 
     /// <summary>
     /// Get a message by key and optionally override the units.
@@ -43,7 +56,7 @@ public class LzMessageSet
         var units = unitsArg ?? Units;
         var msgs = (units == LzMessageUnits.Imperial) ? _msgsImperial : _msgsMetric;
 
-        if(msgs.Count == 0)
+        if (msgs.Count == 0)
             UpdateMsgs(units);
 
         msgs = (units == LzMessageUnits.Imperial) ? _msgsImperial : _msgsMetric;
@@ -54,45 +67,83 @@ public class LzMessageSet
         return key;
     }
 
-    public List<(string file, DocMetaData docMetaData, string culture, MsgItem msgItem)> MsgItems(string key)
+    /// <summary>
+    /// Return a list of editable message items for a given key 
+    /// from this message set.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public List<MsgItemModel> MsgItemModels(string key)
     {
-        var items = new List<(string file, DocMetaData docMetaData, string culture, MsgItem msgItem)>();
-        foreach (var messageDoc in _messageDocs)
-            if(messageDoc.Value.Messages.TryGetValue(key, out MsgItem? msgItem))
+        var items = new List<MsgItemModel>();
+        if (string.IsNullOrEmpty(key))
+            return items;
+        var lastMsg = ""; // Used to provide default on new MstgItem creation
+        foreach (var messageDoc in MessageDocs)
+        {
+            if (CurrentMsgItemModels.TryGetValue((messageDoc.Key, key), out MsgItemModel? existingMsgItemModel))
             {
-                msgItem.Editable = messageDoc.Value.DocMetaData.Editable || msgItem.Editable;
-                msgItem.SetParent(this);
-                items.Add((messageDoc.Key, messageDoc.Value.DocMetaData, Culture, msgItem));
+                if (existingMsgItemModel.GetState() != MsgItemState.Clean)
+                {
+                    items.Add(existingMsgItemModel);
+                    continue;
+                }
             }
-            else 
-            if(messageDoc.Value.DocMetaData.Editable)
-            {
-                var newMsgItem = new MsgItem(this) { Editable = true, Msg = "" };
-                newMsgItem.SetIsNew();
-                items.Add((messageDoc.Key, messageDoc.Value.DocMetaData, Culture, newMsgItem));
-            }
+            MsgItem? msgItem;
+            _ = messageDoc.Value.Messages.TryGetValue(key, out msgItem);
+            var isEditable = (msgItem != null && (msgItem.Editable ?? false)) || messageDoc.Value.DocMetaData.Editable;
+            var isEmpty = msgItem == null || string.IsNullOrEmpty(msgItem.Msg);
 
+            if (!isEditable && isEmpty)
+                continue;
+
+            var msgItemModel = new MsgItemModel()
+            {
+                Parent = this,
+                Key = key,
+                File = messageDoc.Key,
+                DocMetaData = messageDoc.Value.DocMetaData,
+                Culture = Culture
+
+            };
+            if(msgItem is not null)
+            {
+                if (msgItemModel.GetState() == MsgItemState.Clean)
+                {
+                    msgItemModel.Msg = msgItem.Msg;
+                    msgItemModel.Editable = msgItem.Editable ?? messageDoc.Value.DocMetaData.Editable;
+                }
+            } else
+            {
+                msgItemModel.Msg = lastMsg;
+                msgItemModel.Editable = messageDoc.Value.DocMetaData.Editable;
+            }
+            lastMsg = msgItemModel.Msg;
+
+            items.Add(msgItemModel);
+            CurrentMsgItemModels[(messageDoc.Key, key)] = msgItemModel;
+        }
         return items;
     }
- 
+
     public async Task LoadMessagesAsync(List<string> messageFiles, IOSAccess osAccess, bool keepDocs = false)
     {
         _messageFiles = messageFiles;
-        _keepDocs = keepDocs;   
+        _keepDocs = keepDocs;
         _oSAccess = osAccess;
         foreach (var msgFile in messageFiles)
         {
-            // msgFile example: "messages.en-US.json"
+            // msgFile example: "messages.json"
             var filePath = "";
             try
             {
-                filePath = FilePathWithCulture(msgFile, Culture);
+                filePath = FilePathWithCulture(msgFile, Culture); // ex: "messages.en-US.json"
 
                 var json = await _oSAccess.ReadContentAsync(filePath);
                 if (!string.IsNullOrEmpty(json))
                 {
                     var doc = JsonConvert.DeserializeObject<MessageDoc>(json)!;
-                    _messageDocs[filePath] = doc;
+                    MessageDocs[filePath] = doc;
                 }
 
             }
@@ -105,32 +156,43 @@ public class LzMessageSet
     }
     public void UpdateMsgs(LzMessageUnits? unitsArg = null)
     {
-        var units = unitsArg ?? Units;
-        var msgs = (units == LzMessageUnits.Imperial) 
-            ? _msgsImperial = new Dictionary<string, string>()
-            : _msgsMetric = new Dictionary<string, string>();
-        try
+        foreach (LzMessageUnits units in Enum.GetValues(typeof(LzMessageUnits)))
         {
-            if (_oSAccess == null)
-                throw new Exception("SetOSAccess must be called before SetMessageSetAsync.");
-            foreach (var msgFile in _messageFiles) // preserve the precidence order of the files
+            if (unitsArg != null && unitsArg != units)
+                continue;
+
+            var msgs = (units == LzMessageUnits.Imperial)
+                ? _msgsImperial = new Dictionary<string, string>()
+                : _msgsMetric = new Dictionary<string, string>();
+            try
             {
-                var filePath = FilePathWithCulture(msgFile, Culture);
-                if (_messageDocs.TryGetValue(filePath, out MessageDoc? doc))
-                    foreach (var msg in doc.Messages)
-                        msgs[msg.Key] = msg.Value.Msg;
+                if (_oSAccess == null)
+                    throw new Exception("SetOSAccess must be called before SetMessageSetAsync.");
+                foreach (var msgFile in _messageFiles) // preserve the precidence order of the files
+                {
+                    var filePath = FilePathWithCulture(msgFile, Culture);
+                    if (MessageDocs.TryGetValue(filePath, out MessageDoc? doc))
+                        foreach (var msg in doc.Messages)
+                            msgs[msg.Key] = msg.Value.Msg;
+                }
+                ReplaceVars(units); // Performs variable substitution and Units conversion in msgs
             }
-            ReplaceVars(units); // Performs variable substitution and Units conversion in msgs
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error setting message set: {ex.Message}");
+            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error setting message set: {ex.Message}");
-        }
+    }
+    public async Task SaveMessageSetAsync()
+    {
+        foreach(var messageDoc in MessageDocs)
+            await messageDoc.Value.SaveAsync(messageDoc.Key);
+        CurrentMsgItemModels.Clear();
     }
     protected string MergeMessages(string key)
     {
         var msg = key;
-        foreach(var messageDoc in _messageDocs.Values)
+        foreach(var messageDoc in MessageDocs.Values)
             if (messageDoc.Messages.TryGetValue(key, out MsgItem? msgItem))
                 msg = msgItem.Msg;
         return msg;
@@ -219,8 +281,6 @@ public class LzMessageSet
         }
         return msg;
     }
-
-
     const string keyPattern = "__.*__";
     static string[] imperialUnits = { "in", "\"", "ft", "'", "yd", "mi", "oz", "lb", "sq in", "sq ft" };
     static string[] metricUnits = { "mm", "cm", "m", "km", "g", "kg", "sq mm", "sq cm", "sq m" };

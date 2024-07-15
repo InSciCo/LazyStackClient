@@ -26,8 +26,7 @@ public class LzHttpClient : NotifyBase, ILzHttpClient
     // We currently only use AuthConfig when in debug mode 
     // to grab the TenancyKey.
     protected string authConfigKey;
-    protected JObject authConfig => clientConfig.AuthConfigs[authConfigKey];
-    protected string? tenantKey => authConfig != null ? authConfig["tenantKey"]?.ToString() : "";
+    protected string? tenantKey => clientConfig != null ? clientConfig.TenantKey : null;
 
     protected IMethodMapWrapper methodMap;
     protected IAuthProvider? authProvider;
