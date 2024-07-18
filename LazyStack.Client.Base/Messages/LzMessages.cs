@@ -146,8 +146,8 @@ public class LzMessages : NotifyBase, ILzMessages
         }
     }
 	/// <inheritdoc />
-	public List<MsgItemModel> MsgItemModels(string key)
-		=> MessageSet.MsgItemModels(key);
+	public MsgItemsModel MsgItemsModel(string key)
+		=> MessageSet.MsgItemsModels[key];
     /// <inheritdoc />
     public void SetMsgItem(string culture, string key, MsgItem msgItem)
     {

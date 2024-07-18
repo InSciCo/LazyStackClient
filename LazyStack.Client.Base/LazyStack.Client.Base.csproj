@@ -16,6 +16,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Content Remove="Messages\MsgItemModel.cs" />
+	  <Content Remove="Messages\MsgItemsModel.cs" />
 	</ItemGroup>
 
 </Project>

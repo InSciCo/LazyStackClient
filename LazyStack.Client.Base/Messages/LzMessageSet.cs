@@ -11,7 +11,7 @@ namespace LazyStack.Client.Base;
 /// This class implements a lazy process pattern where only the 
 /// default units are processed initially.
 /// </summary>
-public class LzMessageSet
+public class LzMessageSet : NotifyBase
 {
     /// <summary> 
     /// 
@@ -24,6 +24,7 @@ public class LzMessageSet
         Units = defaultUnits;
     }
 
+    #region Public Properties
     public string Culture { get; private set; }
     public LzMessageUnits Units { get; set; }
     public bool Dirty 
@@ -37,16 +38,23 @@ public class LzMessageSet
         } 
     }
     public Dictionary<string, MessageDoc> MessageDocs { get; private set; } = new Dictionary<string, MessageDoc>();
-    public string AssetsUrl { get; set; }   
+    public string AssetsUrl { get; set; }
+    public Dictionary<string, MsgItemsModel> MsgItemsModels { get; private set; } = new Dictionary<string, MsgItemsModel>(); // key is the Msg Key
+    private MsgItemsModel _msgItemsModel;
+    public MsgItemsModel CurrentMsgItemsModel 
+        { get => _msgItemsModel;
+          private set => SetProperty(ref _msgItemsModel, value);
+        }
+    #endregion
 
+    #region Private Members
     protected IOSAccess? _oSAccess;
     private Dictionary<string, string> _msgsImperial = new Dictionary<string, string>();
     private Dictionary<string, string> _msgsMetric = new Dictionary<string, string>();
     private bool _keepDocs = false;
     private List<string> _messageFiles = new List<string>();
-    
+    #endregion
 
-    private Dictionary<(string,string), MsgItemModel> CurrentMsgItemModels = new Dictionary<(string,string), MsgItemModel>();
 
     /// <summary>
     /// Get a message by key and optionally override the units.
@@ -71,63 +79,75 @@ public class LzMessageSet
     }
 
     /// <summary>
-    /// Return a list of editable message items for a given key 
-    /// from this message set.
+    /// Create a new MsgItemsModel which contains  a list of editable message items for a given key 
+    /// There are entries in the MsgItemsModel.Items for each document the key exists in for
+    /// this message set.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public List<MsgItemModel> MsgItemModels(string key)
+    /// 
+    public MsgItemsModel GetMsgItemsModel(string key)
     {
-        var items = new List<MsgItemModel>();
-        if (string.IsNullOrEmpty(key))
-            return items;
-        var lastMsg = ""; // Used to provide default on new MstgItem creation
-        foreach (var messageDoc in MessageDocs)
+        if(MsgItemsModels.TryGetValue(key, out MsgItemsModel msgItemsModel)) 
         {
-            if (CurrentMsgItemModels.TryGetValue((messageDoc.Key, key), out MsgItemModel? existingMsgItemModel))
-            {
-                if (existingMsgItemModel.GetState() != MsgItemState.Clean)
-                {
-                    items.Add(existingMsgItemModel);
-                    continue;
-                }
-            }
-            MsgItem? msgItem;
-            _ = messageDoc.Value.Messages.TryGetValue(key, out msgItem);
-            var isEditable = (msgItem != null && (msgItem.Editable ?? false)) || messageDoc.Value.DocMetaData.Editable;
-            var isEmpty = msgItem == null || string.IsNullOrEmpty(msgItem.Msg);
-
-            if (!isEditable && isEmpty)
-                continue;
-
-            var msgItemModel = new MsgItemModel()
-            {
-                Parent = this,
-                Key = key,
-                File = messageDoc.Key,
-                DocMetaData = messageDoc.Value.DocMetaData,
-                Culture = Culture
-
-            };
-            if(msgItem is not null)
-            {
-                if (msgItemModel.GetState() == MsgItemState.Clean)
-                {
-                    msgItemModel.Msg = msgItem.Msg;
-                    msgItemModel.Editable = msgItem.Editable ?? messageDoc.Value.DocMetaData.Editable;
-                }
-            } else
-            {
-                msgItemModel.Msg = lastMsg;
-                msgItemModel.Editable = messageDoc.Value.DocMetaData.Editable;
-            }
-            lastMsg = msgItemModel.Msg;
-
-            items.Add(msgItemModel);
-            CurrentMsgItemModels[(messageDoc.Key, key)] = msgItemModel;
+            CurrentMsgItemsModel = msgItemsModel;
+            return msgItemsModel;
         }
-        return items;
+        
+        msgItemsModel = new MsgItemsModel(this, key);
+        MsgItemsModels.Add(key, msgItemsModel);
+        CurrentMsgItemsModel = msgItemsModel;
+        return msgItemsModel;
     }
+    //public List<MsgItemModel> MsgItemModels(string key)
+    //{
+    //    var items = new List<MsgItemModel>();
+    //    if (string.IsNullOrEmpty(key))
+    //        return items;
+    //    var lastMsg = ""; // Used to provide default on new MstgItem creation
+    //    foreach (var messageDoc in MessageDocs)
+    //    {
+    //        if (CurrentMsgItemModels.TryGetValue((messageDoc.Key, key), out MsgItemModel? existingMsgItemModel))
+    //        {
+    //            if (existingMsgItemModel.MsgItemState != MsgItemState.Clean)
+    //            {
+    //                items.Add(existingMsgItemModel);
+    //                continue;
+    //            }
+    //        }
+    //        MsgItem? msgItem;
+    //        _ = messageDoc.Value.Messages.TryGetValue(key, out msgItem);
+    //        var isEditable = (msgItem != null && (msgItem.Editable ?? false)) || messageDoc.Value.DocMetaData.Editable;
+    //        var isEmpty = msgItem == null || string.IsNullOrEmpty(msgItem.Msg);
+
+    //        if (!isEditable && isEmpty)
+    //            continue;
+
+    //        var msgItemModel = new MsgItemModel()
+    //        {
+    //            MsgItemsModel = this,
+    //            Key = key,
+    //            File = messageDoc.Key
+    //        };
+    //        if(msgItem is not null)
+    //        {
+    //            if (msgItemModel.MsgItemState == MsgItemState.Clean)
+    //            {
+    //                msgItemModel.Msg = msgItem.Msg;
+    //                msgItemModel.Editable = msgItem.Editable ?? messageDoc.Value.DocMetaData.Editable;
+    //            }
+    //        } else
+    //        {
+    //            msgItemModel.Msg = lastMsg;
+    //            msgItemModel.Editable = messageDoc.Value.DocMetaData.Editable;
+    //        }
+    //        lastMsg = msgItemModel.Msg;
+
+    //        items.Add(msgItemModel);
+    //        CurrentMsgItemModels[(messageDoc.Key, key)] = msgItemModel;
+    //    }
+    //    return items;
+    //}
 
     public async Task LoadMessagesAsync(List<string> messageFiles, IOSAccess osAccess, bool keepDocs = false)
     {
@@ -190,7 +210,7 @@ public class LzMessageSet
     {
         foreach(var messageDoc in MessageDocs)
             await messageDoc.Value.SaveAsync(messageDoc.Key);
-        CurrentMsgItemModels.Clear();
+        MsgItemsModels.Clear();
     }
     protected string MergeMessages(string key)
     {

@@ -10,13 +10,21 @@ namespace LazyStack.Client.Base;
 /// </summary>
 public class MsgItemModel : MsgItem
 {
-    public LzMessageSet? Parent { get; set; }
-    public string Key { get; set; } = "";
-    public string File { get; set; } = "";
-    public DocMetaData DocMetaData { get; set; } = new();
-    public string Culture { get; set; } = "";
+    public MsgItemModel(MsgItemsModel msgItemsModel, string filePath)
+
+    {
+        MsgItemsModel = msgItemsModel;  
+        _filePath = filePath; // Key into the MsgItesmModel dictionary
+
+    }
+
+    #region Public Properties
+    public MsgItemsModel? MsgItemsModel { get; private set; }
+    public DocMetaData DocMetaData => MsgItemsModel!.MessageSet.MessageDocs[_filePath].DocMetaData;
+    #endregion
 
     #region private fields
+    private string _filePath  = string.Empty;
     private bool _isDirty = false;
     private bool _isNew = false;
     private bool _isEdit = false;
@@ -25,8 +33,8 @@ public class MsgItemModel : MsgItem
 
     #region public methods 
     public void SetIsNew() => _isNew = true;
-
-    public MsgItemState GetState()
+    public MsgItemState MsgItemState { get; private set; } 
+    private MsgItemState SetState()
     {
         if (_isNew)
             return MsgItemState.New;
@@ -39,12 +47,14 @@ public class MsgItemModel : MsgItem
         originalMsg = Msg;
         _isEdit = true;
         _isDirty = true;
+        SetState();
     }
     public void CancelEdit()
     {
         Msg = originalMsg;
         _isDirty = false;
         _isEdit = false;
+        SetState();
     }
     public void SaveEdit()
     {
@@ -52,17 +62,10 @@ public class MsgItemModel : MsgItem
         _isDirty = !originalMsg.Equals(Msg);
         _isNew = false;
         _isEdit = false;
-        UpdateMsg();
+        SetState();
+
     }
 
-    private void UpdateMsg()
-    {
-        var doc = Parent?.MessageDocs[File];
-        doc!.Messages[Key] = new MsgItem() { Msg = this.Msg, Editable = this.Editable };
-        doc.Dirty |= _isDirty;
-        // todo: need an UpdateMsgs(key)
-        Parent!.UpdateMsgs();
-    }
 
     #endregion
 

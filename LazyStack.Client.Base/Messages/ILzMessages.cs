@@ -89,13 +89,14 @@ public interface ILzMessages : INotifyPropertyChanged
     /// <returns></returns>
     public string Msg(string key, bool ignoreUseInspect = false, LzMessageUnits? unitsArg = null);
     /// <summary>
-    /// Returns a list of MsgItemModels for the specified key where each MsgItem is associated with 
-    /// one of the message files in the current message set. This method is used by the WYSIWYG editor to
-    /// present all the MsgItemModels for the key. 
+    /// Returns a MsgItemsModel instance for the specified key where each 
+    /// MsgItem is associated with one of the message files in the current message set. 
+    /// This method is used by the WYSIWYG editor to present all the MsgItemModels 
+    /// for the key. 
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public List<MsgItemModel> MsgItemModels(string key);
+    public MsgItemsModel MsgItemsModel(string key);
     /// <summary>
     /// Sets the MsgItem for the specified culture and key. Each MsgItem knows what
     /// message set it it belongs to. Using the culture and key, it is possible to
