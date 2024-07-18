@@ -13,7 +13,6 @@ public static class ConfigureLazyStackBlazorMessages
     public static ILzMessages AddLazyStackBlazorMessages(this ILzMessages lzMessages)
     {
         List<string> messages = [
-            "_content/LazyStack.Blazor/Messages.json"
             ];
         lzMessages.MessageFiles.AddRange(messages);
         return lzMessages;

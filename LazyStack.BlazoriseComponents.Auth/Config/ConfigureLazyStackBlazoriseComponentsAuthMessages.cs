@@ -11,7 +11,6 @@ public static class ConfigureLazyStackBlazoriseComponentsAuthMessages
     public static ILzMessages AddLazyStackBlazoriseComponentsAuthMessages(this ILzMessages lzMessages)
     {
         List<string> messages = [
-            "_content/LazyStack.BlazoriseComponents.Auth/Messages.json"
             ];
         lzMessages.MessageFiles.AddRange(messages);
         return lzMessages;

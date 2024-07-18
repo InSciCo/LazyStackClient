@@ -19,7 +19,11 @@ public interface ILzMessages : INotifyPropertyChanged
     /// </summary>
     public List<string> MessageFiles { get; set; }
     /// <summary>
-    /// The current culter for the current message set.
+    /// Set this value to make access to static assets fully rooted.
+    /// </summary>
+    public string AssetsUrl { get; set; } 
+    /// <summary>
+    /// The current culture for the current message set.
     /// </summary>
     public string Culture { get; }
     /// <summary>
@@ -61,6 +65,7 @@ public interface ILzMessages : INotifyPropertyChanged
     /// </summary>
     /// <param name="oSAccess"></param>
 	public void SetOSAccess(IOSAccess oSAccess);
+  
     /// <summary>
     /// Loads the specified message files for the specified culture and 
     /// units. Makes this message set the current message set. Affects 

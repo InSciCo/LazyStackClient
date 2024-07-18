@@ -12,7 +12,6 @@ public static class ConfigureLazyStackMudBlazorComponentsMessages
 public static ILzMessages AddLazyStackMudBlazorComponentsAuthMessages(this ILzMessages lzMessages)
     {
         List<string> messages = [
-            "_content/LazyStack.MudBlazorComponents.Auth/Messages.json"
             ];
         lzMessages.MessageFiles.AddRange(messages);
         return lzMessages;

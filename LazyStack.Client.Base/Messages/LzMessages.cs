@@ -48,18 +48,21 @@ public class LzMessages : NotifyBase, ILzMessages
     {
 		// Set the defaults for culture and units
 		// This doesn't load any message files so the message set is empty.
-		MessageSet = new LzMessageSet("en-US", LzMessageUnits.Imperial);
+		//MessageSet = new LzMessageSet("en-US", LzMessageUnits.Imperial);
+        MessageSet = new LzMessageSet("en-US", LzMessageUnits.Imperial);
     }
 
     #region  public properites
     /// <inheritdoc />
-    public List<(string culture, string name)> Cultures { get; set; } =  [("en-US", "English (United States)")];
-	/// <inheritdoc />
-	private LzMessageSet? _messageSet;
+    public List<(string culture, string name)> Cultures { get; set; } =  [("en-US", "English (United States)"), ("es-MX", "Español (Mexico)")];
+    /// <inheritdoc />
+    private LzMessageSet? _messageSet;
 	public LzMessageSet MessageSet { 
 		get { return _messageSet!;} 
 		set { SetProperty(ref _messageSet, value); }
 	} 
+	/// <inheritdoc />
+	public string AssetsUrl { get; set; }
 	/// <inheritdoc />
 	public string Culture => MessageSet.Culture;
 	/// <inheritdoc />
@@ -81,7 +84,7 @@ public class LzMessages : NotifyBase, ILzMessages
 					return true;
 			return false;
 		}
-	}	
+	}
 	#endregion
 
 	#region protected properties
@@ -112,12 +115,14 @@ public class LzMessages : NotifyBase, ILzMessages
 		{
 			MessageSet = messageSet;
 			messageSet.Units = units;
+            MessageSet.AssetsUrl = AssetsUrl;
             await MessageSet.LoadMessagesAsync(MessageFiles, _oSAccess);
         }
 		else
 		{
 			MessageSet = new LzMessageSet(culture, units);
 			_MessageSets.Add(culture, MessageSet);
+			MessageSet.AssetsUrl = AssetsUrl;
 			await MessageSet.LoadMessagesAsync(MessageFiles, _oSAccess);
 		}
 	}

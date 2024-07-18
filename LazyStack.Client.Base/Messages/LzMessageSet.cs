@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -22,6 +23,7 @@ public class LzMessageSet
         Culture = culture;
         Units = defaultUnits;
     }
+
     public string Culture { get; private set; }
     public LzMessageUnits Units { get; set; }
     public bool Dirty 
@@ -35,6 +37,7 @@ public class LzMessageSet
         } 
     }
     public Dictionary<string, MessageDoc> MessageDocs { get; private set; } = new Dictionary<string, MessageDoc>();
+    public string AssetsUrl { get; set; }   
 
     protected IOSAccess? _oSAccess;
     private Dictionary<string, string> _msgsImperial = new Dictionary<string, string>();
@@ -197,7 +200,14 @@ public class LzMessageSet
                 msg = msgItem.Msg;
         return msg;
     }
-    protected string FilePathWithCulture(string fileName, string culture) => fileName.Replace(".json", $".{culture}.json");
+    protected string FilePathWithCulture(string filePath, string culture) 
+    {
+		// ex: "Assets/System/BlazoriseComponentMessage.json"
+		var fileName = Path.GetFileNameWithoutExtension(filePath); // BlazorseComponentMessage
+		var directoryPath = Path.GetDirectoryName(filePath); // Assets/System 
+		var newDirectoryName = directoryPath + "-" + culture; 
+		return Path.Combine(newDirectoryName, fileName + "." + culture + ".json");
+    }
     protected bool TryGetMsg(string key, out string msg, LzMessageUnits? unitsArg = null)
     {
         var units = unitsArg ?? Units;
