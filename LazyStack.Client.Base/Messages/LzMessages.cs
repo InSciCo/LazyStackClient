@@ -166,7 +166,6 @@ public class LzMessages : NotifyBase, ILzMessages
         // Todo - add html clean
        
     }
-
 	public async Task SaveMessageSetsAsync()
 	{
 		foreach(var messageSet in _MessageSets.Values)
