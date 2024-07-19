@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq.Expressions;
 using System.Linq;
+using ReactiveUI;
 
 namespace LazyStack.Client.Base
 {
@@ -14,12 +15,13 @@ namespace LazyStack.Client.Base
             MessageSet = messageSet;
             this.Key = key;
             UpdateItems();
+
         }  
 
         #region Public Propeties
         public string Key { get; private set; } 
        
-        public Dictionary<string, MsgItemModel> Items { get; set; } = new Dictionary<string, MsgItemModel>(); // key is Doc FilePath
+        public Dictionary<string, MsgItemModel> Items { get; } = new Dictionary<string, MsgItemModel>(); // key is Doc FilePath
         private string _imperialPreview = "";
         public string ImperialPreview 
         {   get => _imperialPreview; 
@@ -28,9 +30,9 @@ namespace LazyStack.Client.Base
         public string _metricPreview = "";
         public string MetricPreview 
         {   get => _metricPreview; 
-            private set=> SetProperty(ref _imperialPreview, value); } 
-        public List<MsgItemModel> ItemsOrderedByPrecedents { get; private set; } = new List<MsgItemModel>();
-        public LzMessageSet MessageSet { get; set; }
+            private set=> SetProperty(ref _metricPreview, value); } 
+        public List<MsgItemModel> ItemsOrderedByPrecedents { get; } = new List<MsgItemModel>();
+        public LzMessageSet MessageSet { get; private set; }
        
         #endregion
 
@@ -91,13 +93,15 @@ namespace LazyStack.Client.Base
             foreach (var docKey in orderedDocListKeys)
                 if(Items.ContainsKey(docKey))
                     ItemsOrderedByPrecedents.Add(Items[docKey]);
-
+            UpdatePreview();
+            RaisePropertyChanged(nameof(ItemsOrderedByPrecedents));
             return Items;
         }
-        private void UpdatePreview()
+        public void UpdatePreview()
         {
+           MessageSet.UpdateMsgs(unitsArg: null, key: Key);
+            MetricPreview = MessageSet!.Msg(Key, LzMessageUnits.Metric);
             ImperialPreview = MessageSet!.Msg(Key, LzMessageUnits.Imperial);
-            MetricPreview = MessageSet!.Msg(MetricPreview, LzMessageUnits.Metric);
         }
         #endregion
     }

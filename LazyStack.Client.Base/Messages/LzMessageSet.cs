@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReactiveUI;
+using System;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -25,21 +26,32 @@ public class LzMessageSet : NotifyBase
     }
 
     #region Public Properties
-    public string Culture { get; private set; }
-    public LzMessageUnits Units { get; set; }
+    public string Culture {  get; private set; }
+    private LzMessageUnits _units;
+    public LzMessageUnits Units 
+    {   get => _units; 
+        set => SetProperty(ref _units, value); 
+    }
+    private bool _dirty;
     public bool Dirty 
     { 
         get 
-        { 
-            foreach(var messageDoc in MessageDocs.Values)
+        {
+            var foundDirty = false;
+            foreach (var messageDoc in MessageDocs.Values)
                 if (messageDoc.Dirty)
-                    return true;
-            return false;   
+                {
+                    foundDirty = true; 
+                    break;
+                }
+            if(!(foundDirty == _dirty))
+                SetProperty(ref _dirty, foundDirty);
+            return _dirty;   
         } 
     }
-    public Dictionary<string, MessageDoc> MessageDocs { get; private set; } = new Dictionary<string, MessageDoc>();
+    public Dictionary<string, MessageDoc> MessageDocs { get; } = new Dictionary<string, MessageDoc>();
     public string AssetsUrl { get; set; }
-    public Dictionary<string, MsgItemsModel> MsgItemsModels { get; private set; } = new Dictionary<string, MsgItemsModel>(); // key is the Msg Key
+    public Dictionary<string, MsgItemsModel> MsgItemsModels { get; } = new Dictionary<string, MsgItemsModel>(); // key is the Msg Key
     private MsgItemsModel _msgItemsModel;
     public MsgItemsModel CurrentMsgItemsModel 
         { get => _msgItemsModel;
@@ -86,7 +98,7 @@ public class LzMessageSet : NotifyBase
     /// <param name="key"></param>
     /// <returns></returns>
     /// 
-    public MsgItemsModel GetMsgItemsModel(string key)
+    public MsgItemsModel SetMsgItemsModel(string key)
     {
         if(MsgItemsModels.TryGetValue(key, out MsgItemsModel msgItemsModel)) 
         {
@@ -177,7 +189,7 @@ public class LzMessageSet : NotifyBase
         }
         UpdateMsgs();
     }
-    public void UpdateMsgs(LzMessageUnits? unitsArg = null)
+    public void UpdateMsgs(LzMessageUnits? unitsArg = null, string? key = null)
     {
         foreach (LzMessageUnits units in Enum.GetValues(typeof(LzMessageUnits)))
         {
@@ -185,8 +197,9 @@ public class LzMessageSet : NotifyBase
                 continue;
 
             var msgs = (units == LzMessageUnits.Imperial)
-                ? _msgsImperial = new Dictionary<string, string>()
-                : _msgsMetric = new Dictionary<string, string>();
+                ? _msgsImperial
+                : _msgsMetric;
+            if (string.IsNullOrEmpty(key)) msgs.Clear();
             try
             {
                 if (_oSAccess == null)
@@ -195,10 +208,20 @@ public class LzMessageSet : NotifyBase
                 {
                     var filePath = FilePathWithCulture(msgFile, Culture);
                     if (MessageDocs.TryGetValue(filePath, out MessageDoc? doc))
-                        foreach (var msg in doc.Messages)
-                            msgs[msg.Key] = msg.Value.Msg;
+                    {
+                        if (key is not null)
+                        {
+                            if (doc.Messages.TryGetValue(key, out MsgItem msgItem))
+                                msgs[key] = GetMessage(key!, filePath, msgItem.Msg);
+                        }
+                        else
+                        {
+                            foreach (var msg in doc.Messages)
+                                msgs[msg.Key] = GetMessage(key!, filePath, msg.Value.Msg);
+                        }
+                    }
                 }
-                ReplaceVars(units); // Performs variable substitution and Units conversion in msgs
+                ReplaceVars(units, key); // Performs variable substitution and Units conversion in msgs
             }
             catch (Exception ex)
             {
@@ -206,6 +229,22 @@ public class LzMessageSet : NotifyBase
             }
         }
     }
+    /// <summary>
+    /// Gets the current message. Accomodates messages stored in MsgItemsModels.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="filePath"></param>
+    /// <param name="msgs"></param>
+    /// <returns></returns>
+    private string GetMessage(string key, string filePath, string msg)
+    {
+
+        if (key != null && filePath != null && MsgItemsModels.TryGetValue(key, out MsgItemsModel messageItemsModel))
+            return messageItemsModel.Items[filePath].Msg;
+        
+        return msg;
+    }
+
     public async Task SaveMessageSetAsync()
     {
         foreach(var messageDoc in MessageDocs)
@@ -275,18 +314,27 @@ public class LzMessageSet : NotifyBase
 
         return msg;
     }
-    protected void ReplaceVars(LzMessageUnits? unitsArg = null)
+    protected void ReplaceVars(LzMessageUnits? unitsArg = null, string? keyArg = null )
     {
         var units = unitsArg ?? Units;  
         var msgs = (units == LzMessageUnits.Imperial) ? _msgsImperial : _msgsMetric;
         // Refactored to support C# 8.0 which is the latest supported by .netstandard2.0 target
-        for (var i = 0; i < msgs.Count; i++)
+        if (keyArg is null)
         {
-            // replace variables satisfying the keyPattern '__.*__' with the value of the key
-            var msg = msgs.ElementAt(i).Value;
-            var key = msgs.ElementAt(i).Key;
-            ReplaceVars(msg, units);
-            msgs[key] = ReplaceUnits(msg, units);
+            for (var i = 0; i < msgs.Count; i++)
+            {
+                // replace variables satisfying the keyPattern '__.*__' with the value of the key
+                var msg = msgs.ElementAt(i).Value;
+                var key = msgs.ElementAt(i).Key;
+                msg = ReplaceVars(msg, units);
+                msgs[key] = ReplaceUnits(msg, units);
+            }
+        } else
+        {
+            var msg = msgs[keyArg];
+            msg = ReplaceVars(msg, units);
+            msg = ReplaceUnits(msg, units);
+            msgs[keyArg] = msg;
         }
     }
     protected string ReplaceVars(string msg, LzMessageUnits? unitsArg = null)

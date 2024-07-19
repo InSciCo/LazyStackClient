@@ -11,8 +11,12 @@ public enum MsgItemState { Clean, Dirty, New }
 /// create/edit/save a message to a message file in 
 /// a message set.
 /// </summary>
-public class MsgItem
+public class MsgItem : NotifyBase
 {
-    public string Msg { get; set; } = "";
+    private string _msg = "";
+    public string Msg 
+    {   get => _msg; 
+        set => SetProperty(ref _msg, value); 
+    }
     public bool? Editable { get; set; }
 }

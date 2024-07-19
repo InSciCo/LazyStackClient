@@ -59,10 +59,13 @@ public class LzMessages : NotifyBase, ILzMessages
     private LzMessageSet? _messageSet;
 	public LzMessageSet MessageSet { 
 		get { return _messageSet!;} 
-		set { SetProperty(ref _messageSet, value); }
-	} 
+		set { 
+			_messageSet = value;
+            RaisePropertyChanged(nameof(LzMessageSet));
+        }
+	}
 	/// <inheritdoc />
-	public string AssetsUrl { get; set; }
+	public string AssetsUrl { get; set; } = "";
 	/// <inheritdoc />
 	public string Culture => MessageSet.Culture;
 	/// <inheritdoc />
@@ -113,8 +116,8 @@ public class LzMessages : NotifyBase, ILzMessages
 			throw new InvalidOperationException("SetOSAccess must be called before SetMessageSetAsync");
 		if (_MessageSets.TryGetValue(culture, out LzMessageSet? messageSet))
 		{
-			MessageSet = messageSet;
 			messageSet.Units = units;
+            MessageSet = messageSet;
             MessageSet.AssetsUrl = AssetsUrl;
             await MessageSet.LoadMessagesAsync(MessageFiles, _oSAccess);
         }
@@ -136,8 +139,17 @@ public class LzMessages : NotifyBase, ILzMessages
 				return "";
 			var msg = MessageSet.Msg(key, unitsArg);
 
+			bool activeMsgItemsModel = false;
+			bool isCurrentMsgItemModel = false;
+			if(MessageSet.MsgItemsModels.TryGetValue(key, out var msgItemsModel))
+			{
+				activeMsgItemsModel = true;
+				isCurrentMsgItemModel = MessageSet.CurrentMsgItemsModel == msgItemsModel;
+			}
+			var activeMsgIsDirtyClass = activeMsgItemsModel ? "static-content-is-dirty" : "";
+			var isCurrentMessageClass = isCurrentMsgItemModel ? "static-content-is-current" : "";
 			if (UseInspect && !ignoreUseInspect)
-				msg = $"<span class=\"static-content-message\" key=\"{key}\">{msg}</span>";
+				msg = $"<span class=\"static-content-message {activeMsgIsDirtyClass} {isCurrentMessageClass}\" key=\"{key}\">{msg}</span>";
 			return msg;
 		}
 		catch (Exception ex)

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Text;
+using ReactiveUI;
 
 namespace LazyStack.Client.Base;
 
@@ -16,6 +18,10 @@ public class MsgItemModel : MsgItem
         MsgItemsModel = msgItemsModel;  
         _filePath = filePath; // Key into the MsgItesmModel dictionary
 
+        this.WhenAnyValue(x => x.Msg)
+            .Throttle(TimeSpan.FromMilliseconds(50))
+            .Distinct()
+            .Subscribe(x => { MsgItemsModel.UpdatePreview(); });
     }
 
     #region Public Properties
@@ -34,27 +40,19 @@ public class MsgItemModel : MsgItem
     #region public methods 
     public void SetIsNew() => _isNew = true;
     public MsgItemState MsgItemState { get; private set; } 
-    private MsgItemState SetState()
-    {
-        if (_isNew)
-            return MsgItemState.New;
-        if (_isDirty)
-            return MsgItemState.Dirty;
-        return MsgItemState.Clean;
-    }
     public void OpenEdit()
     {
         originalMsg = Msg;
         _isEdit = true;
         _isDirty = true;
-        SetState();
+        MsgItemState = MsgItemState.Dirty;
     }
     public void CancelEdit()
     {
         Msg = originalMsg;
         _isDirty = false;
         _isEdit = false;
-        SetState();
+        MsgItemState = MsgItemState.Clean;
     }
     public void SaveEdit()
     {
@@ -62,7 +60,7 @@ public class MsgItemModel : MsgItem
         _isDirty = !originalMsg.Equals(Msg);
         _isNew = false;
         _isEdit = false;
-        SetState();
+        MsgItemState = MsgItemState.Clean;
 
     }
 

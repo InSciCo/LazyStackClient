@@ -18,5 +18,9 @@
 	  <Content Remove="Messages\MsgItemModel.cs" />
 	  <Content Remove="Messages\MsgItemsModel.cs" />
 	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ReactiveUI" />
+		<PackageReference Include="ReactiveUI.Fody" />
+	</ItemGroup>
 
 </Project>
