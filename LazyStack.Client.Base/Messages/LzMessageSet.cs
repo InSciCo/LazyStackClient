@@ -67,7 +67,6 @@ public class LzMessageSet : NotifyBase
     private List<string> _messageFiles = new List<string>();
     #endregion
 
-
     /// <summary>
     /// Get a message by key and optionally override the units.
     /// </summary>
