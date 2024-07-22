@@ -243,7 +243,6 @@ public class LzMessageSet : NotifyBase
         
         return msg;
     }
-
     public async Task SaveMessageSetAsync()
     {
         foreach(var messageDoc in MessageDocs)
