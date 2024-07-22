@@ -16,6 +16,7 @@
 		<PackageReference Include="ReactiveUI.Fody" />
 		<PackageReference Include="ReactiveUI" />
 		<PackageReference Include="LazyStack.Shared" />
+		<PackageReference Include="lazyStack.Shared.Notifications" />
 		<ProjectReference Include="..\LazyStack.Client.ViewModels.Auth\LazyStack.Client.ViewModels.Auth.csproj" />
 	</ItemGroup>
 
