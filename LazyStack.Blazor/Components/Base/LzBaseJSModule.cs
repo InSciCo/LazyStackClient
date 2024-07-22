@@ -139,7 +139,13 @@ public abstract class LzBaseJSModule : ILzBaseJSModule, INotifyPropertyChanged, 
         }
         catch (Exception exc) when (exc is JSDisconnectedException or ObjectDisposedException or TaskCanceledException)
         {
+            Console.WriteLine($"InvokeSafeVoidAsync expected error: {exc.Message}");
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"InvokeSafeVoidAsync unexpected error: {ex.Message}");
+        }
+
     }
 
     /// <summary>
@@ -177,11 +183,20 @@ public abstract class LzBaseJSModule : ILzBaseJSModule, INotifyPropertyChanged, 
 
         async Task<IJSObjectReference> InitializeModule()
         {
-            var jsObjectReference = await jsRuntime.InvokeAsync<IJSObjectReference>("import", ModuleFileName);
+            try
+            {
+                var jsObjectReference = await jsRuntime.InvokeAsync<IJSObjectReference>("import", ModuleFileName);
 
-            await OnModuleLoaded(jsObjectReference).ConfigureAwait(false);
+                await OnModuleLoaded(jsObjectReference).ConfigureAwait(false);
 
-            return jsObjectReference;
+                return jsObjectReference;
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine($"InitializeModule, {exc.Message}", exc);
+                throw;
+            }
+
         }
     }
 
