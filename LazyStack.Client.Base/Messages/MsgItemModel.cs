@@ -15,18 +15,25 @@ public class MsgItemModel : MsgItem
     public MsgItemModel(MsgItemsModel msgItemsModel, string filePath)
 
     {
-        MsgItemsModel = msgItemsModel;  
+        MsgItemsModel = msgItemsModel;
         _filePath = filePath; // Key into the MsgItesmModel dictionary
-
         this.WhenAnyValue(x => x.Msg)
             .Throttle(TimeSpan.FromMilliseconds(50))
-            .Distinct()
-            .Subscribe(x => { MsgItemsModel.UpdatePreview(); });
+            .DistinctUntilChanged()
+            .Subscribe(x => {
+                MsgItemsModel.UpdatePreview();
+                Dirty = true;
+            });
     }
 
     #region Public Properties
     public MsgItemsModel? MsgItemsModel { get; private set; }
     public DocMetaData DocMetaData => MsgItemsModel!.MessageSet.MessageDocs[_filePath].DocMetaData;
+    public bool Dirty
+    {
+        get => _isDirty;
+        set => SetProperty(ref _isDirty, value);
+    }
     #endregion
 
     #region private fields
@@ -44,28 +51,34 @@ public class MsgItemModel : MsgItem
     {
         originalMsg = Msg;
         _isEdit = true;
-        _isDirty = true;
+        Dirty = true;
         MsgItemState = MsgItemState.Dirty;
     }
     public void CancelEdit()
     {
         Msg = originalMsg;
-        _isDirty = false;
+        Dirty = false;
         _isEdit = false;
         MsgItemState = MsgItemState.Clean;
     }
     public void SaveEdit()
     {
-        originalMsg = "";
-        _isDirty = !originalMsg.Equals(Msg);
-        _isNew = false;
+        Dirty = !originalMsg.Equals(Msg);
         _isEdit = false;
-        MsgItemState = MsgItemState.Clean;
-
+        if (Dirty)
+        {
+            _isNew = false;
+            MsgItemState = MsgItemState.Dirty;
+        }
+        else
+            MsgItemState = MsgItemState.Clean;
     }
-
+    //public void FinishEdit()
+    //{
+    //    Dirty = !originalMsg.Equals(Msg);
+    //    _isEdit = false;
+    //    MsgItemState = MsgItemState.Dirty;
+    //}
 
     #endregion
-
-
 }

@@ -34,20 +34,25 @@ public class LzMessageSet : NotifyBase
     }
     private bool _dirty;
     public bool Dirty 
-    { 
-        get 
+    {
+        get
         {
-            var foundDirty = false;
-            foreach (var messageDoc in MessageDocs.Values)
-                if (messageDoc.Dirty)
+            bool foundDirty = false;
+
+            foreach (var msgItemsModel in MsgItemsModels.Values)
+            {
+                if (msgItemsModel.Dirty)
                 {
-                    foundDirty = true; 
+                    foundDirty = true;
                     break;
                 }
-            if(!(foundDirty == _dirty))
+            }
+ 
+            if (foundDirty != _dirty)
                 SetProperty(ref _dirty, foundDirty);
-            return _dirty;   
-        } 
+
+            return _dirty;
+        }
     }
     public Dictionary<string, MessageDoc> MessageDocs { get; } = new Dictionary<string, MessageDoc>();
     public string AssetsUrl { get; set; }
@@ -179,7 +184,6 @@ public class LzMessageSet : NotifyBase
                     var doc = JsonConvert.DeserializeObject<MessageDoc>(json)!;
                     MessageDocs[filePath] = doc;
                 }
-
             }
             catch (Exception ex)
             {
@@ -206,20 +210,9 @@ public class LzMessageSet : NotifyBase
                 foreach (var msgFile in _messageFiles) // preserve the precidence order of the files
                 {
                     var filePath = FilePathWithCulture(msgFile, Culture);
-                    if (MessageDocs.TryGetValue(filePath, out MessageDoc? doc))
-                    {
-                        if (key is not null)
-                        {
-                            if (doc.Messages.TryGetValue(key, out MsgItem msgItem))
-                                msgs[key] = GetMessage(key!, filePath, msgItem.Msg);
-                        }
-                        else
-                        {
-                            foreach (var msg in doc.Messages)
-                                msgs[msg.Key] = GetMessage(key!, filePath, msg.Value.Msg);
-                        }
-                    }
-                }
+                    UpdateMsgsFromMessageDocs(msgs, key, filePath); // first set from docs
+                    UpdateMsgsFromMsgItemsModels(msgs, key, filePath); // then override if in MsgItems
+                }    
                 ReplaceVars(units, key); // Performs variable substitution and Units conversion in msgs
             }
             catch (Exception ex)
@@ -228,6 +221,44 @@ public class LzMessageSet : NotifyBase
             }
         }
     }
+
+    private void UpdateMsgsFromMsgItemsModels(Dictionary<string, string> msgs, string? key, string filePath)
+    {
+        if (key is not null)
+        {
+            if (MsgItemsModels.TryGetValue(key!, out MsgItemsModel? msgItemsModel))
+            {
+                if (msgItemsModel.Items.TryGetValue(filePath, out MsgItemModel? msgItemModel))
+                    msgs[key] = GetMessage(key, filePath, msgItemModel.Msg);
+            }
+        }
+        else
+        {
+            foreach (var msgItems in MsgItemsModels)
+            {
+                if (msgItems.Value.Items.TryGetValue(filePath, out MsgItemModel? msgItemModel))
+                    msgs[msgItems.Key] = GetMessage(msgItems.Key, filePath, msgItemModel.Msg);
+            }
+        }
+    }
+
+    private void UpdateMsgsFromMessageDocs(Dictionary<string, string> msgs, string? key, string filePath)
+    {
+        if (MessageDocs.TryGetValue(filePath, out MessageDoc? doc))
+        {
+            if (key is not null)
+            {
+                if (doc.Messages.TryGetValue(key, out MsgItem msgItem))
+                    msgs[key] = GetMessage(key!, filePath, msgItem.Msg);
+            }
+            else
+            {
+                foreach (var msg in doc.Messages)
+                    msgs[msg.Key] = GetMessage(key!, filePath, msg.Value.Msg);
+            }
+        }
+    }
+
     /// <summary>
     /// Gets the current message. Accomodates messages stored in MsgItemsModels.
     /// </summary>

@@ -15,7 +15,6 @@ namespace LazyStack.Client.Base
             MessageSet = messageSet;
             this.Key = key;
             UpdateItems();
-
         }  
 
         #region Public Propeties
@@ -33,7 +32,17 @@ namespace LazyStack.Client.Base
             private set=> SetProperty(ref _metricPreview, value); } 
         public List<MsgItemModel> ItemsOrderedByPrecedents { get; } = new List<MsgItemModel>();
         public LzMessageSet MessageSet { get; private set; }
-       
+        public bool Dirty
+        {
+            get
+            {
+                foreach (var item in Items.Values)
+                    if (item.Dirty)
+                        return true;
+
+                return false;
+            }
+        }
         #endregion
 
         #region Private Members
@@ -99,7 +108,7 @@ namespace LazyStack.Client.Base
         }
         public void UpdatePreview()
         {
-           MessageSet.UpdateMsgs(unitsArg: null, key: Key);
+            MessageSet.UpdateMsgs(unitsArg: null, key: Key);
             MetricPreview = MessageSet!.Msg(Key, LzMessageUnits.Metric);
             ImperialPreview = MessageSet!.Msg(Key, LzMessageUnits.Imperial);
         }

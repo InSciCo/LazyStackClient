@@ -143,7 +143,7 @@ public class LzMessages : NotifyBase, ILzMessages
 			bool isCurrentMsgItemModel = false;
 			if(MessageSet.MsgItemsModels.TryGetValue(key, out var msgItemsModel))
 			{
-				activeMsgItemsModel = true;
+				activeMsgItemsModel = msgItemsModel.Dirty;
 				isCurrentMsgItemModel = MessageSet.CurrentMsgItemsModel == msgItemsModel;
 			}
 			var activeMsgIsDirtyClass = activeMsgItemsModel ? "static-content-is-dirty" : "";
