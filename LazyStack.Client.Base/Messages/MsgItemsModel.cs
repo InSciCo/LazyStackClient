@@ -58,7 +58,7 @@ namespace LazyStack.Client.Base
             {
                 if (Items.TryGetValue( messageDoc.Key, out MsgItemModel? existingMsgItemModel))
                 {
-                    if (existingMsgItemModel!.MsgItemState != MsgItemState.Clean)
+                    if (existingMsgItemModel.Dirty)
                     {
                         Items.Add(messageDoc.Key, existingMsgItemModel);
                         continue;
@@ -72,21 +72,21 @@ namespace LazyStack.Client.Base
                 if (!isEditable && isEmpty)
                     continue;
 
-                var msgItemModel = new MsgItemModel(this, messageDoc.Key);
+                var msgItemModel = new MsgItemModel(this, messageDoc.Key, msgItem, messageDoc.Value.DocMetaData.Editable, lastMsg);
 
-                if (msgItem is not null)
-                {
-                    if (msgItemModel.MsgItemState == MsgItemState.Clean)
-                    {
-                        msgItemModel.Msg = msgItem.Msg;
-                        msgItemModel.Editable = msgItem.Editable ?? messageDoc.Value.DocMetaData.Editable;
-                    }
-                }
-                else
-                {
-                    msgItemModel.Msg = lastMsg;
-                    msgItemModel.Editable = messageDoc.Value.DocMetaData.Editable;
-                }
+                //if (msgItem is not null)
+                //{
+                //    if (!msgItemModel.Dirty)
+                //    {
+                //        msgItemModel.Msg = msgItem.Msg;
+                //        msgItemModel.Editable = msgItem.Editable ?? messageDoc.Value.DocMetaData.Editable;
+                //    }
+                //}
+                //else
+                //{
+                //    msgItemModel.Msg = lastMsg;
+                //    msgItemModel.Editable = messageDoc.Value.DocMetaData.Editable;
+                //}
                 lastMsg = msgItemModel.Msg;
 
                 Items.Add(messageDoc.Key, msgItemModel);

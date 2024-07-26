@@ -212,6 +212,7 @@ public class LzMessageSet : NotifyBase
                     var filePath = FilePathWithCulture(msgFile, Culture);
                     UpdateMsgsFromMessageDocs(msgs, key, filePath); // first set from docs
                     UpdateMsgsFromMsgItemsModels(msgs, key, filePath); // then override if in MsgItems
+
                 }    
                 ReplaceVars(units, key); // Performs variable substitution and Units conversion in msgs
             }
@@ -268,7 +269,6 @@ public class LzMessageSet : NotifyBase
     /// <returns></returns>
     private string GetMessage(string key, string filePath, string msg)
     {
-
         if (key != null && filePath != null && MsgItemsModels.TryGetValue(key, out MsgItemsModel messageItemsModel))
             return messageItemsModel.Items[filePath].Msg;
         
@@ -276,9 +276,50 @@ public class LzMessageSet : NotifyBase
     }
     public async Task SaveMessageSetAsync()
     {
-        foreach(var messageDoc in MessageDocs)
-            await messageDoc.Value.SaveAsync(messageDoc.Key);
-        MsgItemsModels.Clear();
+        var dirtyMsgItemsModel = new List<KeyValuePair<string, MsgItemsModel>>();
+        foreach (var msgItemsModel in MsgItemsModels)
+        {
+            if (msgItemsModel.Value.Dirty)
+                dirtyMsgItemsModel.Add(msgItemsModel);
+        }
+
+        if (dirtyMsgItemsModel.Any())
+        {
+            foreach (var dirtyMsgs in dirtyMsgItemsModel)
+            {
+                string msgKey = dirtyMsgs.Key; // ex: inv_reception_desc
+                var msgItemsModel = dirtyMsgs.Value; // ex: LazyStack.Client.Base.MsgItemsModel
+
+                foreach (var msgFile in _messageFiles)
+                {
+                    var filePath = FilePathWithCulture(msgFile, Culture);
+
+                    if (MessageDocs.TryGetValue(filePath, out var messageDoc))
+                    {
+                        bool docUpdated = false;
+
+                        // this only affects the overriden msgs from tenancy. Why?
+                        // Debugging this shows that msgItem.Msg and msgItemModel.Msg are the same
+                        if (msgItemsModel.Items.TryGetValue(filePath, out var msgItemModel))
+                        {
+                            if (messageDoc.Messages.TryGetValue(msgKey, out var msgItem))
+                            {
+                                msgItem.Msg = msgItemModel.Msg;
+                                docUpdated = true;
+                            }
+                        }
+
+                        if (docUpdated)
+                        {
+                            await messageDoc.SaveAsync(filePath);
+                        }
+                    }
+                }
+            }
+
+            foreach (var dirtyModel in dirtyMsgItemsModel)
+                MsgItemsModels.Remove(dirtyModel.Key);
+        }
     }
     protected string MergeMessages(string key)
     {

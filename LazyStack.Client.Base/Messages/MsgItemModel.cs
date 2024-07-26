@@ -12,7 +12,7 @@ namespace LazyStack.Client.Base;
 /// </summary>
 public class MsgItemModel : MsgItem
 {
-    public MsgItemModel(MsgItemsModel msgItemsModel, string filePath)
+    public MsgItemModel(MsgItemsModel msgItemsModel,  string filePath, MsgItem? msgItem, bool docEditable, string defaultMsg)
 
     {
         MsgItemsModel = msgItemsModel;
@@ -22,13 +22,26 @@ public class MsgItemModel : MsgItem
             .DistinctUntilChanged()
             .Subscribe(x => {
                 MsgItemsModel.UpdatePreview();
-                Dirty = true;
+                Dirty = !Msg.Equals(originalMsg);
             });
+        if (msgItem != null)
+        {
+            originalMsg = Msg = msgItem.Msg;
+            Editable = msgItem.Editable ?? false || docEditable;
+        } else
+        {
+            if(docEditable)
+            {
+                originalMsg = Msg = defaultMsg;
+                Editable = true;
+            }
+        }
     }
 
     #region Public Properties
     public MsgItemsModel? MsgItemsModel { get; private set; }
     public DocMetaData DocMetaData => MsgItemsModel!.MessageSet.MessageDocs[_filePath].DocMetaData;
+    private bool _isDirty = false;
     public bool Dirty
     {
         get => _isDirty;
@@ -38,47 +51,15 @@ public class MsgItemModel : MsgItem
 
     #region private fields
     private string _filePath  = string.Empty;
-    private bool _isDirty = false;
-    private bool _isNew = false;
-    private bool _isEdit = false;
-    private string originalMsg = "";
+    private string? originalMsg = "";
     #endregion
 
     #region public methods 
-    public void SetIsNew() => _isNew = true;
-    public MsgItemState MsgItemState { get; private set; } 
-    public void OpenEdit()
-    {
-        originalMsg = Msg;
-        _isEdit = true;
-        Dirty = true;
-        MsgItemState = MsgItemState.Dirty;
-    }
     public void CancelEdit()
     {
-        Msg = originalMsg;
+        Msg = originalMsg ?? "";
         Dirty = false;
-        _isEdit = false;
-        MsgItemState = MsgItemState.Clean;
     }
-    public void SaveEdit()
-    {
-        Dirty = !originalMsg.Equals(Msg);
-        _isEdit = false;
-        if (Dirty)
-        {
-            _isNew = false;
-            MsgItemState = MsgItemState.Dirty;
-        }
-        else
-            MsgItemState = MsgItemState.Clean;
-    }
-    //public void FinishEdit()
-    //{
-    //    Dirty = !originalMsg.Equals(Msg);
-    //    _isEdit = false;
-    //    MsgItemState = MsgItemState.Dirty;
-    //}
 
     #endregion
 }
