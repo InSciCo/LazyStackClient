@@ -19,13 +19,16 @@ public class LzMessageSet : NotifyBase
     /// </summary>
     /// <param name="culture">Culture to load. ex: en-US</param>
     /// <param name="defaultUnits">Initial units. Ex: LzMessageUnits.Imperial </param>
-    public LzMessageSet(string culture, LzMessageUnits defaultUnits)
+    public LzMessageSet(ILzMessages messages, string culture, LzMessageUnits defaultUnits)
     {
+        Messages = messages;
         Culture = culture;
         Units = defaultUnits;
+
     }
 
     #region Public Properties
+    public ILzMessages Messages { get; private set; }    
     public string Culture {  get; private set; }
     private LzMessageUnits _units;
     public LzMessageUnits Units 
@@ -276,50 +279,34 @@ public class LzMessageSet : NotifyBase
     }
     public async Task SaveMessageSetAsync()
     {
-        var dirtyMsgItemsModel = new List<KeyValuePair<string, MsgItemsModel>>();
+        var dirtyFiles = new List<string>();
         foreach (var msgItemsModel in MsgItemsModels)
         {
-            if (msgItemsModel.Value.Dirty)
-                dirtyMsgItemsModel.Add(msgItemsModel);
-        }
+            var msgKey = msgItemsModel.Key;
 
-        if (dirtyMsgItemsModel.Any())
-        {
-            foreach (var dirtyMsgs in dirtyMsgItemsModel)
+            foreach (var msgItemModel in msgItemsModel.Value.Items)
             {
-                string msgKey = dirtyMsgs.Key; // ex: inv_reception_desc
-                var msgItemsModel = dirtyMsgs.Value; // ex: LazyStack.Client.Base.MsgItemsModel
-
-                foreach (var msgFile in _messageFiles)
+                var filePath = msgItemModel.Key;
+                var item = msgItemModel.Value;
+                if (item.Dirty)
                 {
-                    var filePath = FilePathWithCulture(msgFile, Culture);
+                    var doc = MessageDocs[filePath];
+                    if (doc.Messages.ContainsKey(msgKey))
+                        doc.Messages[msgKey] = msgItemModel.Value;
+                    else
+                        doc.Messages.Add(msgKey, msgItemModel.Value);
 
-                    if (MessageDocs.TryGetValue(filePath, out var messageDoc))
-                    {
-                        bool docUpdated = false;
-
-                        // this only affects the overriden msgs from tenancy. Why?
-                        // Debugging this shows that msgItem.Msg and msgItemModel.Msg are the same
-                        if (msgItemsModel.Items.TryGetValue(filePath, out var msgItemModel))
-                        {
-                            if (messageDoc.Messages.TryGetValue(msgKey, out var msgItem))
-                            {
-                                msgItem.Msg = msgItemModel.Msg;
-                                docUpdated = true;
-                            }
-                        }
-
-                        if (docUpdated)
-                        {
-                            await messageDoc.SaveAsync(filePath);
-                        }
-                    }
+                    if (!dirtyFiles.Contains(filePath))
+                        dirtyFiles.Add(filePath);
                 }
             }
-
-            foreach (var dirtyModel in dirtyMsgItemsModel)
-                MsgItemsModels.Remove(dirtyModel.Key);
         }
+        foreach (var filePath in dirtyFiles)
+            if (MessageDocs.TryGetValue(filePath, out MessageDoc? docToSave))
+                await docToSave.SaveAsync(filePath);
+
+        MsgItemsModels.Clear();
+
     }
     protected string MergeMessages(string key)
     {

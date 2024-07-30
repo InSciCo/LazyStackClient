@@ -49,7 +49,7 @@ public class LzMessages : NotifyBase, ILzMessages
 		// Set the defaults for culture and units
 		// This doesn't load any message files so the message set is empty.
 		//MessageSet = new LzMessageSet("en-US", LzMessageUnits.Imperial);
-        MessageSet = new LzMessageSet("en-US", LzMessageUnits.Imperial);
+        MessageSet = new LzMessageSet(this, "en-US", LzMessageUnits.Imperial);
     }
 
     #region  public properites
@@ -123,7 +123,7 @@ public class LzMessages : NotifyBase, ILzMessages
         }
 		else
 		{
-			MessageSet = new LzMessageSet(culture, units);
+			MessageSet = new LzMessageSet(this, culture, units);
 			_MessageSets.Add(culture, MessageSet);
 			MessageSet.AssetsUrl = AssetsUrl;
 			await MessageSet.LoadMessagesAsync(MessageFiles, _oSAccess);

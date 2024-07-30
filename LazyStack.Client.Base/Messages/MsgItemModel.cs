@@ -22,7 +22,8 @@ public class MsgItemModel : MsgItem
             .DistinctUntilChanged()
             .Subscribe(x => {
                 MsgItemsModel.UpdatePreview();
-                Dirty = !Msg.Equals(originalMsg);
+                Dirty = !Msg.Equals(originalMsg);   
+                MsgItemsModel.MessageSet.Messages.Refresh();
             });
         if (msgItem != null)
         {
