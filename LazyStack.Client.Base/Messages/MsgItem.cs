@@ -4,8 +4,6 @@ using System.Text;
 
 namespace LazyStack.Client.Base;
 
-public enum MsgItemState { Clean, Dirty, New }	
-
 /// <summary>
 /// MsgItem contains all the information necessary to 
 /// create/edit/save a message to a message file in 
@@ -17,6 +15,12 @@ public class MsgItem : NotifyBase
     public string Msg 
     {   get => _msg; 
         set => SetProperty(ref _msg, value); 
+    }
+    private string _url = "";
+    public string Uri
+    {
+        get => _url;
+        set => SetProperty(ref _url, value);
     }
     public bool? Editable { get; set; }
 }

@@ -1,6 +1,7 @@
 ﻿using ReactiveUI;
 using System;
 using System.Data;
+using System.Reactive;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -62,15 +63,16 @@ public class LzMessageSet : NotifyBase
     public Dictionary<string, MsgItemsModel> MsgItemsModels { get; } = new Dictionary<string, MsgItemsModel>(); // key is the Msg Key
     private MsgItemsModel _msgItemsModel;
     public MsgItemsModel CurrentMsgItemsModel 
-        { get => _msgItemsModel;
+    { get => _msgItemsModel;
           private set => SetProperty(ref _msgItemsModel, value);
-        }
+    }
     #endregion
 
     #region Private Members
     protected IOSAccess? _oSAccess;
     private Dictionary<string, string> _msgsImperial = new Dictionary<string, string>();
     private Dictionary<string, string> _msgsMetric = new Dictionary<string, string>();
+    private Dictionary<string, string> _images = new Dictionary<string, string>();
     private bool _keepDocs = false;
     private List<string> _messageFiles = new List<string>();
     #endregion
@@ -96,7 +98,16 @@ public class LzMessageSet : NotifyBase
 
         return key;
     }
-
+    /// <summary>
+    /// Get the image by key
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="unitsArg">Optional units </param>
+    /// <returns></returns>
+    public string Img(string key)
+    {
+        return _images.TryGetValue(key, out var value) ? value : key;
+    }
     /// <summary>
     /// Create a new MsgItemsModel which contains  a list of editable message items for a given key 
     /// There are entries in the MsgItemsModel.Items for each document the key exists in for
@@ -170,9 +181,10 @@ public class LzMessageSet : NotifyBase
 
     public async Task LoadMessagesAsync(List<string> messageFiles, IOSAccess osAccess, bool keepDocs = false)
     {
-        _messageFiles = messageFiles;
         _keepDocs = keepDocs;
         _oSAccess = osAccess;
+        _messageFiles = messageFiles;
+
         foreach (var msgFile in messageFiles)
         {
             // msgFile example: "messages.json"
@@ -185,6 +197,9 @@ public class LzMessageSet : NotifyBase
                 if (!string.IsNullOrEmpty(json))
                 {
                     var doc = JsonConvert.DeserializeObject<MessageDoc>(json)!;
+
+                    if (doc.DocMetaData.ContentType != "Messages")
+                        continue;
                     MessageDocs[filePath] = doc;
                 }
             }
@@ -195,6 +210,38 @@ public class LzMessageSet : NotifyBase
         }
         UpdateMsgs();
     }
+    public async Task LoadImagesAsync(List<string> imageFiles, string defaultCulture, IOSAccess osAccess, bool keepDocs = false)
+    {
+        _keepDocs = keepDocs;
+        _oSAccess = osAccess;
+        _messageFiles = imageFiles;
+
+        foreach (var imgFile in imageFiles)
+        {
+            // msgFile example: "messages.json"
+            var filePath = "";
+            try
+            {
+                filePath = FilePathWithCulture(imgFile, Culture); // ex: "messages.en-US.json"
+
+                var json = await _oSAccess.ReadContentAsync(filePath);
+                if (!string.IsNullOrEmpty(json))
+                {
+                    var doc = JsonConvert.DeserializeObject<MessageDoc>(json)!;
+
+                    if (doc.DocMetaData.ContentType != "Images")
+                        continue;
+                    MessageDocs[filePath] = doc;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading messages file: {filePath} {ex.Message}");
+            }
+        }
+        UpdateImgs();
+    }
+   
     public void UpdateMsgs(LzMessageUnits? unitsArg = null, string? key = null)
     {
         foreach (LzMessageUnits units in Enum.GetValues(typeof(LzMessageUnits)))
@@ -225,6 +272,27 @@ public class LzMessageSet : NotifyBase
             }
         }
     }
+    public void UpdateImgs(string? key = null)
+    {
+        var imgs = _images;
+        if (string.IsNullOrEmpty(key)) imgs.Clear();
+        try
+        {
+            if (_oSAccess == null)
+                throw new Exception("SetOSAccess must be called before SetMessageSetAsync.");
+            foreach (var msgFile in _messageFiles) // preserve the precidence order of the files
+            {
+                var filePath = FilePathWithCulture(msgFile, Culture);
+                UpdateImgsFromMessageDocs(imgs, key, filePath); // first set from docs
+                UpdateImgsFromMsgItemsModels(imgs, key, filePath); // then override if in MsgItems
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error setting message set: {ex.Message}");
+        }
+        
+    }
 
     private void UpdateMsgsFromMsgItemsModels(Dictionary<string, string> msgs, string? key, string filePath)
     {
@@ -245,7 +313,6 @@ public class LzMessageSet : NotifyBase
             }
         }
     }
-
     private void UpdateMsgsFromMessageDocs(Dictionary<string, string> msgs, string? key, string filePath)
     {
         if (MessageDocs.TryGetValue(filePath, out MessageDoc? doc))
@@ -262,6 +329,42 @@ public class LzMessageSet : NotifyBase
             }
         }
     }
+    private void UpdateImgsFromMsgItemsModels(Dictionary<string, string> msgs, string? key, string filePath)
+    {
+        if (key is not null)
+        {
+            if (MsgItemsModels.TryGetValue(key!, out MsgItemsModel? msgItemsModel))
+            {
+                if (msgItemsModel.Items.TryGetValue(filePath, out MsgItemModel? msgItemModel))
+                    msgs[key] = GetImage(key, filePath, msgItemModel.Uri);
+            }
+        }
+        else
+        {
+            foreach (var msgItems in MsgItemsModels)
+            {
+                if (msgItems.Value.Items.TryGetValue(filePath, out MsgItemModel? msgItemModel))
+                    msgs[msgItems.Key] = GetImage(msgItems.Key, filePath, msgItemModel.Uri);
+            }
+        }
+    }
+
+    private void UpdateImgsFromMessageDocs(Dictionary<string, string> msgs, string? key, string filePath)
+    {
+        if (MessageDocs.TryGetValue(filePath, out MessageDoc? doc))
+        {
+            if (key is not null)
+            {
+                if (doc.Messages.TryGetValue(key, out MsgItem msgItem))
+                    msgs[key] = GetImage(key!, filePath, msgItem.Uri);
+            }
+            else
+            {
+                foreach (var msg in doc.Images)
+                    msgs[msg.Key] = GetImage(key!, filePath, msg.Value.Uri);
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the current message. Accomodates messages stored in MsgItemsModels.
@@ -275,6 +378,13 @@ public class LzMessageSet : NotifyBase
         if (key != null && filePath != null && MsgItemsModels.TryGetValue(key, out MsgItemsModel messageItemsModel))
             return messageItemsModel.Items[filePath].Msg;
         
+        return msg;
+    }
+    private string GetImage(string key, string filePath, string msg)
+    {
+        if (key != null && filePath != null && MsgItemsModels.TryGetValue(key, out MsgItemsModel messageItemsModel))
+            return messageItemsModel.Items[filePath].Uri;
+
         return msg;
     }
     public async Task SaveMessageSetAsync()

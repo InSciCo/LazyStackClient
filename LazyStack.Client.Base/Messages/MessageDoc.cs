@@ -8,7 +8,7 @@ public class MessageDoc
 {
 	public DocMetaData DocMetaData { get; set; } = new DocMetaData();
 	public Dictionary<string, MsgItem> Messages { get; set; } = new Dictionary<string, MsgItem>();
-
+    public Dictionary<string, MsgItem> Images { get; set; } = new Dictionary<string, MsgItem>();
     [JsonIgnore]
     public bool Dirty { get; set; }
 

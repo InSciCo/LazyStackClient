@@ -1,4 +1,6 @@
 ﻿namespace LazyStack.Client.Base;
+
+using System.Reactive;
 using System.Text.RegularExpressions;
 
 public enum LzMessageUnits { Imperial, Metric }
@@ -48,7 +50,6 @@ public class LzMessages : NotifyBase, ILzMessages
     {
 		// Set the defaults for culture and units
 		// This doesn't load any message files so the message set is empty.
-		//MessageSet = new LzMessageSet("en-US", LzMessageUnits.Imperial);
         MessageSet = new LzMessageSet(this, "en-US", LzMessageUnits.Imperial);
     }
 
@@ -64,8 +65,19 @@ public class LzMessages : NotifyBase, ILzMessages
             RaisePropertyChanged(nameof(LzMessageSet));
         }
 	}
-	/// <inheritdoc />
-	public string AssetsUrl { get; set; } = "";
+    /// <inheritdoc />
+    private LzMessageSet? _imageSet;
+    public LzMessageSet ImageSet
+    {
+        get { return _imageSet!; }
+        set
+        {
+            _imageSet = value;
+            RaisePropertyChanged(nameof(LzMessageSet));
+        }
+    }
+    /// <inheritdoc />
+    public string AssetsUrl { get; set; } = "";
 	/// <inheritdoc />
 	public string Culture => MessageSet.Culture;
 	/// <inheritdoc />
@@ -127,10 +139,33 @@ public class LzMessages : NotifyBase, ILzMessages
 			_MessageSets.Add(culture, MessageSet);
 			MessageSet.AssetsUrl = AssetsUrl;
 			await MessageSet.LoadMessagesAsync(MessageFiles, _oSAccess);
-		}
-	}
-	/// <inheritdoc />
-	public string Msg(string key, bool ignoreUseInspect = false, LzMessageUnits? unitsArg = null)
+          
+        }
+        // 
+        await MessageSet.LoadImagesAsync(MessageFiles, culture, _oSAccess);
+
+    }
+    /// <inheritdoc />
+ 	public async Task SetImageSetAsync(string culture)
+	{
+        if (_oSAccess == null)
+            throw new InvalidOperationException("SetOSAccess must be called before SetImageSetAsync");
+        if (_MessageSets.TryGetValue(culture, out LzMessageSet imageSet))
+        {
+            ImageSet = imageSet;
+            ImageSet.AssetsUrl = AssetsUrl;
+            await ImageSet.LoadImagesAsync(MessageFiles, culture, _oSAccess);
+        }
+        else
+        {
+            ImageSet = new LzMessageSet(this, culture, LzMessageUnits.Imperial); // While we're setting the units, it will not be utilized
+            _MessageSets.Add(culture, ImageSet);
+            ImageSet.AssetsUrl = AssetsUrl;
+            await ImageSet.LoadImagesAsync(MessageFiles, culture, _oSAccess);
+        }
+    }
+    /// <inheritdoc />
+    public string Msg(string key, bool ignoreUseInspect = false, LzMessageUnits? unitsArg = null)
     {
 		if (string.IsNullOrEmpty(key)) return "";
         try
@@ -157,8 +192,27 @@ public class LzMessages : NotifyBase, ILzMessages
             return $"<span style='color:red;'>{key}, {ex.Message}</span>";
         }
     }
-	/// <inheritdoc />
-	public MsgItemsModel MsgItemsModel(string key)
+    /// <inheritdoc />
+    //public string Img(string key, bool ignoreUseInspect = false)
+    //{
+    //    if (string.IsNullOrEmpty(key)) return "";
+    //    try
+    //    {
+    //        if (_oSAccess == null)
+    //            return "";
+    //        var img = ImageSet.Img(key);
+
+    //        if (UseInspect && !ignoreUseInspect)
+    //             img = $"<img src=\"{img}\" class=\"static-content-image\" key=\"{key}\" />";
+    //        return img;
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return $"<span style='color:red;'>{key}, {ex.Message}</span>";
+    //    }
+    //}
+    /// <inheritdoc />
+    public MsgItemsModel MsgItemsModel(string key)
 		=> MessageSet.MsgItemsModels[key];
     /// <inheritdoc />
     public void SetMsgItem(string culture, string key, MsgItem msgItem)

@@ -76,6 +76,15 @@ public interface ILzMessages : INotifyPropertyChanged
     /// <returns></returns>
     public Task SetMessageSetAsync(string culture, LzMessageUnits units);
     /// <summary>
+    /// Loads the default image files for a culture with no specific images and 
+    /// units. Makes this image set the current image set. Affects 
+    /// the MessageSet, Culture and Units properties.
+    /// </summary>
+    /// <param name="culture"></param>
+    /// <param name="units"></param>
+    /// <returns></returns>
+    public Task SetImageSetAsync(string culture);
+    /// <summary>
     /// Returns the message for the specified key. If the key is not found, the key is returned.
     /// When the UseInspect property is true and ignoreUseInspect is false, the key is returned 
     /// in a span tag with the attributes class="static-content-message" and key="{key}". This
