@@ -16,11 +16,5 @@ public class MsgItem : NotifyBase
     {   get => _msg; 
         set => SetProperty(ref _msg, value); 
     }
-    private string _url = "";
-    public string Uri
-    {
-        get => _url;
-        set => SetProperty(ref _url, value);
-    }
     public bool? Editable { get; set; }
 }

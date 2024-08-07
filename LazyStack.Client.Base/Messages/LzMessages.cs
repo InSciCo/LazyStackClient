@@ -1,5 +1,6 @@
 ﻿namespace LazyStack.Client.Base;
 
+using ReactiveUI;
 using System.Reactive;
 using System.Text.RegularExpressions;
 
@@ -46,188 +47,157 @@ public enum LzMessageUnits { Imperial, Metric }
 /// </summary>
 public class LzMessages : NotifyBase, ILzMessages
 {
-	public LzMessages()
+    public LzMessages()
     {
-		// Set the defaults for culture and units
-		// This doesn't load any message files so the message set is empty.
+        // Set the defaults for culture and units
+        // This doesn't load any message files so the message set is empty.
         MessageSet = new LzMessageSet(this, "en-US", LzMessageUnits.Imperial);
     }
 
     #region  public properites
     /// <inheritdoc />
-    public List<(string culture, string name)> Cultures { get; set; } =  [("en-US", "English (United States)"), ("es-MX", "Español (Mexico)")];
+    public List<(string culture, string name)> Cultures { get; set; } = [("en-US", "English (United States)"), ("es-MX", "Español (Mexico)")];
     /// <inheritdoc />
     private LzMessageSet? _messageSet;
-	public LzMessageSet MessageSet { 
-		get { return _messageSet!;} 
-		set { 
-			_messageSet = value;
-            RaisePropertyChanged(nameof(LzMessageSet));
-        }
-	}
-    /// <inheritdoc />
-    private LzMessageSet? _imageSet;
-    public LzMessageSet ImageSet
+    public LzMessageSet MessageSet
     {
-        get { return _imageSet!; }
+        get { return _messageSet!; }
         set
         {
-            _imageSet = value;
+            _messageSet = value;
             RaisePropertyChanged(nameof(LzMessageSet));
         }
     }
+    private LzMessageSet? DefaultMessages;
     /// <inheritdoc />
     public string AssetsUrl { get; set; } = "";
-	/// <inheritdoc />
-	public string Culture => MessageSet.Culture;
-	/// <inheritdoc />
-	public LzMessageUnits Units => MessageSet.Units;
+    /// <inheritdoc />
+    public string Culture => MessageSet.Culture;
+    /// <inheritdoc />
+    public LzMessageUnits Units => MessageSet.Units;
     /// <inheritdoc />
     public List<string> MessageFiles { get; set; } = new();
     /// <inheritdoc />
     public bool UseInspect { get; set; } = false;
-	private int _refreshCount = 0;
+    private int _refreshCount = 0;
     /// <inheritdoc />
     public int RefreshCount { get => _refreshCount; set => SetProperty(ref _refreshCount, value); }
     /// <inheritdoc />
-    public bool Dirty 
-	{
-		get
-		{
-			foreach (var messageSet in _MessageSets.Values)
-				if (messageSet.Dirty)
-					return true;
-			return false;
-		}
-	}
-	#endregion
-
-	#region protected properties
-	protected IOSAccess? _oSAccess;
-	/// <summary>
-	/// Key is culture, value is LzMessageSet
-	/// </summary>
-    protected Dictionary<string,LzMessageSet> _MessageSets { get; set; } = new();
-	#endregion
-
-	#region public methods
-	public void Refresh()
-	{
-		RefreshCount++;
-	}
-	/// <inheritdoc />
-	public void SetOSAccess(IOSAccess oSAccess)
-	{
-		_oSAccess = oSAccess;
-	}
-    
-	/// <inheritdoc />
-	public async Task SetMessageSetAsync(string culture, LzMessageUnits units)
-	{
-		if(_oSAccess == null)
-			throw new InvalidOperationException("SetOSAccess must be called before SetMessageSetAsync");
-		if (_MessageSets.TryGetValue(culture, out LzMessageSet? messageSet))
-		{
-			messageSet.Units = units;
-            MessageSet = messageSet;
-            MessageSet.AssetsUrl = AssetsUrl;
-            await MessageSet.LoadMessagesAsync(MessageFiles, _oSAccess);
+    public bool Dirty
+    {
+        get
+        {
+            foreach (var messageSet in _MessageSets.Values)
+                if (messageSet.Dirty)
+                    return true;
+            return false;
         }
-		else
-		{
-			MessageSet = new LzMessageSet(this, culture, units);
-			_MessageSets.Add(culture, MessageSet);
-			MessageSet.AssetsUrl = AssetsUrl;
-			await MessageSet.LoadMessagesAsync(MessageFiles, _oSAccess);
-          
-        }
-        // 
-        await MessageSet.LoadImagesAsync(MessageFiles, culture, _oSAccess);
+    }
+    #endregion
 
+    #region protected properties
+    protected IOSAccess? _oSAccess;
+    /// <summary>
+    /// Key is culture, value is LzMessageSet
+    /// </summary>
+    protected Dictionary<string, LzMessageSet> _MessageSets { get; set; } = new();
+    #endregion
+
+    #region public methods
+    public void Refresh()
+    {
+        RefreshCount++;
     }
     /// <inheritdoc />
- 	public async Task SetImageSetAsync(string culture)
-	{
+    public void SetOSAccess(IOSAccess oSAccess)
+    {
+        _oSAccess = oSAccess;
+    }
+
+    /// <inheritdoc />
+    public async Task SetMessageSetAsync(string culture, LzMessageUnits units)
+    {
         if (_oSAccess == null)
-            throw new InvalidOperationException("SetOSAccess must be called before SetImageSetAsync");
-        if (_MessageSets.TryGetValue(culture, out LzMessageSet imageSet))
+            throw new InvalidOperationException("SetOSAccess must be called before SetMessageSetAsync");
+
+        //if (DefaultMessages == null)
+        //{
+        //    DefaultMessages = new LzMessageSet(this, culture, units);
+        //    _MessageSets.Add(culture, DefaultMessages);
+        //    MessageSet = DefaultMessages;
+        //}
+        //else 
+        
+        if (_MessageSets.TryGetValue(culture, out var existingSet))
         {
-            ImageSet = imageSet;
-            ImageSet.AssetsUrl = AssetsUrl;
-            await ImageSet.LoadImagesAsync(MessageFiles, culture, _oSAccess);
+            MessageSet = existingSet;
+            MessageSet.Units = units;
+
+            if (ReferenceEquals(DefaultMessages, existingSet))
+                return;
         }
         else
         {
-            ImageSet = new LzMessageSet(this, culture, LzMessageUnits.Imperial); // While we're setting the units, it will not be utilized
-            _MessageSets.Add(culture, ImageSet);
-            ImageSet.AssetsUrl = AssetsUrl;
-            await ImageSet.LoadImagesAsync(MessageFiles, culture, _oSAccess);
+            MessageSet = new LzMessageSet(this, culture, units);
+            _MessageSets.Add(culture, MessageSet);
         }
-    }
+
+        DefaultMessages ??= MessageSet;
+        MessageSet.AssetsUrl = AssetsUrl;
+        await MessageSet.LoadMessagesAsync(MessageFiles, _oSAccess);
+		// await SetImageSetAsync(culture);
+	}
+
     /// <inheritdoc />
     public string Msg(string key, bool ignoreUseInspect = false, LzMessageUnits? unitsArg = null)
     {
-		if (string.IsNullOrEmpty(key)) return "";
+        if (string.IsNullOrEmpty(key)) return "";
         try
-		{
-			if (_oSAccess == null)
-				return "";
-			var msg = MessageSet.Msg(key, unitsArg);
+        {
+            if (_oSAccess == null)
+                return "";
+            var msg = MessageSet.Msg(key, unitsArg);
+            if (msg.Equals(key))
+                msg = DefaultMessages?.Msg(key, unitsArg) ?? key;
 
-			bool activeMsgItemsModel = false;
-			bool isCurrentMsgItemModel = false;
-			if(MessageSet.MsgItemsModels.TryGetValue(key, out var msgItemsModel))
-			{
-				activeMsgItemsModel = msgItemsModel.Dirty;
-				isCurrentMsgItemModel = MessageSet.CurrentMsgItemsModel == msgItemsModel;
-			}
-			var activeMsgIsDirtyClass = activeMsgItemsModel ? "static-content-is-dirty" : "";
-			var isCurrentMessageClass = isCurrentMsgItemModel ? "static-content-is-current" : "";
-			if (UseInspect && !ignoreUseInspect)
-				msg = $"<span class=\"static-content-message {activeMsgIsDirtyClass} {isCurrentMessageClass}\" key=\"{key}\">{msg}</span>";
-			return msg;
-		}
-		catch (Exception ex)
-		{
+            if (Uri.TryCreate(msg, UriKind.Absolute, out _))
+                return msg;
+
+            bool activeMsgItemsModel = false;
+            bool isCurrentMsgItemModel = false;
+            if (MessageSet.MsgItemsModels.TryGetValue(key, out var msgItemsModel))
+            {
+                activeMsgItemsModel = msgItemsModel.Dirty;
+                isCurrentMsgItemModel = MessageSet.CurrentMsgItemsModel == msgItemsModel;
+            }
+            var activeMsgIsDirtyClass = activeMsgItemsModel ? "static-content-is-dirty" : "";
+            var isCurrentMessageClass = isCurrentMsgItemModel ? "static-content-is-current" : "";
+            if (UseInspect && !ignoreUseInspect)
+                msg = $"<span class=\"static-content-message {activeMsgIsDirtyClass} {isCurrentMessageClass}\" key=\"{key}\">{msg}</span>";
+            return msg;
+        }
+        catch (Exception ex)
+        {
             return $"<span style='color:red;'>{key}, {ex.Message}</span>";
         }
     }
     /// <inheritdoc />
-    //public string Img(string key, bool ignoreUseInspect = false)
-    //{
-    //    if (string.IsNullOrEmpty(key)) return "";
-    //    try
-    //    {
-    //        if (_oSAccess == null)
-    //            return "";
-    //        var img = ImageSet.Img(key);
-
-    //        if (UseInspect && !ignoreUseInspect)
-    //             img = $"<img src=\"{img}\" class=\"static-content-image\" key=\"{key}\" />";
-    //        return img;
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return $"<span style='color:red;'>{key}, {ex.Message}</span>";
-    //    }
-    //}
-    /// <inheritdoc />
     public MsgItemsModel MsgItemsModel(string key)
-		=> MessageSet.MsgItemsModels[key];
+        => MessageSet.MsgItemsModels[key];
     /// <inheritdoc />
     public void SetMsgItem(string culture, string key, MsgItem msgItem)
     {
         // Todo - add html clean
-       
+
     }
-	public async Task SaveMessageSetsAsync()
-	{
-		foreach(var messageSet in _MessageSets.Values)
+    public async Task SaveMessageSetsAsync()
+    {
+        foreach (var messageSet in _MessageSets.Values)
             await messageSet.SaveMessageSetAsync();
-	}
+    }
     #endregion
 
     #region protected methods
-		
-	#endregion
+
+    #endregion
 }

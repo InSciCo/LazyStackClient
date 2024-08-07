@@ -12,6 +12,7 @@ public class LzComponentBase : ComponentBase
     [Inject]
     public virtual ILzMessages? Messages { get; set; }
     protected virtual MarkupString Msg(string key, bool ignoreUseInspect = false) => (MarkupString)Messages!.Msg(key, ignoreUseInspect);
+    //protected virtual MarkupString Img(string key, bool ignoreUseInspect = false) => (MarkupString)Messages!.Img(key, ignoreUseInspect);
 
 }
 
