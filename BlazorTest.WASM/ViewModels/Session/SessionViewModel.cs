@@ -6,14 +6,13 @@ namespace BlazorTest.ViewModels;
 public class SessionViewModel : LzSessionViewModelAuth, ISessionViewModel, ILzTransient
 {
     public SessionViewModel(
-        [FactoryInject] IOSAccess osAccess, // singleton
         [FactoryInject] IInternetConnectivitySvc internetConnectivity, // singleton
         [FactoryInject] ILzClientConfig clientConfig, // singleton
         [FactoryInject] ILzMessages messages, // singleton
         [FactoryInject] IAuthProcess authProcess, // transient
         [FactoryInject] ILzHost lzHost // singleton
         )
-        : base(authProcess, osAccess, clientConfig, internetConnectivity, messages)
+        : base(authProcess, clientConfig, internetConnectivity, messages)
     {
         authProcess.SetAuthenticator(clientConfig.AuthConfigs["api"]);
 

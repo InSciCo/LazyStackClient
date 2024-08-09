@@ -8,7 +8,6 @@ public abstract class LzSessionViewModelAuth : LzSessionViewModel, ILzSessionVie
 {
     public LzSessionViewModelAuth(
         IAuthProcess authProcess, 
-        IOSAccess oSAccess,
         ILzClientConfig clientConfig, 
         IInternetConnectivitySvc internetConnectivity,
         ILzMessages messages

@@ -7,11 +7,10 @@ public abstract class LzSessionViewModelAuthNotifications : LzSessionViewModelAu
 {
     public LzSessionViewModelAuthNotifications(
         IAuthProcess authProcess,
-        IOSAccess oSAccess,
         ILzClientConfig clientConfig, 
         IInternetConnectivitySvc internetConnectivity,
     	ILzMessages messages
-		) : base(authProcess, oSAccess, clientConfig, internetConnectivity, messages)
+		) : base(authProcess, clientConfig, internetConnectivity, messages)
 	{
     }
 
