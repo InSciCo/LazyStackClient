@@ -69,7 +69,7 @@ public class LzMessageSet : NotifyBase
     #endregion
 
     #region Private Members
-    protected IOSAccess? _oSAccess;
+    protected IStaticAssets? _staticAssets;
     private Dictionary<string, string> _msgsImperial = new Dictionary<string, string>();
     private Dictionary<string, string> _msgsMetric = new Dictionary<string, string>();
     private bool _keepDocs = false;
@@ -168,10 +168,10 @@ public class LzMessageSet : NotifyBase
     //    return items;
     //}
 
-    public async Task LoadMessagesAsync(List<string> messageFiles, IOSAccess osAccess, bool keepDocs = false)
+    public async Task LoadMessagesAsync(List<string> messageFiles, IStaticAssets osAccess, bool keepDocs = false)
     {
         _keepDocs = keepDocs;
-        _oSAccess = osAccess;
+        _staticAssets = osAccess;
         _messageFiles = messageFiles;
 
         foreach (var msgFile in messageFiles)
@@ -182,7 +182,7 @@ public class LzMessageSet : NotifyBase
             {
                 filePath = FilePathWithCulture(msgFile, Culture); // ex: "messages.en-US.json"
 
-                var json = await _oSAccess.ReadContentAsync(filePath);
+                var json = await _staticAssets.ReadContentAsync(filePath);
                 if (!string.IsNullOrEmpty(json))
                 {
                     var doc = JsonConvert.DeserializeObject<MessageDoc>(json)!;
@@ -209,7 +209,7 @@ public class LzMessageSet : NotifyBase
             if (string.IsNullOrEmpty(key)) msgs.Clear();
             try
             {
-                if (_oSAccess == null)
+                if (_staticAssets == null)
                     throw new Exception("SetOSAccess must be called before SetMessageSetAsync.");
                 foreach (var msgFile in _messageFiles) // preserve the precidence order of the files
                 {

@@ -6,12 +6,10 @@
 public abstract class LzSessionViewModel : LzViewModel, ILzSessionViewModel, INotifyPropertyChanged
 {
     public LzSessionViewModel(
-        IOSAccess oSAccess,
         IInternetConnectivitySvc internetConnectivity,
     	ILzMessages messages
 		)
 	{
-        OSAccess = oSAccess ?? throw new ArgumentNullException(nameof(oSAccess));   
         InternetConnectivity = internetConnectivity ?? throw new ArgumentNullException(nameof(internetConnectivity));
         Messages = messages ?? throw new ArgumentNullException(nameof(messages));
         // Maintain a local instance of the MessageSetSelector so we can react to changes in that value 
@@ -28,13 +26,11 @@ public abstract class LzSessionViewModel : LzViewModel, ILzSessionViewModel, INo
                 // Note: The LzMessage instance MessageSetSelector is not the same instance as the one in 
                 // LzMessages. When it changes, we make a call to the LzMessages instance to update
                 // the current message set.
-                if(OSAccess != null)
-				    await Messages.SetMessageSetAsync(messageSetSelector.Culture, messageSetSelector.Units);
+    		    await Messages.SetMessageSetAsync(messageSetSelector.Culture, messageSetSelector.Units);
 			});
     }
     public IInternetConnectivitySvc InternetConnectivity { get; set; }  
     public string SessionId { get; set; } = Guid.NewGuid().ToString();
-    public IOSAccess OSAccess { get; set; }
     public ILzMessages Messages { get; set; }
     public string SessionName { get; set; } = "Session";
 

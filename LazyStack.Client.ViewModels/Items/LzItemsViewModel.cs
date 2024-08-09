@@ -25,11 +25,6 @@ public abstract class LzItemsViewModel<TVM, TDTO, TModel> : LzViewModel, INotify
         Models = models;  
         DTOs = dtos;
 
-        // Assign default storage API handlers
-        _ContentReadIdAsync = sessionViewModel.OSAccess.ReadContentAsync;
-        _S3ReadIdAsync = sessionViewModel.OSAccess.S3ReadAsync;
-        _LocalReadIdAsync = sessionViewModel.OSAccess.LocalReadAsync;
-        _HttpReadIdAsync = sessionViewModel.OSAccess.HttpReadAsync;
         CanList = true;
         CanAdd = true;
     }
@@ -73,10 +68,6 @@ public abstract class LzItemsViewModel<TVM, TDTO, TModel> : LzViewModel, INotify
     protected StorageAPI _StorageAPI { get; init; }
     protected Func<string, Task<ICollection<TDTO>>>? _DTOReadListId { get; init; }
     protected Func<Task<ICollection<TDTO>>>? _DTOReadListAsync { get; init; }
-    protected Func<string, Task<string>>? _S3ReadIdAsync { get; init; }
-    protected Func<string, Task<string>>? _LocalReadIdAsync { get; init; }
-    protected Func<string, Task<string>>? _ContentReadIdAsync { get; init; }
-    protected Func<string, Task<string>>? _HttpReadIdAsync { get; init; }
     protected string _EntityName { get; set; } = string.Empty;
 
     // Public Methods
@@ -86,66 +77,23 @@ public abstract class LzItemsViewModel<TVM, TDTO, TModel> : LzViewModel, INotify
         IsLoaded = false;
         IsChanged = true;
     }   
-    public virtual async Task<(bool, string)> ReadAsync(bool forceload = false, StorageAPI storageAPI = StorageAPI.DTO)
-        => await ReadAsync(string.Empty, forceload, storageAPI);
-    public virtual async Task<(bool, string)> ReadAsync(string id, bool forceload = false, StorageAPI storageAPI = StorageAPI.DTO)
+    public virtual async Task<(bool, string)> ReadAsync(bool forceload = false)
+        => await ReadAsync(string.Empty, forceload);
+    public virtual async Task<(bool, string)> ReadAsync(string id, bool forceload = false)
     {
-        if (storageAPI == StorageAPI.Default)
-            storageAPI = (storageAPI == StorageAPI.Default)
-                ? StorageAPI.DTO
-                : storageAPI;
-
         var userMsg = "Can't read " + _EntityName + " id:" + id;
         try
         {
-            CheckAuth(storageAPI);  
-            switch(storageAPI)
-            {
-                case StorageAPI.DTO:
-                    if(string.IsNullOrEmpty(id) && _DTOReadListAsync == null)
-                        throw new Exception("SvcReadList function not assigned");   
-                    if(!string.IsNullOrEmpty(id) && _DTOReadListId == null)
-                        throw new Exception("SvcReadListId function not assigned");
-                    IsLoading = true;
-                    var items = (!string.IsNullOrEmpty(id))
-                        ? await _DTOReadListId!(id)
-                        : await _DTOReadListAsync!(); 
-                    return await UpdateDataAsync(items, forceload, storageAPI);
-                case StorageAPI.S3:
-                    if (string.IsNullOrEmpty(id)) throw new Exception("ParentId required for S3SvcReadId");
-                    if (_S3ReadIdAsync == null) throw new Exception("S3SvcReadIdAsync not assigned.");
-                    IsLoading = true;
-                    var s3Text = await _S3ReadIdAsync(id);
-                    return await UpdateDataFromTextAsync(s3Text, forceload, storageAPI);
-                case StorageAPI.Local:
-                    if(string.IsNullOrEmpty(id)) throw new Exception("ParentId required for LocalSvcReadId");   
-                    if(_LocalReadIdAsync == null) throw new Exception("LocalSvcReadIdAsync not assigned.");
-                    IsLoading = true;
-                    var localText = await _LocalReadIdAsync(id);
-                    return await UpdateDataFromTextAsync(localText, forceload, storageAPI);    
-                case StorageAPI.Content:
-                    if(string.IsNullOrEmpty(id)) throw new Exception("ParentId required for ContentSvcReadId");
-                    if(_ContentReadIdAsync == null) throw new Exception("ContentSvcReadIdAsync not assigned.");
-                    IsLoading = true;
-                    var contentText = await _ContentReadIdAsync(id);
-                    return await UpdateDataFromTextAsync(contentText, forceload, storageAPI);
-                case StorageAPI.Http:
-                    if(string.IsNullOrEmpty(id)) throw new Exception("ParentId required for HttpSvcReadId");
-                    if(_HttpReadIdAsync == null) throw new Exception("HttpSvcReadIdAsync not assigned.");
-                    IsLoading = true;
-                    var httpText = await _HttpReadIdAsync(id);
-                    return await UpdateDataFromTextAsync(httpText, forceload, storageAPI);
-                case StorageAPI.Model:
-                    if(Models != null)
-                        return await UpdateDataAsync(Models, forceload, storageAPI);
-                    if(DTOs != null)
-                        return await UpdateDataAsync(DTOs, forceload, storageAPI);
-                    throw new Exception("Either Models or DTOs need to be assigned");
-                case StorageAPI.None:
-                    return (true, string.Empty);
-                default:
-                    return (false, Log(userMsg, "StorageAPI not implemented")); 
-            }
+            CheckAuth();  
+            if(string.IsNullOrEmpty(id) && _DTOReadListAsync == null)
+                throw new Exception("SvcReadList function not assigned");   
+            if(!string.IsNullOrEmpty(id) && _DTOReadListId == null)
+                throw new Exception("SvcReadListId function not assigned");
+            IsLoading = true;
+            var items = (!string.IsNullOrEmpty(id))
+                ? await _DTOReadListId!(id)
+                : await _DTOReadListAsync!(); 
+            return await UpdateDataAsync(items, forceload);
         }
         catch (Exception ex)
         {
@@ -193,7 +141,7 @@ public abstract class LzItemsViewModel<TVM, TDTO, TModel> : LzViewModel, INotify
         }
         return (success, msg);
     }
-    public virtual void CheckAuth(StorageAPI storageAPI)
+    public virtual void CheckAuth()
     {
         return;
     }
@@ -205,13 +153,13 @@ public abstract class LzItemsViewModel<TVM, TDTO, TModel> : LzViewModel, INotify
         => throw new NotImplementedException();
     public virtual(TVM viewmodel, string id) NewViewModel(string key, TDTO dto)
         => throw new NotImplementedException();
-    protected virtual async Task<(bool, string)> UpdateDataFromTextAsync(string jsonContent, bool forceload, StorageAPI storageAPI)
+    protected virtual async Task<(bool, string)> UpdateDataFromTextAsync(string jsonContent, bool forceload)
     {
         var items = JsonConvert.DeserializeObject<ICollection<TDTO>>(jsonContent);
         if (items == null) throw new Exception("UpdateDataFromJsonAsync returned null");
-        return await UpdateDataAsync(items, forceload, storageAPI);
+        return await UpdateDataAsync(items, forceload);
     }
-    protected virtual async Task<(bool, string)> UpdateDataAsync(ICollection<TDTO> list, bool forceload, StorageAPI storageAPI)
+    protected virtual async Task<(bool, string)> UpdateDataAsync(ICollection<TDTO> list, bool forceload)
     {
         var tasks = new List<Task<(bool success, string msg)>>();
         foreach (var item in list)
@@ -228,7 +176,7 @@ public abstract class LzItemsViewModel<TVM, TDTO, TModel> : LzViewModel, INotify
                     ViewModels![id] = vm;
                 vm.State = LzItemViewModelState.Current;
                 if (AutoReadChildren)
-                    tasks.Add(ViewModels![id].ReadChildrenAsync(forceload, storageAPI));
+                    tasks.Add(ViewModels![id].ReadChildrenAsync(forceload));
             }
             catch
             {
@@ -243,7 +191,7 @@ public abstract class LzItemsViewModel<TVM, TDTO, TModel> : LzViewModel, INotify
         IsLoaded = result.success;
         return result;
     }
-    protected virtual async Task<(bool, string)> UpdateDataAsync(IDictionary<string,TModel> list, bool forceload, StorageAPI storageAPI)
+    protected virtual async Task<(bool, string)> UpdateDataAsync(IDictionary<string,TModel> list, bool forceload)
     {
         var tasks = new List<Task<(bool success, string msg)>>();
         foreach (var item in list)
@@ -260,7 +208,7 @@ public abstract class LzItemsViewModel<TVM, TDTO, TModel> : LzViewModel, INotify
                     ViewModels![id] = vm;
                 vm.State = LzItemViewModelState.Current;
                 if (AutoReadChildren)
-                    tasks.Add(ViewModels![id].ReadChildrenAsync(forceload, storageAPI));
+                    tasks.Add(ViewModels![id].ReadChildrenAsync(forceload));
             }
             catch
             {
@@ -273,7 +221,7 @@ public abstract class LzItemsViewModel<TVM, TDTO, TModel> : LzViewModel, INotify
         return result;
     }
 
-    protected virtual async Task<(bool, string)> UpdateDataAsync(IDictionary<string, TDTO> list, bool forceload, StorageAPI storageAPI)
+    protected virtual async Task<(bool, string)> UpdateDataAsync(IDictionary<string, TDTO> list, bool forceload)
     {
         var tasks = new List<Task<(bool success, string msg)>>();
         foreach (var item in list)
@@ -290,7 +238,7 @@ public abstract class LzItemsViewModel<TVM, TDTO, TModel> : LzViewModel, INotify
                     ViewModels![id] = vm;
                 vm.State = LzItemViewModelState.Current;
                 if (AutoReadChildren)
-                    tasks.Add(ViewModels![id].ReadChildrenAsync(forceload, storageAPI));
+                    tasks.Add(ViewModels![id].ReadChildrenAsync(forceload));
             }
             catch
             {

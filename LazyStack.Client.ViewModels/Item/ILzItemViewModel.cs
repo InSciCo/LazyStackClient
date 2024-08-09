@@ -21,20 +21,20 @@ public interface ILzItemViewModel<TModel>
     public bool IsDeleted { get; }
     public bool IsDirty { get; set; }
     public ILzParentViewModel? ParentViewModel { get; set; }
-    public void CheckAuth(StorageAPI storageAPI);   
+    public void CheckAuth();   
 
     // Public Methods
-    public Task<(bool, string)> CreateAsync(string? id,StorageAPI storageAPI = StorageAPI.Default);
-    public Task<(bool, string)> ReadAsync(string id, StorageAPI storageAPI = StorageAPI.Default);
-    public Task<(bool, string)> ReadAsync(StorageAPI storageAPI = StorageAPI.Default);
-    public Task<(bool, string)> UpdateAsync(string? id, StorageAPI storageAPI = StorageAPI.Default);
-    public Task<(bool, string)> SaveEditAsync(string? id, StorageAPI storageAPI = StorageAPI.Default);
-    public Task<(bool, string)> DeleteAsync(string id, StorageAPI storageAPI = StorageAPI.Default);
+    public Task<(bool, string)> CreateAsync(string? id);
+    public Task<(bool, string)> ReadAsync(string id);
+    public Task<(bool, string)> ReadAsync();
+    public Task<(bool, string)> UpdateAsync(string? id);
+    public Task<(bool, string)> SaveEditAsync(string? id);
+    public Task<(bool, string)> DeleteAsync(string id);
     public void OpenEdit(bool forceCopy = false);
     public Task OpenEditAsync(bool forceCopy = false);
     public Task<(bool, string)> CancelEditAsync();
     public bool Validate();
-    public Task<(bool, string)> ReadChildrenAsync(bool forceload, StorageAPI storageAPI);
+    public Task<(bool, string)> ReadChildrenAsync(bool forceload);
 
 
 }

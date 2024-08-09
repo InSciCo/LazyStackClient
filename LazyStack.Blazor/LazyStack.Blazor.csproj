@@ -11,6 +11,7 @@
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Content Remove="BlazorStaticAssets.cs" />
 	  <Content Remove="Components\Msg.cs" />
 	</ItemGroup>
 

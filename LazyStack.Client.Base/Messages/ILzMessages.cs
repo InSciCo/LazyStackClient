@@ -61,10 +61,10 @@ public interface ILzMessages : INotifyPropertyChanged
     /// Set the OSAccess object. This object abstracts the method 
     /// used to load the message files.
     /// </summary>
-    /// <param name="oSAccess"></param>
+    /// <param name="staticAssets"></param>
     /// </summary>
-    /// <param name="oSAccess"></param>
-	public void SetOSAccess(IOSAccess oSAccess);
+    /// <param name="staticAssets"></param>
+	public void SetStaticAssets(IStaticAssets staticAssets);
   
     /// <summary>
     /// Loads the specified message files for the specified culture and 

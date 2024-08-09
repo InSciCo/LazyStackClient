@@ -37,9 +37,9 @@
 
                 // We initialize the following because the DI container doens't have access
                 // to the JSRuntime until the first render in MAUI.
-                OSAccess.SetJSRuntime(JSRuntime);
                 InternetConnectivity.SetJSRuntime(JSRuntime);
-                Messages.SetOSAccess(OSAccess);
+                var staticAssets = new BlazorStaticAssets(new HttpClient());
+                Messages.SetStaticAssets(staticAssets);
 
                 await ClientConfig.ReadAuthConfigAsync(Host.Url + "config");
 

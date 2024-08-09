@@ -107,23 +107,23 @@ public abstract class LzItemViewModelAuthNotifications<TDTO, TModel> : LzItemVie
         }
     }
     
-    public override async Task<(bool, string)> ReadAsync(string id, StorageAPI storageAPI = StorageAPI.Default)
+    public override async Task<(bool, string)> ReadAsync(string id)
     {
-        var (success, msg) = await base.ReadAsync(id, storageAPI);
+        var (success, msg) = await base.ReadAsync(id);
         if(success)
             LastNotificationTick = UpdatedAt;
         return (success, msg);
     }
-    public override async Task<(bool, string)> UpdateAsync(string? id, StorageAPI storageAPI = StorageAPI.Default)
+    public override async Task<(bool, string)> UpdateAsync(string? id)
     {
-        var (success, msg) = await base.UpdateAsync(id, storageAPI);
+        var (success, msg) = await base.UpdateAsync(id);
         if (success)
             LastNotificationTick = UpdatedAt;
         return (success, msg);
     }
-    public override async Task<(bool, string)> SaveEditAsync(string? id, StorageAPI storageAPI = StorageAPI.Default)
+    public override async Task<(bool, string)> SaveEditAsync(string? id)
     {
-        var (success, msg) = await base.SaveEditAsync(id, storageAPI);
+        var (success, msg) = await base.SaveEditAsync(id);
         if (success)
             IsMerge = false;
         return (success, msg);

@@ -26,11 +26,11 @@
 
         // Public Methods
         public void Clear();
-        public Task<(bool, string)> ReadAsync(bool forceload = false, StorageAPI storageAPI = StorageAPI.DTO);
-        public Task<(bool, string)> ReadAsync(string parentId, bool forceload = false, StorageAPI storageAPI = StorageAPI.DTO);
+        public Task<(bool, string)> ReadAsync(bool forceload = false);
+        public Task<(bool, string)> ReadAsync(string parentId, bool forceload = false);
         public Task<(bool, string)> CancelCurrentViewModelEditAsync();
         public Task<(bool, string)> SaveCurrentViewModelAsync(string? id);
-        public void CheckAuth(StorageAPI storageAPI);
+        public void CheckAuth();
         public (TVM viewmodel, string id) NewViewModel(TDTO dto);
         public (TVM viewmodel, string id) NewViewModel(string key, TModel model);
         public (TVM viewmodel, string id) NewViewModel(string key, TDTO dto);

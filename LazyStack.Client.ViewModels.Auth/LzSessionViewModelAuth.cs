@@ -12,7 +12,7 @@ public abstract class LzSessionViewModelAuth : LzSessionViewModel, ILzSessionVie
         ILzClientConfig clientConfig, 
         IInternetConnectivitySvc internetConnectivity,
         ILzMessages messages
-        ) : base(oSAccess, internetConnectivity, messages)    
+        ) : base(internetConnectivity, messages)    
     {
         AuthProcess = authProcess ?? throw new ArgumentNullException(nameof(authProcess));    
 

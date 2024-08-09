@@ -47,27 +47,10 @@ public abstract class LzItemsViewModelBase<TVM, TDTO, TModel> : LzViewModelBase,
 public abstract class LzItemsViewModelNotificationsBase<TVM, TDTO, TModel> :  LzItemsViewModelBase<TVM, TDTO, TModel>,  INotifyCollectionChanged, ILzItemsViewModelNotificationsBase<TVM, TDTO, TModel>
 ```
 
-## StoreageAPI 
-LzItemViewModelBase and LzItemsViewModelBase both have a StorageAPI property. This is a reference to the 
-StorageAPI that is used for CRUDL operations. 
-```
-public enum StorageAPI
-{
-    Default, // Usually DTO API
-    DTO, // API calls, usually database access, generally requires auth
-    Model, // Manpulate Model objects, primarly used for updating in memory objects. Rarely used. Somewhat experimental.
-    S3, // bucket access, generally requireds auth
-    Http, // limited to gets, no auth
-    Local, // local device storage
-    Content, // _content access
-    None // Use for updating data in place.
-}
-```
-
 
 ## Service APIs 
 When you create a ViewModel, you will need to provide a ServiceAPI. This is the API that is used to perform 
-CRUDL operations. Here are the ServiceAPIs that are available, some have default implementations, some do not. 
+CRUDL operations. 
 
 ### LzItemViewModelBase 
 
@@ -79,40 +62,6 @@ DTO Access
 - _DTOUpdateAsync(DTO)
 - _DTODeleteIdAsync(Id)
  
-Model Access 
-- _ModelCreateAsync(DTO)
-- _ModelCreateIdAsync(Id,DTO)
-- _ModelReadAsync(), this.Id to read the item 
-- _ModelReadIdAsync(Id)
-- _ModelUpdateAsync(DTO)
-- _ModelDeleteIdAsync(Id)
-
-
-S3 Access 
-- _S3CreateIdAsync(s3objectname) = IContentAccess.S3CreateIdAsync(s3objectname)
-- _S3ReadIdAsync(s3objectname) = IContentAccess.S3ReadIdAsync(s3objectname)
-- _S3UpdateIdAsync(s3objectname) = IContentAccess.S3UpdateIdAsync(s3objectname)
-- _S3DeleteIdAsync(s3objectname) = IContentAccess.S3DeleteIdAsync(s3objectname)
-
-Http Access 
-- _HttpSvcReadIdAsync(url) = IContentAccess.HttpSvcReadIdAsync(url)
-
-Local Access
-- _LocalSvcCreateIdAsync(filename,filecontent)
-- _LocalSvcReadIdAsync(filename)
-- _LocalSvcUpdateIdAsync(filename,filecontent)
-- _LocalSvcDeleteIdAsync(filename)
-
-Content Access
-- ContentSvcReadIdAsync(filename) // ex: "_content/MyApp/MyFile.txt"
-
-For a Blazor app, content is retrieved from the http server and cached in the browser. If the Blazor app is a PWA, then the service-worker will pre-cache content so it is available offline.
-
-For a MAUI app, content is packaged with the app and is available offline in the BlazorWebView. MAUI code does not have direct access this content. However, you can use JS Interop to fetch static content from a "_content/*" source.
- 
-Internal
-- User  implemented methods. Override the default CRUD implementations you want to use. 
-
 
 ## Notes on manipulating Nested Classes
 It is common to manipulate a document that contains nested data types. Our main approach to handling this situation is to create a class for that document that implements Create, Read, Update and Delete methods with the same signature as a DTO service interface. 
@@ -121,7 +70,7 @@ An example of when this approach is useful is when you load a DTO from a service
 
 If your database doesn't contain types with nested types, you use the DTO service directly. If you have nested types, you have two choices:
 - Create a ViewModel for the type.
-  - Create a class that provides the Create, Read, Update and Delete methods for the nested classes.
+- Create a class that provides the Create, Read, Update and Delete methods for the nested classes.
  
 ## How to use the ViewModel Classes
 ItemsViewModel manages a list of ItemViewModel instances.
@@ -176,11 +125,6 @@ Notes:
 - MakeDataCopy() ```{_DataCopyJson = JsonConvert.SerializeObject((TDTO)Data);}``` Please note that only the DTO properties are copied. You can defeat this behavior by overloading the MakeDataCopy() method but you usually don't want to do that. Often, the additional properties are ItemsViewModels and you don't want to serialize ViewModels.
 - RestoreFromDataCopy() ```{JsonConvert.PopulateObject(_DataCopyJson, Data);}```
 
-Notes: 
-- StoreageAPi.Model is used when the ViewModel references a existing class instance of type DTO or TModel. The _ModelCreateAsync, _ModelReadAsync, _ModelUpdateAsync and _ModelDeleteAsync methods are provided for implementing side effects only. For instance, you may want to do a referential integrity check.
-- When created with a dto value, a protected property __DTO is set. 
-- When Update() is called and _DTO is not null, the default implementation of _ModelUpdateAsync() does a deep clone of the Model to the DTO. This avoids having to know the parent class containing the DTO instance. If the target DTO has event subscriptions, then you should override the _ModelUpdateAsync() to use JSON serialization to do the update instead. eg: ```JsonConvert.PopulateObject(JsonConvert.SerializeObject((TDTO) Data))```. 
-- TModel may contain additional properties that are not in the DTO. 
    
 
 

@@ -16,7 +16,7 @@ public enum LzMessageUnits { Imperial, Metric }
 /// External message resources are culture specific with a sufix determining the 
 /// culture of the messages. ex: "_content/{assembly}/LzMessages.en-US.json".s
 /// Message resources are loaded using IOSAccess.ContentReadAsync so 
-/// you need to call SetOSAccess before loading external message resources. 
+/// you need to call SetStaticAssets before loading external message resources. 
 /// 
 /// To load external message resources:
 /// 1. Set the MessageDocs property to the list of message files. ex:
@@ -26,7 +26,7 @@ public enum LzMessageUnits { Imperial, Metric }
 ///     "_content/Tenancy/MyApp/messages.json", // tenant messages override data messages
 ///     "_content/Tenancy/MyApp/inventory.json // tenant inventory override data inventory
 ///     };
-/// 2. Call SetOSAccess() with an IOSAccess object. 
+/// 2. Call SetStaticAssets() with an IOSAccess object. 
 /// 3. Call SetMessageSetAsync("en-US, LzMessageUnits.Imperial") with the culture 
 ///    and units to load the specific language files and make the "message set" current.
 /// 
@@ -96,7 +96,7 @@ public class LzMessages : NotifyBase, ILzMessages
     #endregion
 
     #region protected properties
-    protected IOSAccess? _oSAccess;
+    protected IStaticAssets? _staticAssets;
     /// <summary>
     /// Key is culture, value is LzMessageSet
     /// </summary>
@@ -109,15 +109,15 @@ public class LzMessages : NotifyBase, ILzMessages
         RefreshCount++;
     }
     /// <inheritdoc />
-    public void SetOSAccess(IOSAccess oSAccess)
+    public void SetStaticAssets(IStaticAssets staticAssets)
     {
-        _oSAccess = oSAccess;
+        _staticAssets = staticAssets;
     }
 
     /// <inheritdoc />
     public async Task SetMessageSetAsync(string culture, LzMessageUnits units)
     {
-        if (_oSAccess == null)
+        if (_staticAssets == null)
             throw new InvalidOperationException("SetOSAccess must be called before SetMessageSetAsync");
 
         //if (DefaultMessages == null)
@@ -144,7 +144,7 @@ public class LzMessages : NotifyBase, ILzMessages
 
         DefaultMessages ??= MessageSet;
         MessageSet.AssetsUrl = AssetsUrl;
-        await MessageSet.LoadMessagesAsync(MessageFiles, _oSAccess);
+        await MessageSet.LoadMessagesAsync(MessageFiles, _staticAssets);
 		// await SetImageSetAsync(culture);
 	}
 
@@ -154,7 +154,7 @@ public class LzMessages : NotifyBase, ILzMessages
         if (string.IsNullOrEmpty(key)) return "";
         try
         {
-            if (_oSAccess == null)
+            if (_staticAssets == null)
                 return "";
             var msg = MessageSet.Msg(key, unitsArg);
             if (msg.Equals(key))

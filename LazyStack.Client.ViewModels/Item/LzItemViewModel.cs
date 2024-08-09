@@ -19,24 +19,7 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
         CanDelete = true;
         IsLoaded = false;
         IsDirty = false;
-
-        // Assign default storage API handlers
-        _ContentReadIdAsync = sessionViewModel.OSAccess.ReadContentAsync;
-        _S3CreateIdAsync = sessionViewModel.OSAccess.S3CreateAsync;
-        _S3ReadIdAsync = sessionViewModel.OSAccess.S3ReadAsync;
-        _S3UpdateIdAsync = sessionViewModel.OSAccess.S3UpdateAsync;
-        _S3DeleteIdAsync = sessionViewModel.OSAccess.S3DeleteAsync;
-        _LocalCreateIdAsync = sessionViewModel.OSAccess.LocalCreateAsync;
-        _LocalReadIdAsync = sessionViewModel.OSAccess.LocalReadAsync;
-        _LocalUpdateIdAsync = sessionViewModel.OSAccess.LocalUpdateAsync;
-        _LocalDeleteIdAsync = sessionViewModel.OSAccess.LocalDeleteAsync;
-        _HttpReadIdAsync = sessionViewModel.OSAccess.HttpReadAsync;
-        _ModelCreateAsync = ModelCreateAsync;
-        _ModelReadIdAsync = ModelReadAsync;
-        _ModelUpdateAsync = ModelUpdateAsync;
-        _ModelDeleteIdAsync = ModelDeleteAsync;
-        _ModelUpdateIdAsync = ModelUpdateIdAsync;
-        
+       
 
         this.WhenAnyValue(x => x.State, (x) => x == LzItemViewModelState.New)
             .ToPropertyEx(this, x => x.IsNew);
@@ -99,7 +82,6 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
     protected string _EntityName { get; init; } = string.Empty;
     protected string _DataCopyJson = string.Empty;
     // Storage 
-    protected StorageAPI _StorageAPI { get; init; }
     // DTO access - requires authentication
     protected Func<TDTO, Task<TDTO>>? _DTOCreateAsync { get; init; } // Assumes storage Id is in TDTO
     protected Func<string, TDTO, Task<TDTO>>? _DTOCreateIdAsync { get; init; } // Assumes storage Id is passed separate from TDTO
@@ -108,35 +90,6 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
     protected Func<TDTO, Task<TDTO>>? _DTOUpdateAsync { get; init; } // Assumes storage Id is in TDTO
     protected Func<string, TDTO, Task<TDTO>>? _DTOUpdateIdAsync { get; init; } // Assumes storage Id is passed separate from TDTO
     protected Func<string, Task>? _DTODeleteIdAsync { get; init; }
-    // S3 access - requires authentication
-    // Id is S3 bucket reference
-    protected Func<string, string, Task>? _S3CreateIdAsync { get; init; }
-    protected Func<string, Task<string>>? _S3ReadIdAsync { get; init; }
-    protected Func<string, string, Task>? _S3UpdateIdAsync { get; init; }
-    protected Func<string, Task>? _S3DeleteIdAsync { get; init; }
-    // Local storage access
-    // Id is full path reference
-    protected Func<string, string, Task>? _LocalCreateIdAsync { get; init; }
-    protected Func<string, Task<string>>? _LocalReadIdAsync { get; init; }
-    protected Func<string, string, Task>? _LocalUpdateIdAsync { get; init; }
-    protected Func<string, Task>? _LocalDeleteIdAsync { get; init; }
-    // _content access 
-    // Id is something like "_content/library/somefile"
-    // WASM implements this using HttpClient - assumes resource is under wwwroot
-    // MAUI implements this using FileSystem.OpenAppPackageFileAsync(id)
-    protected Func<string, Task<string>>? _ContentReadIdAsync { get; init; }
-    // Http access - general http calls
-    // Id is URL
-    protected Func<string, Task<string>>? _HttpReadIdAsync { get; init; }
-
-    // Model access - no authentication
-    protected Func<TModel, Task<TModel>>? _ModelCreateAsync { get; init; } // Assumes storage Id is in TDTO
-    protected Func<string, TModel, Task<TModel>>? _ModelCreateIdAsync { get; init; } // Assumes storage Id is passed separate from TDTO
-    protected Func<string, Task<TModel>>? _ModelReadIdAsync { get; init; }
-    protected Func<Task<TModel>>? _ModelReadAsync { get; init; } // Read using this.Id
-    protected Func<TModel, Task<TModel>>? _ModelUpdateAsync { get; init; } // Assumes storage Id is in TDTO
-    protected Func<string, TModel, Task<TModel>>? _ModelUpdateIdAsync { get; init; } // Assumes storage Id is passed separate from TDTO
-    protected Func<string, Task>? _ModelDeleteIdAsync { get; init; }
     protected void CheckId(string? id)
     {
         if (id is null)
@@ -144,15 +97,11 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
     }
 
     // Public Methods
-    public virtual void CheckAuth(StorageAPI storageAPI)
+    public virtual void CheckAuth()
     {
     }
-    public virtual async Task<(bool, string)> CreateAsync(string? id, StorageAPI storageAPI = StorageAPI.Default)
+    public virtual async Task<(bool, string)> CreateAsync(string? id)
     {
-        if (storageAPI == StorageAPI.Default)
-            storageAPI = (_StorageAPI == StorageAPI.Default) 
-                ? StorageAPI.DTO
-                : _StorageAPI;
 
         try
         {
@@ -170,65 +119,22 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
             if (!Validate())
                 throw new Exception("Validation failed.");
 
-            CheckAuth(storageAPI);
+            CheckAuth();
 
-            // Perform storage operation
-            switch (storageAPI)
+            if (id is null)
             {
-                case StorageAPI.DTO:
-                    if (id is null)
-                    {
-                        if (_DTOCreateAsync == null)
-                            throw new Exception("SvcCreateAsync not assigned.");
-                        item = await _DTOCreateAsync(item!);
-                    }
-                    else
-                    {
-                        if (_DTOCreateIdAsync == null)
-                            throw new Exception("SvcCreateIdAsync not assigned.");
-                        CheckId(id);
-                        item = await _DTOCreateIdAsync(id!, item!);
-                    }
-                    UpdateData(item);
-                    break;
-                case StorageAPI.S3:
-                    if (_S3CreateIdAsync == null)
-                        throw new Exception("S3SvcCreateIdAsync not assigned.");
-                    CheckId(id);
-                    var s3Text = JsonConvert.SerializeObject(item);
-                    await _S3CreateIdAsync(id!, s3Text!);
-                    break;
-                case StorageAPI.Http:
-                    throw new Exception("HttpSvcCreateIdAsync is not supported.");
-                case StorageAPI.Content:
-                    throw new Exception("ContentSvcCreateIdAsync is not supported.");
-                case StorageAPI.Local:
-                    if (_LocalCreateIdAsync == null)
-                        throw new Exception("LocalSvcCreateIdAsync not assigned.");
-                    CheckId(id);
-                    var localText = JsonConvert.SerializeObject(item);
-                    await _LocalCreateIdAsync(id!,localText!);
-                    break;
-                case StorageAPI.Model:
-                    if (id is null)
-                    {
-                        if (_ModelCreateAsync == null)
-                            throw new Exception("InternalCreateAsync not assigned.");
-                        await _ModelCreateAsync(Data!);
-                    }
-                    else
-                    {
-                        if (_ModelCreateIdAsync == null)
-                            throw new Exception("InternalCreateIdAsync not assigned.");
-                        CheckId(id);
-                        await _ModelCreateIdAsync(id!, Data!);
-                    }
-                    UpdateData(Data);
-                    break;
-                case StorageAPI.None:
-                    break;
-
+                if (_DTOCreateAsync == null)
+                    throw new Exception("CreateAsync not assigned.");
+                item = await _DTOCreateAsync(item!);
             }
+            else
+            {
+                if (_DTOCreateIdAsync == null)
+                    throw new Exception("CreateIdAsync not assigned.");
+                CheckId(id);
+                item = await _DTOCreateIdAsync(id!, item!);
+            }
+            UpdateData(item);
 
             State = LzItemViewModelState.Current;
             return (true, string.Empty);
@@ -238,71 +144,25 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
             return (false, Log(MethodBase.GetCurrentMethod()!, ex.Message));
         }
     }
-    public virtual async Task<(bool, string)> ReadAsync(string id, StorageAPI storageAPI = StorageAPI.Default)
+    public virtual async Task<(bool, string)> ReadAsync(string id)
     {
-        if (storageAPI == StorageAPI.Default)
-            storageAPI = (_StorageAPI == StorageAPI.Default)
-                ? StorageAPI.DTO
-                : _StorageAPI;
         var userMsg = "Can't load " + _EntityName;
         try
         {
             if (!CanRead) 
                 throw new Exception("Read not authorized");
 
-            CheckAuth(storageAPI);
+            CheckAuth();
             CheckId(id);
 
             // Perform storage operation
-            switch (storageAPI)
-            {
-                case StorageAPI.DTO:
-                    if (_DTOReadIdAsync == null)
-                        throw new Exception("SvcReadIdAsync not assigned.");
-                    UpdateData(await _DTOReadIdAsync(id));
-                    break;
-                case StorageAPI.S3:
-                    if (_S3ReadIdAsync == null)
-                        throw new Exception("S3SvcReadIdAsync not assigned.");
-                    var s3Text = await _S3ReadIdAsync(id);
-                    var s3Item = JsonConvert.DeserializeObject<TDTO>(s3Text);
-                    UpdateData(s3Item!);
-                    break;
-                case StorageAPI.Http:
-                    if (_HttpReadIdAsync == null)
-                        throw new Exception("HttpSvcReadIdAsync not assigned.");
-                    var httpText = await _HttpReadIdAsync(id);
-                    var httpItem = JsonConvert.DeserializeObject<TDTO>(httpText);
-                    UpdateData(httpItem!);
-                    break;
-                case StorageAPI.Content:
-                    if (_ContentReadIdAsync == null)
-                        throw new Exception("ContentSvcReadIdAsync not assigned.");
-                    var contentText = await _ContentReadIdAsync(id);
-                    var contextItem = JsonConvert.DeserializeObject<TDTO>(contentText);
-                    UpdateData(contextItem!);
-                    break;
-                case StorageAPI.Local:
-                    if (_LocalReadIdAsync == null)
-                        throw new Exception("LocalSvcReadIdAsync not assigned.");
-                    var localText = await _LocalReadIdAsync(id);
-                    var localItem = JsonConvert.DeserializeObject<TDTO>(localText);
-                    UpdateData(localItem!);
-                    break;
-                case StorageAPI.Model:
-                    if (_ModelReadIdAsync == null)
-                        throw new Exception("InternalReadIdAsync not assigned.");
-                    UpdateData(await _ModelReadIdAsync(id));
-                    break;
-                case StorageAPI.None:
-                    break;
-                
-            }
-            
+            if (_DTOReadIdAsync == null)
+                throw new Exception("SvcReadIdAsync not assigned.");
+            UpdateData(await _DTOReadIdAsync(id));
             State = LzItemViewModelState.Current;
 
             if (AutoLoadChildren)
-                return await ReadChildrenAsync(forceload: true, storageAPI);
+                return await ReadChildrenAsync(forceload: true);
 
             return (true, string.Empty);
         }
@@ -315,47 +175,21 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
     // ReadAsync without an Id is used to read from an API, often where  the API uses the 
     // logged in identity of the caller as an id for data retrieval. The identity of the 
     // caller is contained in the JWT or Authentication Signature so as to make it 
-    // impossible for a sniffer to see the id of the data requested. Currently, this is 
-    // relevant to the DTO API but we may extend it to the S3 service as well.
-    public virtual async Task<(bool, string)> ReadAsync(StorageAPI storageAPI = StorageAPI.Default)
+    // impossible for a sniffer to see the id of the data requested. 
+    public virtual async Task<(bool, string)> ReadAsync()
     {
-        if (storageAPI == StorageAPI.Default)
-            storageAPI = (_StorageAPI == StorageAPI.Default)
-                ? StorageAPI.DTO
-                : _StorageAPI;
         try
         {
             if (!CanRead)
                 throw new Exception("Read not authorized");
 
-            CheckAuth(storageAPI);
+            CheckAuth();
 
             // Perform storage operation
-            switch (storageAPI)
-            {
-                case StorageAPI.DTO:
-                    if (_DTOReadAsync == null)
-                        throw new Exception("SvcReadAsync not assigned.");
-                    UpdateData(await _DTOReadAsync());
-                    break;
-                case StorageAPI.S3:
-                    throw new Exception("S3SvcReadAsync not supported. Use S3SvcReadIdAsync instead.");
-                case StorageAPI.Http:
-                    throw new Exception("HttpSvcReadAsync not supported. Use HttpSvcReadIdAsync instead.");
-                case StorageAPI.Content:
-                    throw new Exception("ContentSvcReadAsync not supported. Use ContentSvcReadIdAsync instead.");
-                case StorageAPI.Local:
-                    throw new Exception("LocalSvcReadAsync not supported. Use LocalSvcReadIdAsync instead.");
-                case StorageAPI.Model:
-                    if (_ModelReadAsync == null)
-                        throw new Exception("InternalReadAsync not assigned.");
-                    UpdateData(await _ModelReadAsync());
-                    break;
-                case StorageAPI.None:
-                    break;
+            if (_DTOReadAsync == null)
+                throw new Exception("SvcReadAsync not assigned.");
+            UpdateData(await _DTOReadAsync());
 
-
-            }
             // Id = Data!.Id;
             State = LzItemViewModelState.Current;
             IsLoaded = true;
@@ -366,16 +200,11 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
             return (false, Log(MethodBase.GetCurrentMethod()!, ex.Message));
         }
     }
-    public virtual async Task<(bool, string)> UpdateAsync(string? id, StorageAPI storageAPI = StorageAPI.Default)
+    public virtual async Task<(bool, string)> UpdateAsync(string? id)
     {
-        if (storageAPI == StorageAPI.Default)
-            storageAPI = (_StorageAPI == StorageAPI.Default)
-                ? StorageAPI.DTO
-                : _StorageAPI;
-
         try
         {
-            if (!CanUpdate) 
+            if (!CanUpdate)
                 throw new Exception("Update not authorized");
 
             // Todo: Review usecases to see if we need this.
@@ -388,60 +217,20 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
             if (!Validate())
                 throw new Exception("Validation failed.");
 
-            CheckAuth(storageAPI);
+            CheckAuth();
 
-            switch(storageAPI)
+            if (id is null)
             {
-                case StorageAPI.DTO:
-                    if(id is null)
-                    {
-                        if (_DTOUpdateAsync == null)
-                            throw new Exception("SvcUpdateAsync is not assigned.");
-                        UpdateData(await _DTOUpdateAsync((TDTO)Data!));
-                    }
-                    else
-                    {
-                        if (_DTOUpdateIdAsync == null)
-                            throw new Exception("SvcUpdateIdAsync is not assigned.");
-                        CheckId(id);
-                        UpdateData(await _DTOUpdateIdAsync(id,(TDTO)Data!));
-                    }
-                    break;
-                case StorageAPI.S3:
-                    if (_S3UpdateIdAsync == null)
-                        throw new Exception("S3SvcUpdateIdAsync is not assigned.");
-                    CheckId(id);
-                    var s3Text = JsonConvert.SerializeObject(Data);
-                    await _S3UpdateIdAsync(id!, s3Text);
-                    break;
-                case StorageAPI.Http:
-                    throw new Exception("HttpSvcUpdateIdAsync is not supported.");
-                case StorageAPI.Content:
-                    throw new Exception("ContentSvcUpdateIdAsync is not supported.");
-                case StorageAPI.Local:
-                    if (_LocalUpdateIdAsync == null)
-                        throw new Exception("LocalSvcUpdateIdAsync is not assigned.");
-                    CheckId(id);
-                    var localText = JsonConvert.SerializeObject(Data);
-                    await _LocalUpdateIdAsync(id!,localText);
-                    break;
-                case StorageAPI.Model:
-                    if (id is null)
-                    {
-                        if (_ModelUpdateAsync == null)
-                            throw new Exception("InternalUpdateAsync is not assigned.");
-                        UpdateData(await _ModelUpdateAsync(Data!));
-                    }
-                    else
-                    {
-                        if (_ModelUpdateIdAsync == null)
-                            throw new Exception("InternalUpdateIdAsync is not assigned.");
-                        CheckId(id);
-                        UpdateData(await _ModelUpdateIdAsync(id,Data!));
-                    }
-                    break;
-                case StorageAPI.None:
-                    break;
+                if (_DTOUpdateAsync == null)
+                    throw new Exception("SvcUpdateAsync is not assigned.");
+                UpdateData(await _DTOUpdateAsync((TDTO)Data!));
+            }
+            else
+            {
+                if (_DTOUpdateIdAsync == null)
+                    throw new Exception("SvcUpdateIdAsync is not assigned.");
+                CheckId(id);
+                UpdateData(await _DTOUpdateIdAsync(id, (TDTO)Data!));
             }
             State = LzItemViewModelState.Current;
             return (true, string.Empty);
@@ -451,14 +240,14 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
             return (false, Log(MethodBase.GetCurrentMethod()!, ex.Message));
         }
     }
-    public virtual async Task<(bool, string)> SaveEditAsync(string? id, StorageAPI storageAPI = StorageAPI.Default)
+    public virtual async Task<(bool, string)> SaveEditAsync(string? id)
     {
         try
         {
             var (success, msg) =
                 State == LzItemViewModelState.New
-                ? await CreateAsync(id, storageAPI)
-                : await UpdateAsync(id, storageAPI);
+                ? await CreateAsync(id)
+                : await UpdateAsync(id);
 
             State = LzItemViewModelState.Current;
             IsLoaded = true;
@@ -469,13 +258,8 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
             return (false, Log(MethodBase.GetCurrentMethod()!, ex.Message));
         }
     }
-    public virtual async Task<(bool,string)> DeleteAsync(string id, StorageAPI storageAPI = StorageAPI.Default)
+    public virtual async Task<(bool,string)> DeleteAsync(string id)
     {
-        if (storageAPI == StorageAPI.Default)
-            storageAPI = (_StorageAPI == StorageAPI.Default)
-                ? StorageAPI.DTO
-                : _StorageAPI;
-
         try
         {
             if (!CanDelete)
@@ -484,37 +268,11 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
             if (State != LzItemViewModelState.Current)
                 throw new Exception("State != Current");
 
-            CheckAuth(storageAPI);
+            CheckAuth();
             CheckId(id); 
-            switch(storageAPI)
-            {
-                case StorageAPI.DTO:
-                    if (_DTODeleteIdAsync == null)
-                        throw new Exception("SvcDelete(id) is not assigned.");
-                    await _DTODeleteIdAsync(Id!);
-                    break;
-                case StorageAPI.S3:
-                    if (_S3DeleteIdAsync == null)
-                        throw new Exception("S3SvcDelete(id) is not assigned.");
-                    await _S3DeleteIdAsync(Id!);
-                    break;
-                case StorageAPI.Http:
-                    throw new Exception("HttpSvcDelete(id) is not supported.");
-                case StorageAPI.Content:
-                    throw new Exception("ContentSvcDelete(id) is not supported.");
-                case StorageAPI.Local:
-                    if (_LocalDeleteIdAsync == null)
-                        throw new Exception("LocalSvcDelete(id) is not assigned.");
-                    await _LocalDeleteIdAsync(Id!);
-                    break;
-                case StorageAPI.Model:
-                    if (_ModelDeleteIdAsync == null)
-                        throw new Exception("InternalDelete(id) is not assigned.");
-                    await _ModelDeleteIdAsync(Id!);
-                    break;
-                case StorageAPI.None:
-                    break;
-            }
+            if (_DTODeleteIdAsync == null)
+                throw new Exception("SvcDelete(id) is not assigned.");
+            await _DTODeleteIdAsync(Id!);
 
             State = LzItemViewModelState.Deleted;
             Data = null;
@@ -566,7 +324,7 @@ public abstract class LzItemViewModel<TDTO, TModel> : LzViewModel, ILzItemViewMo
         return true;
     }
 
-    public virtual async Task<(bool, string)> ReadChildrenAsync(bool forceload, StorageAPI storageAPI)
+    public virtual async Task<(bool, string)> ReadChildrenAsync(bool forceload)
     {
         await Task.Delay(0);
         return (true, string.Empty);

@@ -15,6 +15,7 @@
 	  <Compile Remove="ILzMessages.cs" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Content Remove="IStaticAssets.cs" />
 	  <Content Remove="Messages\MsgItemModel.cs" />
 	  <Content Remove="Messages\MsgItemsModel.cs" />
 	</ItemGroup>
