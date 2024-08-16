@@ -145,7 +145,6 @@ public class LzMessages : NotifyBase, ILzMessages
         DefaultMessages ??= MessageSet;
         MessageSet.AssetsUrl = AssetsUrl;
         await MessageSet.LoadMessagesAsync(MessageFiles, _staticAssets);
-		// await SetImageSetAsync(culture);
 	}
 
     /// <inheritdoc />
@@ -160,11 +159,12 @@ public class LzMessages : NotifyBase, ILzMessages
             if (msg.Equals(key))
                 msg = DefaultMessages?.Msg(key, unitsArg) ?? key;
 
+            // Will have to change later!
             if (Uri.TryCreate(msg, UriKind.Absolute, out _))
                 return msg;
 
             bool activeMsgItemsModel = false;
-            bool isCurrentMsgItemModel = false;
+			bool isCurrentMsgItemModel = false;
             if (MessageSet.MsgItemsModels.TryGetValue(key, out var msgItemsModel))
             {
                 activeMsgItemsModel = msgItemsModel.Dirty;
@@ -172,6 +172,7 @@ public class LzMessages : NotifyBase, ILzMessages
             }
             var activeMsgIsDirtyClass = activeMsgItemsModel ? "static-content-is-dirty" : "";
             var isCurrentMessageClass = isCurrentMsgItemModel ? "static-content-is-current" : "";
+
             if (UseInspect && !ignoreUseInspect)
                 msg = $"<span class=\"static-content-message {activeMsgIsDirtyClass} {isCurrentMessageClass}\" key=\"{key}\">{msg}</span>";
             return msg;
